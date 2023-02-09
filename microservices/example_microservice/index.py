@@ -12,7 +12,7 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 db = SQLAlchemy(app)
 
 
-# class definition for Book
+# class definition for Booksss
 # inherits from db.Model
 class Book(db.Model):
 
