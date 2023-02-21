@@ -1,0 +1,3 @@
+[submodule "microservices/isimud"]
+	path = microservices/isimud
+	url = https://github.com/tropicbliss/isimud.git
