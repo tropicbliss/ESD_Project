@@ -1,9 +1,0 @@
-autopep8==2.0.1
-flask-cors==3.0.10
-flask-sqlalchemy==3.0.2
-flask==2.2.2
-mysql-connector-python==8.0.32
-pylint==2.16.1
-pylint-flask==0.6
-pylint-flask-sqlalchemy==0.2.0
-requests==2.28.2
