@@ -1,6 +1,0 @@
-[submodule "microservices/isimud"]
-	path = microservices/isimud
-	url = https://github.com/tropicbliss/isimud.git
-[submodule "microservices/--force"]
-	path = microservices/--force
-	url = https://github.com/tropicbliss/isimud
