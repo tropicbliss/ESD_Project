@@ -2,7 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const Filter = require("bad-words");
 
-const PORT = 3000;
+const PORT = parseInt(process.env.PORT);
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));

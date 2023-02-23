@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  censorer:
+    build:
+      context: censorer
+    restart: always
+    environment:
+      PORT: 3000
