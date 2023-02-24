@@ -89,8 +89,7 @@ def update_user_data():
             return jsonify({
                 "message": "contactNo is invalid"
             }), 400
-        else:
-            user.contactNo = data["contactNo"]
+        user.contactNo = data["contactNo"]
         db.session.commit()
         return jsonify(
             {
