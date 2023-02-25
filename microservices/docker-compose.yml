@@ -12,5 +12,5 @@ services:
       context: user
     restart: always
     environment:
-      DATABASE_URI: mysql+mysqlconnector://root@localhost:3306/esdproject
+      DATABASE_URI: mysql+mysqlconnector://root@host.docker.internal:3306/esdproject
       PORT: 3000
