@@ -16,11 +16,15 @@ services:
       PORT: 3000
     depends_on:
       - mysqluser
+    networks:
+      - my-net
   comments:
     image: comments
     restart: always
     depends_on:
       - mysqlcomments
+    networks:
+      - my-net
   mysqluser:
     image: mysql:8.0.22
     environment:
@@ -30,6 +34,8 @@ services:
     restart: always
     volumes:
       - ./mysqluser:/var/lib/mysql
+    networks:
+      - my-net
   mysqlcomments:
     image: mysql:8.0.22
     environment:
@@ -39,3 +45,9 @@ services:
     restart: always
     volumes:
       - ./mysqlcomments:/var/lib/mysql
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    driver: bridge
