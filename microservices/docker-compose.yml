@@ -28,6 +28,8 @@ services:
       MYSQL_DATABASE: user
       MYSQL_ROOT_PASSWORD: password
     restart: always
+    volumes:
+      - ./mysqluser:/var/lib/mysql
   mysqlcomments:
     image: mysql:8.0.22
     environment:
@@ -35,3 +37,5 @@ services:
       MYSQL_DATABASE: comments
       MYSQL_ROOT_PASSWORD: password
     restart: always
+    volumes:
+      - ./mysqlcomments:/var/lib/mysql
