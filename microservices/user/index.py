@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from email_validator import validate_email, EmailNotValidError
 import re
 import os
+from ariadne import load_schema_from_path, make_executable_schema, graphql_sync, snake_case_fallback_resolvers, ObjectType
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URI"]
@@ -15,18 +16,27 @@ class User(db.Model):
     __tablename__ = "user"
 
     name = db.Column(db.String(64), primary_key=True)
-    contactNo = db.Column(db.String(8), nullable=False)
+    contact_no = db.Column(db.String(8), nullable=False)
     email = db.Column(db.String(64), nullable=False)
 
     def json(self):
         return {
             "name": self.name,
-            "contactNo": self.contactNo,
+            "contact_no": self.contact_no,
             "email": self.email
         }
 
 
 db.create_all()
+
+type_defs = load_schema_from_path("schema.graphql")
+schema = make_executable_schema(type_defs, snake_case_fallback_resolvers)
+
+
+@app.post("/graphql")
+def graphql_server():
+    data = request.get_json()
+    success, result = graphql_sync(schema)
 
 
 @app.post("/create")
@@ -40,9 +50,9 @@ def create_new_user():
         return jsonify({
             "message": "email is invalid"
         }), 400
-    if not re.match(r'\b[689]\d{7}\b', user.contactNo):
+    if not re.match(r'\b[689]\d{7}\b', user.contact_no):
         return jsonify({
-            "message": "contactNo is invalid"
+            "message": "contact_no is invalid"
         }), 400
     if User.query.filter_by(name=user.name).first():
         return jsonify({
@@ -88,11 +98,11 @@ def update_user_data():
             return jsonify({
                 "message": "email is invalid"
             }), 400
-        if not re.match(r'\b[689]\d{7}\b', data["contactNo"]):
+        if not re.match(r'\b[689]\d{7}\b', data["contact_no"]):
             return jsonify({
-                "message": "contactNo is invalid"
+                "message": "contact_no is invalid"
             }), 400
-        user.contactNo = data["contactNo"]
+        user.contact_no = data["contact_no"]
         db.session.commit()
         return jsonify(
             {
