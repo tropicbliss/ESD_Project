@@ -47,6 +47,21 @@ services:
       - ./mysqlcomments:/var/lib/mysql
     networks:
       - my-net
+  esd-rabbit:
+    image: rabbitmq:3-management
+    restart: always
+    networks:
+      - my-net
+  logger:
+    build:
+      context: logging
+    restart: always
+    environment:
+      AMQP_ADDR: amqp://esd-rabbit:5672/%2f
+    networks:
+      - my-net
+    depends_on:
+      - esd-rabbit
 
 networks:
   my-net:
