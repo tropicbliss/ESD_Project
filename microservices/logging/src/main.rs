@@ -45,12 +45,12 @@ fn main() -> Result<()> {
             debug!(message=?delivery, "received message");
             if let Ok(delivery) = delivery {
                 async_global_executor::spawn(async move {
-                    let _ = delivery.ack(BasicAckOptions::default()).await;
                     let source = delivery.routing_key.as_str().split_once('.').unwrap().1;
-                    let raw_message = delivery.data;
-                    if let Ok(log_message) = String::from_utf8(raw_message) {
+                    let raw_message = &delivery.data;
+                    if let Ok(log_message) = std::str::from_utf8(raw_message) {
                         info!("{source} -> {log_message}");
                     }
+                    let _ = delivery.ack(BasicAckOptions::default()).await;
                 })
                 .detach();
             }
