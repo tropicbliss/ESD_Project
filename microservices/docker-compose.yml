@@ -12,5 +12,26 @@ services:
       context: user
     restart: always
     environment:
-      DATABASE_URI: mysql+mysqlconnector://root@host.docker.internal:3306/user
+      DATABASE_URI: mysql+mysqlconnector://root:password@mysqluser:3306/user
       PORT: 3000
+    depends_on:
+      - mysqluser
+  comments:
+    image: comments
+    restart: always
+    depends_on:
+      - mysqlcomments
+  mysqluser:
+    image: mysql:8.0.22
+    environment:
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: user
+      MYSQL_ROOT_PASSWORD: password
+    restart: always
+  mysqlcomments:
+    image: mysql:8.0.22
+    environment:
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: comments
+      MYSQL_ROOT_PASSWORD: password
+    restart: always
