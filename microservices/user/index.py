@@ -26,6 +26,9 @@ class User(db.Model):
         }
 
 
+db.create_all()
+
+
 @app.post("/create")
 def create_new_user():
     data = request.get_json()
@@ -103,4 +106,4 @@ def update_user_data():
 
 
 if __name__ == "__main__":
-    app.run(port=int(os.environ["PORT"]), debug=True)
+    app.run(port=int(os.environ["PORT"]), debug=False)

@@ -1,0 +1,21 @@
+schema {
+  query: Query
+}
+
+type UserResult {
+  success: Boolean!
+  errors: [String]
+  user: User
+}
+
+type User {
+  name: String!
+  contactNo: String!
+  email: String!
+}
+
+type Query {
+  getUser(name: String!): UserResult!
+  createUser(user: User!): UserResult!
+  updateUser(user: User!): UserResult!
+}
