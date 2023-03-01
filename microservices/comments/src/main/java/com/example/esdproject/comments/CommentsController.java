@@ -20,6 +20,6 @@ public class CommentsController {
 
     @GetMapping("/{id}")
     public Comments getComment(@PathVariable Integer id) {
-        return commentsRepository.findById(id).orElseThrow(() -> new CommentsNotFoundException(id));
+        return commentsRepository.findByGroomerId(id).orElseThrow(() -> new CommentsNotFoundException(id));
     }
 }

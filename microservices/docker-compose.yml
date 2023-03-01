@@ -62,6 +62,14 @@ services:
       - my-net
     depends_on:
       - esd-rabbit
+  appointments:
+    build:
+      context: appointments
+    restart: always
+    environment:
+      DB_URI: mongodb+srv://esduser:esdproject@esdproject.j8dxyud.mongodb.net/?retryWrites=true&w=majority
+    networks:
+      - my-net
 
 networks:
   my-net:

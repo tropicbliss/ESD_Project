@@ -1,0 +1,20 @@
+[package]
+name = "appointments"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.69"
+axum = "0.6.9"
+bson = "2.5.0"
+chrono = "0.4.23"
+futures = "0.3.26"
+mongodb = "2.3.1"
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.93"
+tokio = { version = "1.25.0", features = ["full"] }
+tracing = "0.1.37"
+tracing-subscriber = { version = "0.3.16", features = ["env-filter"] }
+uuid = "1.3.0"
