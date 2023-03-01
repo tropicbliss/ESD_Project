@@ -4,7 +4,7 @@ from email_validator import validate_email, EmailNotValidError
 import re
 import os
 from ariadne import load_schema_from_path, make_executable_schema, graphql_sync, snake_case_fallback_resolvers, ObjectType
-#trying to download all the functions
+
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URI"]
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
