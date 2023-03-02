@@ -12,39 +12,21 @@ services:
       context: user
     restart: always
     environment:
-      DATABASE_URI: mysql+mysqlconnector://root:password@mysqluser:3306/user
-      PORT: 3000
-    depends_on:
-      - mysqluser
+      DB_URI: mongodb+srv://esduser:esdproject@esdproject.j8dxyud.mongodb.net/?retryWrites=true&w=majority
+      DATABASE: esdproject
+      COLLECTION: user
+      ADDR: 0.0.0.0:5000
     networks:
       - my-net
   comments:
-    image: comments
+    build:
+      context: comments
     restart: always
-    depends_on:
-      - mysqlcomments
-    networks:
-      - my-net
-  mysqluser:
-    image: mysql:8.0.22
     environment:
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: user
-      MYSQL_ROOT_PASSWORD: password
-    restart: always
-    volumes:
-      - ./mysqluser:/var/lib/mysql
-    networks:
-      - my-net
-  mysqlcomments:
-    image: mysql:8.0.22
-    environment:
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: comments
-      MYSQL_ROOT_PASSWORD: password
-    restart: always
-    volumes:
-      - ./mysqlcomments:/var/lib/mysql
+      DB_URI: mongodb+srv://esduser:esdproject@esdproject.j8dxyud.mongodb.net/?retryWrites=true&w=majority
+      DATABASE: esdproject
+      COLLECTION: comments
+      ADDR: 0.0.0.0:5000
     networks:
       - my-net
   esd-rabbit:
@@ -68,6 +50,9 @@ services:
     restart: always
     environment:
       DB_URI: mongodb+srv://esduser:esdproject@esdproject.j8dxyud.mongodb.net/?retryWrites=true&w=majority
+      DATABASE: esdproject
+      COLLECTION: appointments
+      ADDR: 0.0.0.0:5000
     networks:
       - my-net
 
