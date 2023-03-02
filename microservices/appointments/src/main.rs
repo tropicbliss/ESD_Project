@@ -61,6 +61,28 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
+async fn does_groomer_exist(client: &HttpClient, id: &str) -> Result<bool, ApiError> {
+    Ok(client
+        .get(format!("http://groomer:5000/read/{id}"))
+        .send()
+        .await
+        .map_err(|_| ApiError::InternalError)?
+        .status()
+        .as_u16()
+        == 200)
+}
+
+async fn does_user_exist(client: &HttpClient, id: &str) -> Result<bool, ApiError> {
+    Ok(client
+        .get(format!("http://user:5000/read/{id}"))
+        .send()
+        .await
+        .map_err(|_| ApiError::InternalError)?
+        .status()
+        .as_u16()
+        == 200)
+}
+
 #[derive(Clone)]
 struct SharedState {
     db: Collection<Appointment>,
@@ -108,20 +130,9 @@ async fn get_user(
         picture_url: String,
     }
 
-    // Check if user_id exists
-    if !state
-        .http
-        .get(format!("http://user:5000/read/{user_id}"))
-        .send()
-        .await
-        .map_err(|_| ApiError::InternalError)?
-        .status()
-        .as_u16()
-        == 200
-    {
+    if !does_user_exist(&state.http, &user_id).await? {
         return Err(ApiError::UserDoesNotExist);
     }
-
     let filter = doc! {"user_id": user_id};
     let res = state
         .db
@@ -190,6 +201,9 @@ async fn get_arriving_customers(
         name: String,
     }
 
+    if !does_groomer_exist(&state.http, &groomer_id).await? {
+        return Err(ApiError::GroomerDoesNotExist);
+    }
     let filter = doc! {"groomer_id": groomer_id, "status": "awaiting"};
     let res = state
         .db
@@ -236,6 +250,9 @@ async fn get_staying_customers(
         name: String,
     }
 
+    if !does_groomer_exist(&state.http, &groomer_id).await? {
+        return Err(ApiError::GroomerDoesNotExist);
+    }
     let filter = doc! {"groomer_id": groomer_id, "status": "staying"};
     let res = state
         .db
@@ -323,6 +340,16 @@ async fn stayed_customers(
     state: State<SharedState>,
     Json(payload): Json<StayedCustomersInput>,
 ) -> Result<StatusCode, ApiError> {
+    let (user_exists, groomer_exists) = tokio::join!(
+        does_user_exist(&state.http, &payload.user_id),
+        does_groomer_exist(&state.http, &payload.groomer_id)
+    );
+    if !user_exists? {
+        return Err(ApiError::UserDoesNotExist);
+    }
+    if !groomer_exists? {
+        return Err(ApiError::GroomerDoesNotExist);
+    }
     let filter =
         doc! {"groomer_id": payload.groomer_id, "user_id": payload.user_id, "status": "left"};
     let mut res = state
@@ -360,6 +387,16 @@ async fn create_appointment(
     state: State<SharedState>,
     Json(payload): Json<CreateInput>,
 ) -> Result<Json<CreateOutput>, ApiError> {
+    let (user_exists, groomer_exists) = tokio::join!(
+        does_user_exist(&state.http, &payload.user_id),
+        does_groomer_exist(&state.http, &payload.groomer_id)
+    );
+    if !user_exists? {
+        return Err(ApiError::UserDoesNotExist);
+    }
+    if !groomer_exists? {
+        return Err(ApiError::GroomerDoesNotExist);
+    }
     let payload = Appointment {
         end_date: DateTime::now(),
         groomer_id: payload.groomer_id,
@@ -383,6 +420,7 @@ enum ApiError {
     IncorrectStatus,
     IncorrectStatusFlow,
     UserDoesNotExist,
+    GroomerDoesNotExist,
 }
 
 impl IntoResponse for ApiError {
@@ -392,6 +430,7 @@ impl IntoResponse for ApiError {
             ApiError::IncorrectStatus => (StatusCode::BAD_REQUEST, "incorrect status"),
             ApiError::IncorrectStatusFlow => (StatusCode::BAD_REQUEST, "incorrect status flow"),
             ApiError::UserDoesNotExist => (StatusCode::NOT_FOUND, "user cannot be found"),
+            ApiError::GroomerDoesNotExist => (StatusCode::NOT_FOUND, "groomer cannot be found"),
         };
         let body = Json(json!({ "message": error_message }));
         (status, body).into_response()
