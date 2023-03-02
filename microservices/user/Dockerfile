@@ -1,6 +1,6 @@
-FROM python:3-slim
+FROM rust:slim-buster
 WORKDIR /usr/src/app
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-COPY ./index.py ./schema.graphql ./
-CMD ["python", "./index.py"]
+COPY . .
+RUN cargo install --path .
+RUN rm -r *
+ENTRYPOINT [ "comments" ]
