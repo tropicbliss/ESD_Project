@@ -1,0 +1,14 @@
+mutation CreateUser($name: String!, $contactNo: String!, $email: String!) {
+  createUser(name: $name, contactNo: $contactNo, email: $email)
+}
+
+mutation UpdateUser($name: String, $contactNo: String, $email: String) {
+  updateUser(name: $name, contactNo: $contactNo, email: $email)
+}
+
+query GetUser($name: String!) {
+  getUser(name: $name) {
+    contactNo
+    email
+  }
+}

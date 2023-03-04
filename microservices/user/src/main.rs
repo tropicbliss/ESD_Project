@@ -1,5 +1,5 @@
 use anyhow::Result;
-use async_graphql::{http::GraphiQLSource, Context, EmptySubscription, Object, Schema};
+use async_graphql::{http::GraphiQLSource, Context, EmptySubscription, Object, Schema, ID};
 use async_graphql_axum::{GraphQLRequest, GraphQLResponse};
 use axum::{
     extract::State,
@@ -14,6 +14,7 @@ use mongodb::{
 };
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
+use thiserror::Error;
 use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
@@ -27,8 +28,7 @@ async fn main() -> Result<()> {
         .init();
     let client_options = ClientOptions::parse(&std::env::var("DB_URI")?).await?;
     let client = Client::with_options(client_options)?;
-    let database =
-        client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "esdproject".into()));
+    let database = client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "user".into()));
     let collection =
         database.collection::<User>(&std::env::var("COLLECTION").unwrap_or_else(|_| "user".into()));
     let schema = Schema::build(QueryRoot, MutationRoot, EmptySubscription)
@@ -98,11 +98,22 @@ impl MutationRoot {
         name: String,
         contact_no: String,
         email: String,
-    ) -> async_graphql::Result<bool> {
+    ) -> async_graphql::Result<ID> {
         let is_valid_phone = validator::validate_phone(&contact_no);
         let is_valid_email = validator::validate_email(&email);
-        if !is_valid_email || !is_valid_phone {
-            return Ok(false);
+        if !is_valid_email {
+            return Err(ApiError::EmailValidation.into());
+        }
+        if !is_valid_phone {
+            return Err(ApiError::ContactNoValidation.into());
+        }
+        let user_exists = ctx
+            .data_unchecked::<Collection<User>>()
+            .find_one(doc! {"name": name}, None)
+            .await?
+            .is_some();
+        if user_exists {
+            return Err(ApiError::UserExists);
         }
         let payload = User {
             contact_no,
@@ -112,7 +123,7 @@ impl MutationRoot {
         ctx.data_unchecked::<Collection<User>>()
             .insert_one(&payload, None)
             .await?;
-        Ok(true)
+        Ok(ID(payload.name))
     }
 
     async fn update_user(
@@ -126,18 +137,19 @@ impl MutationRoot {
         let mut update = Document::new();
         if let Some(contact_no) = &contact_no {
             if !validator::validate_phone(contact_no) {
-                return Ok(false);
+                return Err(ApiError::ContactNoValidation.into());
             }
             update.insert("contact_no", contact_no);
         }
         if let Some(email) = &email {
             if !validator::validate_email(email) {
-                return Ok(false);
+                return Err(ApiError::EmailValidation.into());
             }
             update.insert("email", email);
         }
+        let update_final = doc! {"$set": update};
         ctx.data_unchecked::<Collection<User>>()
-            .update_one(query, update, None)
+            .update_one(query, update_final, None)
             .await?;
         Ok(true)
     }
@@ -149,4 +161,14 @@ async fn graphql_handler(state: State<UserSchema>, req: GraphQLRequest) -> Graph
 
 async fn graphiql() -> impl IntoResponse {
     Html(GraphiQLSource::build().endpoint("/").finish())
+}
+
+#[derive(Error, Debug)]
+enum ApiError {
+    #[error("contact number provided is invalid")]
+    ContactNoValidation,
+    #[error("email provided is invalid")]
+    EmailValidation,
+    #[error("user already exists")]
+    UserExists,
 }

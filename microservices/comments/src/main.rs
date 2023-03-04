@@ -7,6 +7,7 @@ use axum::{
     Json, Router,
 };
 use futures::TryStreamExt;
+use graphql_client::{GraphQLQuery, Response};
 use mongodb::{bson::doc, options::ClientOptions, Client, Collection};
 use reqwest::Client as HttpClient;
 use serde::{Deserialize, Serialize};
@@ -27,7 +28,7 @@ async fn main() -> Result<()> {
     let client_options = ClientOptions::parse(&std::env::var("DB_URI")?).await?;
     let client = Client::with_options(client_options)?;
     let database =
-        client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "esdproject".into()));
+        client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "comments".into()));
     let collection = database
         .collection::<Comment>(&std::env::var("COLLECTION").unwrap_or_else(|_| "comments".into()));
     let shared_state = SharedState {
@@ -49,6 +50,10 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
+#[derive(GraphQLQuery)]
+#[graphql(schema_path = "src/schema.json", query_path = "src/query.graphql")]
+struct GetUser;
+
 #[derive(Clone)]
 struct SharedState {
     db: Collection<Comment>,
@@ -58,7 +63,7 @@ struct SharedState {
 #[derive(Serialize, Deserialize)]
 struct Comment {
     id: String,
-    user_id: String,
+    user_name: String,
     groomer_id: String,
     title: String,
     message: String,
@@ -68,7 +73,7 @@ struct Comment {
 #[derive(Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
 struct CreateInput {
-    user_id: String,
+    user_name: String,
     groomer_id: String,
     title: String,
     message: String,
@@ -95,15 +100,24 @@ async fn does_groomer_exist(client: &HttpClient, id: &str) -> Result<bool, ApiEr
         == 200)
 }
 
-async fn does_user_exist(client: &HttpClient, id: &str) -> Result<bool, ApiError> {
-    Ok(client
-        .get(format!("http://user:5000/read/{id}"))
+async fn does_user_exist(client: &HttpClient, name: &str) -> Result<bool, ApiError> {
+    let variables = get_user::Variables {
+        name: name.to_string(),
+    };
+    let request_body = GetUser::build_query(variables);
+    let res = client
+        .post(format!("http://user:5000/"))
+        .json(&request_body)
         .send()
         .await
-        .map_err(|_| ApiError::InternalError)?
-        .status()
-        .as_u16()
-        == 200)
+        .map_err(|_| ApiError::InternalError)?;
+    let response_body: Response<get_user::ResponseData> =
+        res.json().await.map_err(|_| ApiError::InternalError)?;
+    Ok(response_body
+        .data
+        .ok_or(ApiError::InternalError)?
+        .get_user
+        .is_some())
 }
 
 async fn censor_comment(client: &HttpClient, comment: &str) -> Result<String, ApiError> {
@@ -131,7 +145,7 @@ async fn create_comment(
 ) -> Result<Json<CreateOutput>, ApiError> {
     payload.validate().map_err(|_| ApiError::InvalidData)?;
     let (user_exists, groomer_exists) = tokio::join!(
-        does_user_exist(&state.http, &payload.user_id),
+        does_user_exist(&state.http, &payload.user_name),
         does_groomer_exist(&state.http, &payload.groomer_id)
     );
     if !user_exists? {
@@ -150,7 +164,7 @@ async fn create_comment(
         message: message?,
         rating: 5,
         title: title?,
-        user_id: payload.user_id,
+        user_name: payload.user_name,
     };
     state
         .db
@@ -168,7 +182,7 @@ async fn create_comment(
 #[serde(rename_all = "camelCase")]
 struct GetOutput {
     id: String,
-    user_id: String,
+    user_name: String,
     title: String,
     message: String,
     rating: u8,
@@ -199,7 +213,7 @@ async fn get_comment(
             message: c.message,
             rating: c.rating,
             title: c.title,
-            user_id: c.user_id,
+            user_name: c.user_name,
         })
         .collect();
     Ok(Json(res))

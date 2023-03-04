@@ -7,6 +7,7 @@ use axum::{
     Json, Router,
 };
 use futures::{stream, StreamExt, TryStreamExt};
+use graphql_client::{GraphQLQuery, Response};
 use mongodb::{
     bson::{doc, DateTime},
     options::ClientOptions,
@@ -34,7 +35,7 @@ async fn main() -> Result<()> {
     let client_options = ClientOptions::parse(&std::env::var("DB_URI")?).await?;
     let client = Client::with_options(client_options)?;
     let database =
-        client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "esdproject".into()));
+        client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "appointments".into()));
     let collection = database.collection::<Appointment>(
         &std::env::var("COLLECTION").unwrap_or_else(|_| "appointments".into()),
     );
@@ -61,6 +62,10 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
+#[derive(GraphQLQuery)]
+#[graphql(schema_path = "src/schema.json", query_path = "src/query.graphql")]
+struct GetUser;
+
 async fn does_groomer_exist(client: &HttpClient, id: &str) -> Result<bool, ApiError> {
     Ok(client
         .get(format!("http://groomer:5000/read/{id}"))
@@ -72,15 +77,24 @@ async fn does_groomer_exist(client: &HttpClient, id: &str) -> Result<bool, ApiEr
         == 200)
 }
 
-async fn does_user_exist(client: &HttpClient, id: &str) -> Result<bool, ApiError> {
-    Ok(client
-        .get(format!("http://user:5000/read/{id}"))
+async fn does_user_exist(client: &HttpClient, name: &str) -> Result<bool, ApiError> {
+    let variables = get_user::Variables {
+        name: name.to_string(),
+    };
+    let request_body = GetUser::build_query(variables);
+    let res = client
+        .post(format!("http://user:5000/"))
+        .json(&request_body)
         .send()
         .await
-        .map_err(|_| ApiError::InternalError)?
-        .status()
-        .as_u16()
-        == 200)
+        .map_err(|_| ApiError::InternalError)?;
+    let response_body: Response<get_user::ResponseData> =
+        res.json().await.map_err(|_| ApiError::InternalError)?;
+    Ok(response_body
+        .data
+        .ok_or(ApiError::InternalError)?
+        .get_user
+        .is_some())
 }
 
 #[derive(Clone)]
@@ -92,7 +106,7 @@ struct SharedState {
 #[derive(Serialize, Deserialize)]
 struct Appointment {
     id: String,
-    user_id: String,
+    user_name: String,
     groomer_id: String,
     start_date: DateTime,
     end_date: DateTime,
@@ -121,7 +135,7 @@ struct UserEndpointOutput {
 }
 
 async fn get_user(
-    Path(user_id): Path<String>,
+    Path(user_name): Path<String>,
     state: State<SharedState>,
 ) -> Result<Json<Vec<UserEndpointOutput>>, ApiError> {
     #[derive(Deserialize)]
@@ -130,10 +144,10 @@ async fn get_user(
         picture_url: String,
     }
 
-    if !does_user_exist(&state.http, &user_id).await? {
+    if !does_user_exist(&state.http, &user_name).await? {
         return Err(ApiError::UserDoesNotExist);
     }
-    let filter = doc! {"user_id": user_id};
+    let filter = doc! {"user_name": user_name};
     let res = state
         .db
         .find(filter, None)
@@ -219,7 +233,7 @@ async fn get_arriving_customers(
             let client = &state.http;
             async move {
                 let res: UserReadEndpointOutput = client
-                    .get(format!("http://user:5000/read/{}", app.user_id))
+                    .get(format!("http://user:5000/read/{}", app.user_name))
                     .send()
                     .await
                     .unwrap()
@@ -268,7 +282,7 @@ async fn get_staying_customers(
             let client = &state.http;
             async move {
                 let res: UserReadEndpointOutput = client
-                    .get(format!("http://user:5000/read/{}", app.user_id))
+                    .get(format!("http://user:5000/read/{}", app.user_name))
                     .send()
                     .await
                     .unwrap()
@@ -333,7 +347,7 @@ async fn change_appointment_status(
 #[serde(rename_all = "camelCase")]
 struct StayedCustomersInput {
     groomer_id: String,
-    user_id: String,
+    user_name: String,
 }
 
 async fn stayed_customers(
@@ -341,7 +355,7 @@ async fn stayed_customers(
     Json(payload): Json<StayedCustomersInput>,
 ) -> Result<StatusCode, ApiError> {
     let (user_exists, groomer_exists) = tokio::join!(
-        does_user_exist(&state.http, &payload.user_id),
+        does_user_exist(&state.http, &payload.user_name),
         does_groomer_exist(&state.http, &payload.groomer_id)
     );
     if !user_exists? {
@@ -351,7 +365,7 @@ async fn stayed_customers(
         return Err(ApiError::GroomerDoesNotExist);
     }
     let filter =
-        doc! {"groomer_id": payload.groomer_id, "user_id": payload.user_id, "status": "left"};
+        doc! {"groomer_id": payload.groomer_id, "user_name": payload.user_name, "status": "left"};
     let mut res = state
         .db
         .find(filter, None)
@@ -372,7 +386,7 @@ async fn stayed_customers(
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct CreateInput {
-    user_id: String,
+    user_name: String,
     groomer_id: String,
     pet_info: Vec<Pet>,
 }
@@ -388,7 +402,7 @@ async fn create_appointment(
     Json(payload): Json<CreateInput>,
 ) -> Result<Json<CreateOutput>, ApiError> {
     let (user_exists, groomer_exists) = tokio::join!(
-        does_user_exist(&state.http, &payload.user_id),
+        does_user_exist(&state.http, &payload.user_name),
         does_groomer_exist(&state.http, &payload.groomer_id)
     );
     if !user_exists? {
@@ -404,7 +418,7 @@ async fn create_appointment(
         pets: payload.pet_info,
         start_date: DateTime::now(),
         status: String::from("awaiting"),
-        user_id: payload.user_id,
+        user_name: payload.user_name,
     };
     state
         .db
