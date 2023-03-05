@@ -3,6 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 import cuid
 import os
 
+# todo: update the required-bys for docker compose and add email contact_no validation or smth
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ("DB_URI")
