@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register New Groomer</title>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <style>
+        span{
+            color:red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add Groomer</h1>
+    <form onsubmit= "return validateForm()">
+        <table>
+            <tr> <td>name  <input type="text" id="groomer_name"><span id="err1"></span></td></tr>
+
+            <tr> <td>email <input type="email" id="email"><span id="err2"></span></td></tr>
+
+            <tr><td>picture url <input type="text" id="img" name="img" accept="image/*"></td></tr>
+
+            <tr> <td>contact number <input type="text" id="contact_no"><span id="err3"></span></td></tr>
+
+            <tr><td>address <input type="text" placeholder="Enter your address" id="address"><span id="err4"></span></td></tr>
+
+            <tr><td>capacity <input type="number" min="0" max="100" value="0"></td></tr>
+
+            <tr><td><button type="submit" onclick="addGroomer()">Submit</button></td></tr>
+
+        </table>
+    </form>
+        <script>
+               // Reset error messages
+           
+            function validateForm() {
+                var name = document.getElementById("groomer_name").value;
+                var picture_url = document.getElementById("img").value;
+                var email = document.getElementById("email").value;
+                var address = document.getElementById("address").value;
+                var contactNo = document.getElementById("contact_no").value;
+    
+                var nameErr = document.getElementById("err1");
+                var emailErr = document.getElementById("err2");
+                var contactNoErr = document.getElementById("err3");
+                var addressErr = document.getElementById("err4");
+                
+                nameErr.innerText = "";
+                emailErr.innerText = "";
+                addressErr.innerText = "";
+                contactNoErr.innerText = "";
+             
+    
+                // Check for errors and display error messages
+                if (name == ""){
+                    nameErr.innerText = " Please enter a name";
+                   return false
+                }
+    
+                if (email == "") {
+                    emailErr.innerText = " Please enter an email address";
+                    return false
+                }
+
+                if (contactNo == "") {
+                    contactNoErr.innerText = " Please enter a contact number";
+                    return false;
+                }
+    
+                if (address == "") {
+                    addressErr.innerText = " Please enter an address";  
+                    return false
+                }
+
+                return true;
+              
+            }
+
+            function addGroomer(){
+                console.log(response.data)
+                var name = document.getElementById("groomer_name").value;
+                var email = document.getElementById("email").value;
+                var picture_url = document.getElementById("img").value;
+                var contactNo = document.getElementById("contact_no").value;
+                var address = document.getElementById("address").value;
+                var capacity = document.getElementById("capacity").value;
+
+
+                axios.post(
+                    "http://127.0.0.1:5000/groomer/" + name,{
+                    picture_url : picture_url,
+                    capacity: capacity,
+                    address: address,
+                    contact_no : contactNo,
+                    email : email
+                })
+
+                .then(response =>{
+                    console.log(response.data)
+                })
+
+                .catch(error => {
+                    console.log(error.message)
+                })
+
+            }
+
+    
+        </script>
+
+</body>
+</html>

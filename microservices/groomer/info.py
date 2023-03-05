@@ -1,7 +1,6 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from wtforms import Form, StringField, TelField , IntegerField, validators
 
 
 app = Flask(__name__)
@@ -9,6 +8,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localh
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+CORS(app)
+
 
 class Groomer(db.Model):
     __tablename__ = "groomer"
@@ -74,19 +75,7 @@ def get_groomer(name):
     ), 404
 
 
-class RegisterForm(Form):
-    name = StringField('name', [validators.Length(min=4, max=25)])
-    picture_url = StringField('picture_url', validators.DataRequired, validators.length(max=255))
-    email = StringField('email', [validators.Length(min=6, max=35)])
-    contact_no = TelField('contact_no', [validators.DataRequired])
-    address = StringField('address',[validators.DataRequired])
-    capacity = IntegerField('capacity', [validators.DataRequired])
-
-    def is_present(form, field):
-        if not validators.url(field.data):
-            raise validators.ValidationError('Invalid URL')
-
-
+#create a groomer
 @app.route("/groomer/<string:name>", methods=['POST'])
 def create_groomer(name):
     if(Groomer.query.filter_by(name=name).first()):
@@ -100,35 +89,32 @@ def create_groomer(name):
             }
         ), 400
 
-    form = RegisterForm(request.form)
-    if request.method == 'POST' and form.validate():
-        name = form.name.data
-        picture_url = form.picture_url.data
-        email = form.email.data
-        contact_no = form.contact_no.data
-        address = form.address.data
-        capacity = form.capacity.data
-        
-        groomer = Groomer(name=name, picture_url = picture_url, email=email, contact_no=contact_no, address=address, capacity=capacity) 
+    data = request.get_json()
+    groomer = Groomer(name, **data)
 
-        try:
-            db.session.add(groomer)
-            db.session.commit()
-    
-        except Exception as e:
-            return jsonify({"message": str(e)}), 500
+    try:
+        db.session.add(groomer)
+        db.session.commit()
 
+    except:
         return jsonify(
             {
-                "code": 201,
-                "data": groomer.json()
+                "code": 500,
+                "data": {
+                    "name": name
+                },
+                "message": "An error occurred creating the groomer."
             }
-        ), 201
+        ), 500
+
+
+    return jsonify(
+        {
+            "code": 201,
+            "data": groomer.json()
+        }
+    ), 201
     
-    else:
-        return "Error in creating groomer"
-
-
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
