@@ -10,7 +10,7 @@ python = "^3.11"
 flask = "^2.2.2"
 flask-sqlalchemy = "^3.0.2"
 mysql-connector-python = "^8.0.32"
-cuid = "^0.3"
+string-validator = "^0.1.7"
 
 
 [tool.poetry.group.dev.dependencies]

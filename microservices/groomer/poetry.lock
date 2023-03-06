@@ -59,17 +59,6 @@ files = [
 ]
 
 [[package]]
-name = "cuid"
-version = "0.3"
-description = "Fast, scalable unique ID generation"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "cuid-0.3.tar.gz", hash = "sha256:7e183f420cbba32dbc63343e0379027ac24f0f8f4662b99dd21fcdbd82c211c7"},
-]
-
-[[package]]
 name = "dill"
 version = "0.3.6"
 description = "serialize all of python"
@@ -617,6 +606,82 @@ pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3-binary"]
 
 [[package]]
+name = "string-validator"
+version = "0.1.7"
+description = "A fast and correct Python string validator library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "string_validator-0.1.7-cp310-cp310-macosx_10_7_x86_64.whl", hash = "sha256:d3f67c2f7b2d2fe5ba82308505102edcd194d962d9763132b7ec20b27988829f"},
+    {file = "string_validator-0.1.7-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:feed1ae71a58725124afbdc6d73caed14f749011bf24823a9b2868197fcd3645"},
+    {file = "string_validator-0.1.7-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:2fca71307cda79070a45dd133af336d241d7385a20d064b38a481138cc45769c"},
+    {file = "string_validator-0.1.7-cp310-cp310-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:b935850dfa39d6b8de44274cffec783b9d741dd3c122858ff43fcea1b61e86c2"},
+    {file = "string_validator-0.1.7-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:efc3d00918aa8e099b0c1317d1e069e5a55457d44389d00a9af21064ff90c00c"},
+    {file = "string_validator-0.1.7-cp310-cp310-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:4454587d051f49e86dd85ebd08c121a071747353ca9f7a15922d01c4c7a0f5b4"},
+    {file = "string_validator-0.1.7-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:75177bd74e2f5ad44b914dbee6089f503e953b607bfe9eac9cc88678ea710339"},
+    {file = "string_validator-0.1.7-cp310-cp310-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:7a2572baa285151fd8097eabdbe21afdc904b6cc06768c9093c2c361ab9f1d17"},
+    {file = "string_validator-0.1.7-cp310-none-win32.whl", hash = "sha256:29032a78efb20081f640e1fc07368619651783bba458dd3569b25c0937ee3b9e"},
+    {file = "string_validator-0.1.7-cp310-none-win_amd64.whl", hash = "sha256:3cdb6df549cb19c6dc2c37f8f16a585709544bc32bbe88e822f6504ee197d28b"},
+    {file = "string_validator-0.1.7-cp311-cp311-macosx_10_7_x86_64.whl", hash = "sha256:2ff664e52fdbc9d2a4ef9cd2ad23bf9d8c6e2ffaf2a32eb1f9d367b1e324827f"},
+    {file = "string_validator-0.1.7-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:5c8d1f52c9b515e1a373948fdabe144dbafeba0fb86b77f5acbf2e32b5a53594"},
+    {file = "string_validator-0.1.7-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c7562ae958e7f38fd59a02f93a426207995f502c9af2b7fec1e58323710beec4"},
+    {file = "string_validator-0.1.7-cp311-cp311-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:5cb54e35b743ce8adf9c6ccac11cc8e84f64d39bef1af41a1018cab88b4edef0"},
+    {file = "string_validator-0.1.7-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:0e283cf0855b39abfea93286d766a9243d2f80f4140e8aea91422fbf63a425e2"},
+    {file = "string_validator-0.1.7-cp311-cp311-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:0d2ff70d42f3983833e4aaab72e08ccc2f0c8fe6ac9183a815b33934c394f4cf"},
+    {file = "string_validator-0.1.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ae125d4e18e144a3f50780e58776c105ba6b7bfc81c5649e7da1843bd564b6c2"},
+    {file = "string_validator-0.1.7-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:d6b297a1eb14f7ae90095d5ce8629a7cda9e160a63779f157c0dde116937bb62"},
+    {file = "string_validator-0.1.7-cp311-none-win32.whl", hash = "sha256:ceff4bddf4c952c950d4e3e22ea39212991a7f04706966772b16e32456f73c28"},
+    {file = "string_validator-0.1.7-cp311-none-win_amd64.whl", hash = "sha256:895dcd31f2bf4ec9c4a9955d1f1d92cad672fe38b73b8c12b97c8c94defc96d7"},
+    {file = "string_validator-0.1.7-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:baebe6c3e007975f5e75edda7b304c4ec12288aeb90f2e2fa0be606a3d70f6d3"},
+    {file = "string_validator-0.1.7-cp312-cp312-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:fe1da977910500683a4612665f087bb96765ada3bc72589918ed1e681ee116ed"},
+    {file = "string_validator-0.1.7-cp312-cp312-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:7ffa772b92ec97cd318f58b69f26fccbb691a94cf755ee6f19c94b48cdbb6d8e"},
+    {file = "string_validator-0.1.7-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7e8903070eecfe3ad35d11030b05b333adaa45f94ad0f0ae05a47a571b83f13a"},
+    {file = "string_validator-0.1.7-cp37-cp37m-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:bcac4ec79280097e6b50e4c859ee567b0cc5b0554716b61c69226d94fa9986cd"},
+    {file = "string_validator-0.1.7-cp37-cp37m-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:521f963cd04c168df2b27c849e3daa80cbd721d31c4048725b63aa5161ab9452"},
+    {file = "string_validator-0.1.7-cp37-cp37m-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:ab87bacb6c9f7d15cb6218516b91a6c291d8460afab64169dcc40b7b9a26afd7"},
+    {file = "string_validator-0.1.7-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:38d8861cbd511e3c301c0127b7622e8d1309a97dab31375319e4c36c40fdfbd4"},
+    {file = "string_validator-0.1.7-cp37-cp37m-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:b7923dc349417e2299e18257f85a96541c41a4f8e36d680f9594952f044af418"},
+    {file = "string_validator-0.1.7-cp37-none-win32.whl", hash = "sha256:25dfb8bbe088e8d23aa24c885dff4a1931305b89e3bc1492cc6df43a6c18af36"},
+    {file = "string_validator-0.1.7-cp37-none-win_amd64.whl", hash = "sha256:4a1dbc5d9bc94ec6be6eeafc2d6e1a4c946575fc657545fb1a9e8d0d18fd61cf"},
+    {file = "string_validator-0.1.7-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7c27fbdd3bbbc47c2f7655014d3ff24e1738fea7e00f1bc6bb931ed5ef7faa72"},
+    {file = "string_validator-0.1.7-cp38-cp38-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:7287087b27145d2f76e3c0a4b7565d0b406ba633dca06cfa6305416d5771b4b6"},
+    {file = "string_validator-0.1.7-cp38-cp38-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:398ad00a800b5dcefc0fc589c9ce5047dfe1e87ccf478b707a168c97589239a1"},
+    {file = "string_validator-0.1.7-cp38-cp38-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:afd3c206c2574f4539a85b7e8bf77ad6e463c04325e66c8434dee6b7cf92f2f2"},
+    {file = "string_validator-0.1.7-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:754f20670e2e957bb5d1b62be0a8de0edf618b888358d1ec9d3840b142eee905"},
+    {file = "string_validator-0.1.7-cp38-cp38-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:950f9d9ec221c62849ac3fb81a988647a4a7eeecd3cbbb480fc8de72826d8a71"},
+    {file = "string_validator-0.1.7-cp38-none-win32.whl", hash = "sha256:b75834031f780cb010261bae73e704d21606a78943303d1df8a8c366c0053426"},
+    {file = "string_validator-0.1.7-cp38-none-win_amd64.whl", hash = "sha256:229f0e980913489a598d24326cd052da6d9706a07b4f9b50166d82aa5c01cb7e"},
+    {file = "string_validator-0.1.7-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:dc75ee7f6b728ab56e0c27b0c8eb17f1c5a22a38f793734aabb7d48bf4d6c566"},
+    {file = "string_validator-0.1.7-cp39-cp39-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:d59dfde3ed73ec0e705d925c83b366e7d07abaa1507d6dedae1d184b5cf35458"},
+    {file = "string_validator-0.1.7-cp39-cp39-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:c41cba986bed0e3219b3a6d5e887370ac33c36759d35d728aa4d2bb35149f4d4"},
+    {file = "string_validator-0.1.7-cp39-cp39-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:1d24f91cb1ae21c841fa357c5e5f5536aa03d84033d20a122ca71f3fc0284573"},
+    {file = "string_validator-0.1.7-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e522684b3c745103430e653d20a86215582d2c9d8a96aff6be2512d3a91d4fc6"},
+    {file = "string_validator-0.1.7-cp39-cp39-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:b799da31a132f7a127d059801cb70f471681048b5a513bdbffe0cbdd02cf659e"},
+    {file = "string_validator-0.1.7-cp39-none-win32.whl", hash = "sha256:5332760582c811f8954824b9ea3d1d5d6a5dfdfa89300b3c433121e22f09114f"},
+    {file = "string_validator-0.1.7-cp39-none-win_amd64.whl", hash = "sha256:3ce8741030118c8c099a4459ddbb67adab145ab104a99baea6e9054d502c24e1"},
+    {file = "string_validator-0.1.7-pp37-pypy37_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a3df29c515bf7bc9b473b29812acb450d63912971b4a31669f991cf691ae3a2a"},
+    {file = "string_validator-0.1.7-pp37-pypy37_pp73-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:ee1d0745a71a34120018215d485f3464e5f95c6b9cf27b72d36e7f1d985388db"},
+    {file = "string_validator-0.1.7-pp37-pypy37_pp73-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:4dd6a0f535d78659e76245ff2460b0ad2a6e47b114d299d6c04d417ea9f450a7"},
+    {file = "string_validator-0.1.7-pp37-pypy37_pp73-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:da39d7a18ced9191c359e10227918fe902dbce0a03a85009062bf79f3bd22c15"},
+    {file = "string_validator-0.1.7-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a845cbca7537a98212d3935685e72e2a368e0e90c0cf2827bcf289d5a84bb5bc"},
+    {file = "string_validator-0.1.7-pp37-pypy37_pp73-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:6b22495a8ac82724965bc5dd17456f3ff26cac777592b71765facd11acb1bb2c"},
+    {file = "string_validator-0.1.7-pp38-pypy38_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:acec9b4b93935e369f2a23dc47f5bfceb4d397cfeadf06cb081a94a83dc48488"},
+    {file = "string_validator-0.1.7-pp38-pypy38_pp73-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:0419cca754b6feb8204713831e866245d2ec3013b06a276db6d17329839342b8"},
+    {file = "string_validator-0.1.7-pp38-pypy38_pp73-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:58eda0598b964c871eaf1a4e40744d91ea66719ab6accedf46bf43f936c8f818"},
+    {file = "string_validator-0.1.7-pp38-pypy38_pp73-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:5d4cd25f0fd571ca5c6c8d33d104b14a9766f8c006489f6fd9588016bfd716da"},
+    {file = "string_validator-0.1.7-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:90e99e7367790813b158f5fd11971f746c0446fc6d939eb2bc5b26c2bd1ca9c1"},
+    {file = "string_validator-0.1.7-pp38-pypy38_pp73-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:15959dd8d7b41911eda6a84b84cab7ff8ff3efdd7dc1d1b87790eeaaae5d728a"},
+    {file = "string_validator-0.1.7-pp39-pypy39_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:241aa6fd9e8cc37087ed90d6c43a67cd03d9d7922e63d307bdd3431e441d480d"},
+    {file = "string_validator-0.1.7-pp39-pypy39_pp73-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:40dc9c4cbe9e9c9d814adeefac4d671daeacb227546fed6511b24752b202dad9"},
+    {file = "string_validator-0.1.7-pp39-pypy39_pp73-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:862df6222639f8611bafea24bf867aa408a683a5c4f9ce14230ccb399cea496a"},
+    {file = "string_validator-0.1.7-pp39-pypy39_pp73-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:e50043ec4837e48030e1fdf7360aa1649f4b737b1764d875fdba842232ac0696"},
+    {file = "string_validator-0.1.7-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b639dbdc20c19788a801cc6f64b4a7abbfc1df589d9f132017fae244a0f2612b"},
+    {file = "string_validator-0.1.7-pp39-pypy39_pp73-manylinux_2_5_i686.manylinux1_i686.whl", hash = "sha256:8b555d2373267d67abecfd414863b9e7f79385b84f1d5fb0414ecf4f7273199d"},
+    {file = "string_validator-0.1.7.tar.gz", hash = "sha256:b7b40db719fdefe37e4845b07a073eea704a6ec39fd3e8865ee31063a4ea7cac"},
+]
+
+[[package]]
 name = "tomlkit"
 version = "0.11.6"
 description = "Style preserving TOML library"
@@ -746,4 +811,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "1e6f0754c9faea546a6398c6003608dab0baf737b4e9304e0809e9ce18973341"
+content-hash = "048d7f364c132c65e8d1dc4f24b52b1798cbd560d0cbeba2bd176e62a6568616"
