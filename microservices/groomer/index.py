@@ -38,6 +38,8 @@ class Groomer(db.Model):
 
 
 class AcceptedPets:
+    __tablename__ = "acceptedpets"
+
     id: db.Column(db.String(50), primary_key=True)
     groomer_id: db.Column(db.String(50), db.ForeignKey(
         "groomer.id"), nullable=False)
