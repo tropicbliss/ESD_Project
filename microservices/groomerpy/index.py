@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask, request, jsonify, render_template, redirect, url_for, g
 from flask_sqlalchemy import SQLAlchemy
 import os
 import string_validator
@@ -6,7 +6,7 @@ from flask_expects_json import expects_json
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ("DB_URI")
+app.config['SQLALCHEMY_DATABASE_URI'] = "mysql+mysqlconnector://root:PG6k20YjR5mrPFCSfJ8b@containers-us-west-97.railway.app:7626/railway"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -37,7 +37,7 @@ class Groomer(db.Model):
         return {"id": self.id, "name": self.name, "picture_url": self.picture_url, "capacity": self.capacity, "address": self.address, "contact_no": self.contact_no, "email": self.email}
 
 
-class AcceptedPets:
+class AcceptedPets(db.Model):
     __tablename__ = "acceptedpets"
 
     id: db.Column(db.String(50), primary_key=True)
@@ -56,6 +56,22 @@ class AcceptedPets:
             "groomer_id": self.groomer_id,
             "pet_type": self.pet_type
         }
+
+
+def validate_data(picture_url, email, phone_no):
+    if picture_url:
+        valid_picture_url = string_validator.validate_url(picture_url)
+        if not valid_picture_url:
+            return False
+    if email:
+        valid_email = string_validator.validate_email(email)
+        if not valid_email:
+            return False
+    if phone_no:
+        valid_phone = string_validator.validate_phone(phone_no)
+        if not valid_phone:
+            return False
+    return True
 
 
 create_schema = {
@@ -78,18 +94,12 @@ create_schema = {
 @app.post("/create")
 @expects_json(create_schema)
 def create_groomer():
-    data = request.json()
-    pet_types = data.pop("pet_types")
-    valid_picture_url = string_validator.validate_url(data["picture_url"])
-    phone_number = data["contact_no"]
-    if "+65" not in phone_number:
-        data["contact_no"] = "+65" + phone_number
-    valid_phone_no = string_validator.validate_phone(data["contact_no"])
-    valid_email = string_validator.validate_email(data["email"])
-    if not valid_phone_no or valid_picture_url or valid_email:
+    data = g.data
+    if not validate_data(data["picture_url"], data["email"], data["contact_no"]):
         return jsonify({
-            "message": "invalid data given"
+            "message": "data provided is invalid"
         }), 400
+    pet_types = data.pop("pet_types")
     groomer = Groomer(**data)
     pet_type_data = list()
     for pet_type in pet_types:
@@ -128,7 +138,7 @@ get_schema = {
 @app.post("/read")
 @expects_json(get_schema)
 def get_groomer():
-    data = request.json()
+    data = g.data
     res = Groomer.query.filter_by(**data)
     return jsonify([r.json() for r in res]), 200
 
@@ -165,25 +175,29 @@ update_schema = {
 @app.post("/update/<string:id>")
 @expects_json(update_schema)
 def update_groomer(id):
-    data = request.json()
+    data = g.data
     pet_types = None
+    if not validate_data(data.get("picture_url"), data.get("email"), data.get("contact_no")):
+        return jsonify({
+            "message": "data provided is invalid"
+        }), 400
     try:
         pet_types = data.pop("pet_types")
     except KeyError:
         pass
     groomer = Groomer.query.filter_by(id=id).first()
     if groomer:
-        if data["address"]:
+        if data.get("address"):
             groomer.address = data["address"]
-        if data["capacity"]:
+        if data.get("capacity"):
             groomer.capacity = data["capacity"]
-        if data["contact_no"]:
+        if data.get("contact_no"):
             groomer.contact_no = data["contact_no"]
-        if data["email"]:
+        if data.get("email"):
             groomer.email = data["email"]
-        if data["name"]:
+        if data.get("name"):
             groomer.name = data["name"]
-        if data["picture_url"]:
+        if data.get("picture_url"):
             groomer.picture_url = data["picture_url"]
         if pet_types:
             groomer.pet_types = pet_types
@@ -208,7 +222,7 @@ accepts_schema = {
 @app.post("/accepts/<string:id>")
 @expects_json(accepts_schema)
 def does_groomer_accept_pet(id):
-    data = request.json()
+    data = g.data
     groomer = Groomer.query.filter_by(id=id).first()
     if groomer:
         if all([pet_type in groomer.pet_types for pet_type in data["pet_types"]]):
@@ -225,4 +239,4 @@ def does_groomer_accept_pet(id):
 
 
 if __name__ == '__main__':
-    app.run(port=int(os.environ("PORT")), debug=True)
+    app.run(port=int(5000), debug=True)
