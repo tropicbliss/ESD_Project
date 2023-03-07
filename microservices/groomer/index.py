@@ -2,8 +2,8 @@ from flask import Flask, request, jsonify, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 import cuid
 import os
-
-# todo: update the required-bys for docker compose and add email contact_no validation or smth
+import string_validator
+from flask_expects_json import expects_json
 
 
 app = Flask(__name__)
@@ -26,7 +26,7 @@ class Groomer(db.Model):
     pet_types = db.relationship("AcceptedPets", backref="groomer", lazy=True)
 
     def __init__(self, name, picture_url, capacity, address, contact_no, email):
-        self.id = cuid.cuid()
+        self.id = string_validator.create_cuid()
         self.name = name
         self.picture_url = picture_url
         self.capacity = capacity
@@ -45,7 +45,7 @@ class AcceptedPets:
     pet_type: db.Column(db.String(50), nullable=False)
 
     def __init__(self, groomer_id, pet_type):
-        self.id = cuid.cuid()
+        self.id = string_validator.create_cuid()
         self.groomer_id = groomer_id
         self.pet_type = pet_type
 
@@ -57,19 +57,38 @@ class AcceptedPets:
         }
 
 
+create_schema = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "picture_url": {"type": "string"},
+        "capacity": {"type": "number", "minimum": 1},
+        "address": {"type": "string"},
+        "contact_no": {"type": "string"},
+        "email": {"type": "string"},
+        "pet_types": {"type": "array", "items": {
+            "type": "string"
+        }, "minItems": 1},
+    },
+    "required": ["name", "picture_url", "capacity", "address", "contact_no", "email", "pet_types"]
+}
+
+
 @app.post("/create")
+@expects_json(create_schema)
 def create_groomer():
     data = request.json()
-    try:
-        pet_types = data.pop("pet_types")
-        # I hate Python so much
-        if type(pet_types) is not list:
-            raise KeyError
-    except KeyError:
+    pet_types = data.pop("pet_types")
+    valid_picture_url = string_validator.validate_url(data["picture_url"])
+    phone_number = data["contact_no"]
+    if "+65" not in phone_number:
+        data["contact_no"] = "+65" + phone_number
+    valid_phone_no = string_validator.validate_phone(data["contact_no"])
+    valid_email = string_validator.validate_email(data["email"])
+    if not valid_phone_no or valid_picture_url or valid_email:
         return jsonify({
-            "message": "pet_types not specified"
+            "message": "invalid data given"
         }), 400
-    # do data validation stuff
     groomer = Groomer(**data)
     pet_type_data = list()
     for pet_type in pet_types:
@@ -88,7 +107,25 @@ def create_groomer():
     }), 200
 
 
+get_schema = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "picture_url": {"type": "string"},
+        "capacity": {"type": "number", "minimum": 1},
+        "address": {"type": "string"},
+        "contact_no": {"type": "string"},
+        "email": {"type": "string"},
+        "pet_types": {"type": "array", "items": {
+            "type": "string"
+        }, "minItems": 1},
+    },
+    "required": []
+}
+
+
 @app.post("/read")
+@expects_json(get_schema)
 def get_groomer():
     data = request.json()
     res = Groomer.query.filter_by(**data)
@@ -107,24 +144,32 @@ def search_groomer_by_id(id):
     return jsonify(res.json()), 200
 
 
-class ApiException(Exception):
-    pass
+update_schema = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "picture_url": {"type": "string"},
+        "capacity": {"type": "number", "minimum": 1},
+        "address": {"type": "string"},
+        "contact_no": {"type": "string"},
+        "email": {"type": "string"},
+        "pet_types": {"type": "array", "items": {
+            "type": "string"
+        }, "minItems": 1},
+    },
+    "required": []
+}
 
 
 @app.post("/update/<string:id>")
+@expects_json(update_schema)
 def update_groomer(id):
     data = request.json()
     pet_types = None
     try:
         pet_types = data.pop("pet_types")
-        if type(pet_types) is not list:
-            raise ApiException
     except KeyError:
         pass
-    except ApiException:
-        return jsonify({
-            "message": "pet_types not specified"
-        }), 400
     groomer = Groomer.query.filter_by(id=id).first()
     if groomer:
         if data["address"]:
@@ -148,23 +193,30 @@ def update_groomer(id):
     }), 404
 
 
+accepts_schema = {
+    "type": "object",
+    "properties": {
+        "pet_types": {"type": "array", "items": {
+            "type": "string"
+        }, "minItems": 1},
+    },
+    "required": []
+}
+
+
 @app.post("/accepts/<string:id>")
+@expects_json(accepts_schema)
 def does_groomer_accept_pet(id):
     data = request.json()
     groomer = Groomer.query.filter_by(id=id).first()
     if groomer:
-        if data["pet_types"]:
-            if all([pet_type in groomer.pet_types for pet_type in data["pet_types"]]):
-                return jsonify({
-                    "message": "all pets accepted"
-                }), 200
-            else:
-                return jsonify({
-                    "message": "pet type not accepted"
-                }), 400
+        if all([pet_type in groomer.pet_types for pet_type in data["pet_types"]]):
+            return jsonify({
+                "message": "all pets accepted"
+            }), 200
         else:
             return jsonify({
-                "message": "pet_types not specified"
+                "message": "pet type not accepted"
             }), 400
     return jsonify({
         "message": "groomer not found"
