@@ -28,7 +28,7 @@ async fn main() -> Result<()> {
     let client_options = ClientOptions::parse(&std::env::var("DB_URI")?).await?;
     let client = Client::with_options(client_options)?;
     let database =
-        client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "comments".into()));
+        client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "esdproject".into()));
     let collection = database
         .collection::<Comment>(&std::env::var("COLLECTION").unwrap_or_else(|_| "comments".into()));
     let shared_state = SharedState {

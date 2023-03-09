@@ -27,6 +27,10 @@ services:
       DATABASE: esdproject
       COLLECTION: comments
       ADDR: 0.0.0.0:5000
+    depends_on:
+      - groomer
+      - user
+      - censorer
     networks:
       - my-net
   esd-rabbit:
@@ -51,8 +55,12 @@ services:
     environment:
       DB_URI: mongodb+srv://esduser:esdproject@esdproject.j8dxyud.mongodb.net/?retryWrites=true&w=majority
       DATABASE: esdproject
-      COLLECTION: appointments
+      APPOINTMENTS_COLLECTION: appointments
+      CAPACITY_COLLECTION: capacity
       ADDR: 0.0.0.0:5000
+    depends_on:
+      - groomer
+      - user
     networks:
       - my-net
   groomer:
