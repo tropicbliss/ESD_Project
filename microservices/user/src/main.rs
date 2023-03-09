@@ -109,11 +109,11 @@ impl MutationRoot {
         }
         let user_exists = ctx
             .data_unchecked::<Collection<User>>()
-            .find_one(doc! {"name": name}, None)
+            .find_one(doc! {"name": &name}, None)
             .await?
             .is_some();
         if user_exists {
-            return Err(ApiError::UserExists);
+            return Err(ApiError::UserExists.into());
         }
         let payload = User {
             contact_no,

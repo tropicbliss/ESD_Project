@@ -128,8 +128,8 @@ struct Pet {
 struct UserEndpointOutput {
     groomer_id: String,
     groomer_name: String,
-    start_date: String,
-    end_date: String,
+    start_date: DateTime,
+    end_date: DateTime,
     groomer_picture_url: String,
     pet_names: Vec<String>,
 }
@@ -181,7 +181,7 @@ async fn get_user(
     let res = res
         .into_iter()
         .map(|app| UserEndpointOutput {
-            end_date: app.end_date.try_to_rfc3339_string().unwrap(),
+            end_date: app.end_date,
             groomer_name: groomer_info.get(&app.groomer_id).unwrap().name.clone(),
             groomer_picture_url: groomer_info
                 .get(&app.groomer_id)
@@ -190,7 +190,7 @@ async fn get_user(
                 .clone(),
             groomer_id: app.groomer_id,
             pet_names: app.pets.into_iter().map(|pet| pet.name).collect(),
-            start_date: app.start_date.try_to_rfc3339_string().unwrap(),
+            start_date: app.start_date,
         })
         .collect();
     Ok(Json(res))
