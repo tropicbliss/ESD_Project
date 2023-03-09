@@ -9,7 +9,7 @@ use axum::{
 use futures::{stream, StreamExt, TryStreamExt};
 use graphql_client::{GraphQLQuery, Response};
 use mongodb::{
-    bson::{doc, DateTime},
+    bson::{doc, Bson, DateTime},
     options::ClientOptions,
     Client, Collection,
 };
@@ -110,7 +110,7 @@ struct Appointment {
     groomer_id: String,
     start_date: DateTime,
     end_date: DateTime,
-    status: String,
+    status: Status,
     pets: Vec<Pet>,
 }
 
@@ -201,8 +201,8 @@ async fn get_user(
 struct SignInOutput {
     id: String,
     user_name: String,
-    start_date: String,
-    end_date: String,
+    start_date: DateTime,
+    end_date: DateTime,
     pets: Vec<Pet>,
 }
 
@@ -241,10 +241,10 @@ async fn get_arriving_customers(
                     .await
                     .unwrap();
                 SignInOutput {
-                    end_date: app.end_date.try_to_rfc3339_string().unwrap(),
+                    end_date: app.end_date,
                     id: app.id,
                     pets: app.pets,
-                    start_date: app.start_date.try_to_rfc3339_string().unwrap(),
+                    start_date: app.start_date,
                     user_name: res.name,
                 }
             }
@@ -290,10 +290,10 @@ async fn get_staying_customers(
                     .await
                     .unwrap();
                 SignInOutput {
-                    end_date: app.end_date.try_to_rfc3339_string().unwrap(),
+                    end_date: app.end_date,
                     id: app.id,
                     pets: app.pets,
-                    start_date: app.start_date.try_to_rfc3339_string().unwrap(),
+                    start_date: app.start_date,
                     user_name: res.name,
                 }
             }
@@ -304,22 +304,35 @@ async fn get_staying_customers(
     Ok(Json(res))
 }
 
+#[derive(Deserialize, Serialize, PartialEq)]
+enum Status {
+    Awaiting,
+    Staying,
+    Left,
+}
+
+impl From<Status> for Bson {
+    fn from(value: Status) -> Self {
+        let string = match value {
+            Status::Awaiting => "awaiting",
+            Status::Left => "left",
+            Status::Staying => "staying",
+        };
+        Self::String(string.to_string())
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct StatusChangeInput {
-    status: String,
+    status: Status,
 }
-
-const STATUSES: [&'static str; 3] = ["awaiting", "staying", "left"];
 
 async fn change_appointment_status(
     Path(appointment_id): Path<String>,
     state: State<SharedState>,
     Json(payload): Json<StatusChangeInput>,
 ) -> Result<StatusCode, ApiError> {
-    if !STATUSES.contains(&payload.status.as_str()) {
-        return Err(ApiError::IncorrectStatus);
-    }
     let filter = doc! {"id": appointment_id};
     let res = state
         .db
@@ -327,8 +340,8 @@ async fn change_appointment_status(
         .await
         .map_err(|_| ApiError::InternalError)?;
     if let Some(old_appointment) = res {
-        if old_appointment.status == STATUSES[1] && payload.status == STATUSES[0]
-            || old_appointment.status == STATUSES[2] && payload.status == STATUSES[1]
+        if old_appointment.status == Status::Staying && payload.status == Status::Awaiting
+            || old_appointment.status == Status::Left && payload.status == Status::Staying
         {
             return Err(ApiError::IncorrectStatusFlow);
         }
@@ -417,7 +430,7 @@ async fn create_appointment(
         id: cuid::cuid2(),
         pets: payload.pet_info,
         start_date: DateTime::now(),
-        status: String::from("awaiting"),
+        status: Status::Awaiting,
         user_name: payload.user_name,
     };
     state
@@ -431,7 +444,6 @@ async fn create_appointment(
 #[derive(Debug)]
 enum ApiError {
     InternalError,
-    IncorrectStatus,
     IncorrectStatusFlow,
     UserDoesNotExist,
     GroomerDoesNotExist,
@@ -441,7 +453,6 @@ impl IntoResponse for ApiError {
     fn into_response(self) -> axum::response::Response {
         let (status, error_message) = match self {
             ApiError::InternalError => (StatusCode::INTERNAL_SERVER_ERROR, "internal server error"),
-            ApiError::IncorrectStatus => (StatusCode::BAD_REQUEST, "incorrect status"),
             ApiError::IncorrectStatusFlow => (StatusCode::BAD_REQUEST, "incorrect status flow"),
             ApiError::UserDoesNotExist => (StatusCode::NOT_FOUND, "user cannot be found"),
             ApiError::GroomerDoesNotExist => (StatusCode::NOT_FOUND, "groomer cannot be found"),
