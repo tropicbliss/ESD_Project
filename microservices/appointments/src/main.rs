@@ -155,7 +155,7 @@ struct CheckAddInput {
     groomer_id: String,
     start_time: DateTime,
     end_time: DateTime,
-    quantity: usize,
+    quantity: u32,
 }
 
 #[derive(Deserialize)]
@@ -207,7 +207,7 @@ async fn check_add(
         .await
         .map_err(|_| ApiError::InternalError)?;
     for capacity in res {
-        if capacity.current_capacity + payload.quantity > groomer_capacity {
+        if capacity.current_capacity + payload.quantity as usize > groomer_capacity {
             return Err(ApiError::OverCapacity);
         }
     }
