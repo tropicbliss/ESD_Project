@@ -76,5 +76,14 @@ def create_product():
 def edit_product():
     stripe.Product.modify("id", name="Updated Product")
 
+@app.route('/create-price',methods=['POST'])
+def create_price():
+    stripe.Price.create(
+        product='{{PRODUCT_ID}}',
+        unit_amount=1000,
+        currency="usd",
+        recurring={"interval": "month"},
+    )
+
 if __name__ == '__main__':
     app.run(port=4242)
