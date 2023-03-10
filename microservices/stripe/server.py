@@ -20,17 +20,25 @@ app = Flask(__name__,
 
 YOUR_DOMAIN = 'http://localhost:4242'
 
+customer_3_items = [
+    {'product_id': 'price_1MjcO8LUyNHnHR56qLlSI1Xa', 'quantity': 1},
+    {'product_id': 'price_1Mk5bgLUyNHnHR56sV912KTa', 'quantity': 1},
+    {'product_id': 'price_1Mk5c7LUyNHnHR561ur9ZA4w', 'quantity': 1},
+]
+
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
-        checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                    'price': 'price_1MjcO8LUyNHnHR56qLlSI1Xa',
+        this_line_items = []
+        for key in request.form:
+            if key.startswith('checkbox_') and request.form.get(key) is not None:
+                this_line_items.append({
+                    'price': request.form.get(key),
                     'quantity': 1,
-                },
-            ],
+                })
+        print(this_line_items)
+        checkout_session = stripe.checkout.Session.create(
+            line_items = this_line_items,
             mode='payment',
             success_url=YOUR_DOMAIN + '/success.html',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
@@ -39,6 +47,34 @@ def create_checkout_session():
         return str(e)
 
     return redirect(checkout_session.url, code=303)
+
+@app.route('/make-refund', methods=['POST'])
+def make_refund():
+    try:
+        stripe.Refund.create(payment_intent="pi_3Mk6SlLUyNHnHR5619vpIbxf")
+    except Exception as e:
+        return str(e)
+    return redirect("success.html")
+
+@app.route('/create-product', methods=['POST'])
+def create_product():
+    try:
+        stripe.Product.create(
+        name="Basic Dashboard",
+        default_price_data={
+            "unit_amount": 1000,
+            "currency": "usd",
+            "recurring": {"interval": "month"},
+        },
+        expand=["default_price"],
+        )
+    except Exception as e:
+        return str(e)
+    return redirect("success.html")
+
+@app.route('/edit-product', methods=['POST'])
+def edit_product():
+    stripe.Product.modify("id", name="Updated Product")
 
 if __name__ == '__main__':
     app.run(port=4242)
