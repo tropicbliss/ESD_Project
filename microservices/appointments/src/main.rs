@@ -439,6 +439,7 @@ async fn get_staying_customers(
 }
 
 #[derive(Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
 enum Status {
     Awaiting,
     Staying,
