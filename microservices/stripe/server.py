@@ -6,7 +6,8 @@ Stripe Sample.
 Python 3.6 or newer required.
 """
 import os
-from flask import Flask, redirect, request
+from flask import Flask, redirect, request,jsonify
+import json
 
 import stripe
 # This is a public sample test API key.
@@ -20,32 +21,38 @@ app = Flask(__name__,
 
 YOUR_DOMAIN = 'http://localhost:4242'
 
-customer_3_items = [
-    {'product_id': 'price_1MjcO8LUyNHnHR56qLlSI1Xa', 'quantity': 1},
-    {'product_id': 'price_1Mk5bgLUyNHnHR56sV912KTa', 'quantity': 1},
-    {'product_id': 'price_1Mk5c7LUyNHnHR561ur9ZA4w', 'quantity': 1},
-]
-
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
-        this_line_items = []
-        for key in request.form:
-            if key.startswith('checkbox_') and request.form.get(key) is not None:
-                this_line_items.append({
-                    'price': request.form.get(key),
-                    'quantity': 1,
-                })
-        print(this_line_items)
+        # Parse JSON data from request
+        data = request.data.decode('utf-8')
+        json_data = json.loads(data)
+
+        # Extract line items from JSON data
+        line_items = []
+        for item in json_data['line_items']:
+            line_item = {
+                'price': item['product_id'],
+                'quantity': item['quantity']
+            }
+            line_items.append(line_item)
+
+        # Create Stripe checkout session
         checkout_session = stripe.checkout.Session.create(
-            line_items = this_line_items,
+            line_items=line_items,
             mode='payment',
             success_url=YOUR_DOMAIN + '/success.html',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
         )
+
+        # Return session ID to client
+        
+
     except Exception as e:
         return str(e)
 
+    print(jsonify({'session_id': checkout_session['id']}))
+    print(checkout_session.url)
     return redirect(checkout_session.url, code=303)
 
 @app.route('/make-refund', methods=['POST'])
