@@ -1,0 +1,57 @@
+<html lang="en">
+<%- include("./partials/header.ejs") %>
+
+<body>
+
+    <h1>Join Us</h1>
+
+  <div class="create-groomer content">
+    <form action="/hotels" method="POST">
+        <label for="name">Hotel Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="email">Email:</label> 
+        <input type="text" id="email" name="email" required> <br>
+
+        <label for="contact_no">Contact Number:</label>
+        <input type="text" id="contact_no" name="contact_no" required> <br>
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" required>
+
+        <label for="pwd">Password:</label>
+        <input type="password" id="pwd" name="pwd" required>
+        
+        <p>Type of Pets: </p>
+        <% const pet_arr= ["Birds", "Hamsters", "Cats", "Dogs", "Rabbits", "Guinea pigs", "Chinchillas", "Mice", "Fishes"] %> 
+
+        <% pet_arr.forEach(pet => { %>
+          <input type="checkbox" id="<%= pet %>" name="petsAllowed" value="<%= pet %>">
+          <label for="<%= pet %>"><%= pet %></label><br>
+        <% }) %>
+
+        <p>Services offered: </p>
+        <% const services= ["Boarding", "Training", "Grooming", "Medical Care"] %> 
+
+        <% services.forEach(service => { %>
+            <input type="checkbox" id="<%= service %>" name="services" value="<%= service %>">
+            <label for="<%= service %>"><%= service %></label><br>
+        <% }) %>
+
+        <p>Membership Tier</p>
+        <% const memberships= ["Basic", "Premium", "Elite"] %> 
+
+        <% memberships.forEach(membership => { %>
+            <input type="checkbox" id="<%= membership %>" name="membership_tier" value="<%= membership %>">
+            <label for="<%= membership %>"><%= membership %></label><br>
+        <% }) %>
+        
+        <br> 
+
+        <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <%- include("./partials/footer.ejs") %>
+</body>
+</html>
