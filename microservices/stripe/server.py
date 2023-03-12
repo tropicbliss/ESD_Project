@@ -24,19 +24,26 @@ YOUR_DOMAIN = 'http://localhost:4242'
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
-        # Parse JSON data from request
-        data = request.data.decode('utf-8')
-        json_data = json.loads(data)
-
-        # Extract line items from JSON data
-        line_items = []
-        for item in json_data['line_items']:
-            line_item = {
-                'price': item['product_id'],
-                'quantity': item['quantity']
-            }
-            line_items.append(line_item)
-
+        if request.is_json:
+            # Parse JSON data from request
+            json_data = request.get_json()
+            print(json_data)
+            # Extract line items from JSON data
+            line_items = []
+            for item in json_data['line_items']:
+                line_item = {
+                    'price': item['product_id'],
+                    'quantity': item['quantity']
+                }
+                line_items.append(line_item)
+        else:
+            # Extract line items from form data
+            print(request.form.get('product_id'))
+            line_items = [{
+                'price': request.form.get('product_id'),
+                'quantity': 1
+            }]
+        
         # Create Stripe checkout session
         checkout_session = stripe.checkout.Session.create(
             line_items=line_items,
@@ -44,14 +51,11 @@ def create_checkout_session():
             success_url=YOUR_DOMAIN + '/success.html',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
         )
-
         # Return session ID to client
         
-
     except Exception as e:
         return str(e)
 
-    print(jsonify({'session_id': checkout_session['id']}))
     print(checkout_session.url)
     return redirect(checkout_session.url, code=303)
 
