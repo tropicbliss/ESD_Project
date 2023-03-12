@@ -17,12 +17,31 @@
       </div>
     </div>
     <form action="/create-checkout-session" method="POST">
-      <label for="subscribe">Eugenium:</label>
-      <input type="checkbox" id="subscribe" name="product_id" value="price_1MjcO8LUyNHnHR56qLlSI1Xa">
-      <br>
-      <label for="terms">Waterbottle:</label>
-      <input type="checkbox" id="terms" name="checkbox_k" value="price_1Mk5bgLUyNHnHR56sV912KTa" required>
-      <br>
+      <div>
+        <input type="radio" id="basic" name="product_id" value="price_1Mklu5LUyNHnHR56tJ5E1kR0">
+        <label for="basic">Basic</label>
+      </div>
+    
+      <div>
+        <input type="radio" id="premium" name="product_id" value="price_1MkluHLUyNHnHR566Fw51VfA">
+        <label for="premium">Premium</label>
+      </div>
+    
+      <div>
+        <input type="radio" id="luxury" name="product_id" value="price_1MkluULUyNHnHR56ISQ59eIo">
+        <label for="luxury">Luxury</label>
+      </div>
+    
+      <div>
+        <label for="quantity">Quantity:</label>
+        <select id="quantity" name="quantity">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
       <button type="submit" id="checkout-button">Checkout</button>
     </form>
   </section>

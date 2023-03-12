@@ -41,7 +41,7 @@ def create_checkout_session():
             print(request.form.get('product_id'))
             line_items = [{
                 'price': request.form.get('product_id'),
-                'quantity': 1
+                'quantity': request.form.get('quantity')
             }]
         
         # Create Stripe checkout session
