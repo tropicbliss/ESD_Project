@@ -17,7 +17,7 @@ stripe.api_key = 'sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM
 
 app = Flask(__name__,
             static_url_path='',
-            static_folder='public')
+            static_folder='../../frontend - users view/stripeTest')
 
 YOUR_DOMAIN = 'http://localhost:4242'
 
