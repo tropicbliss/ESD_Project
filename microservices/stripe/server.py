@@ -6,7 +6,8 @@ Stripe Sample.
 Python 3.6 or newer required.
 """
 import os
-from flask import Flask, redirect, request
+from flask import Flask, redirect, request,jsonify
+import json
 
 import stripe
 # This is a public sample test API key.
@@ -16,29 +17,84 @@ stripe.api_key = 'sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM
 
 app = Flask(__name__,
             static_url_path='',
-            static_folder='public')
+            static_folder='../../frontend - users view/stripeTest')
 
 YOUR_DOMAIN = 'http://localhost:4242'
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
+        if request.is_json:
+            # Parse JSON data from request
+            json_data = request.get_json()
+            print(json_data)
+            # Extract line items from JSON data
+            line_items = []
+            for item in json_data['line_items']:
+                line_item = {
+                    'price': item['product_id'],
+                    'quantity': item['quantity']
+                }
+                line_items.append(line_item)
+        else:
+            # Extract line items from form data
+            print(request.form.get('product_id'))
+            line_items = [{
+                'price': request.form.get('product_id'),
+                'quantity': request.form.get('quantity')
+            }]
+        
+        # Create Stripe checkout session
         checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                    'price': 'price_1MjcO8LUyNHnHR56qLlSI1Xa',
-                    'quantity': 1,
-                },
-            ],
+            line_items=line_items,
             mode='payment',
             success_url=YOUR_DOMAIN + '/success.html',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
         )
+        # Return session ID to client
+        
     except Exception as e:
         return str(e)
 
+    print(checkout_session.url)
     return redirect(checkout_session.url, code=303)
+
+@app.route('/make-refund', methods=['POST'])
+def make_refund():
+    try:
+        stripe.Refund.create(payment_intent="pi_3Mk6SlLUyNHnHR5619vpIbxf")
+    except Exception as e:
+        return str(e)
+    return redirect("success.html")
+
+@app.route('/create-product', methods=['POST'])
+def create_product():
+    try:
+        stripe.Product.create(
+        name="Basic Dashboard",
+        default_price_data={
+            "unit_amount": 1000,
+            "currency": "usd",
+            "recurring": {"interval": "month"},
+        },
+        expand=["default_price"],
+        )
+    except Exception as e:
+        return str(e)
+    return redirect("success.html")
+
+@app.route('/edit-product', methods=['POST'])
+def edit_product():
+    stripe.Product.modify("id", name="Updated Product")
+
+@app.route('/create-price',methods=['POST'])
+def create_price():
+    stripe.Price.create(
+        product='{{PRODUCT_ID}}',
+        unit_amount=1000,
+        currency="usd",
+        recurring={"interval": "month"},
+    )
 
 if __name__ == '__main__':
     app.run(port=4242)

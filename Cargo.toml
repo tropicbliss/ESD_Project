@@ -1,2 +1,2 @@
 [workspace]
-members = ["microservices/appointments", "microservices/comments", "microservices/user"]
+members = ["microservices/appointments", "microservices/comments", "microservices/user", "microservices/logging"]
