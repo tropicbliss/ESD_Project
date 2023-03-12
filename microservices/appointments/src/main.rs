@@ -337,7 +337,25 @@ struct SignInOutput {
     user_name: String,
     start_date: DateTime,
     end_date: DateTime,
-    pets: Vec<Pet>,
+    pets: Vec<PetInputOutput>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PetInputOutput {
+    pet_type: String,
+    name: String,
+    gender: PetGender,
+    age: usize,
+    medical_info: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+enum PetGender {
+    Male,
+    Female,
+    Unspecified,
 }
 
 async fn get_arriving_customers(
@@ -374,10 +392,16 @@ async fn get_arriving_customers(
                     .json()
                     .await
                     .unwrap();
+                let pets = app
+                    .pets
+                    .into_iter()
+                    .map(|e| e.try_into())
+                    .collect::<Result<Vec<_>, _>>()
+                    .unwrap();
                 SignInOutput {
                     end_date: app.end_date,
                     id: app.id,
-                    pets: app.pets,
+                    pets,
                     start_date: app.start_date,
                     user_name: res.name,
                 }
@@ -423,10 +447,16 @@ async fn get_staying_customers(
                     .json()
                     .await
                     .unwrap();
+                let pets = app
+                    .pets
+                    .into_iter()
+                    .map(|e| e.try_into())
+                    .collect::<Result<Vec<_>, _>>()
+                    .unwrap();
                 SignInOutput {
                     end_date: app.end_date,
                     id: app.id,
-                    pets: app.pets,
+                    pets,
                     start_date: app.start_date,
                     user_name: res.name,
                 }
@@ -536,13 +566,51 @@ async fn stayed_customers(
 struct CreateInput {
     user_name: String,
     groomer_id: String,
-    pet_info: Vec<Pet>,
+    pet_info: Vec<PetInputOutput>,
 }
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct CreateOutput {
     id: String,
+}
+
+impl TryFrom<Pet> for PetInputOutput {
+    type Error = &'static str;
+
+    fn try_from(value: Pet) -> std::result::Result<Self, Self::Error> {
+        let gender = match value.pet_type.as_str() {
+            "male" => PetGender::Male,
+            "female" => PetGender::Female,
+            "unspecified" => PetGender::Unspecified,
+            _ => return Err("unknown pet gender"),
+        };
+        Ok(Self {
+            age: value.age,
+            gender,
+            medical_info: value.medical_info,
+            name: value.name,
+            pet_type: value.pet_type,
+        })
+    }
+}
+
+impl From<PetInputOutput> for Pet {
+    fn from(value: PetInputOutput) -> Self {
+        let gender = match value.gender {
+            PetGender::Female => "female",
+            PetGender::Male => "male",
+            PetGender::Unspecified => "unspecified",
+        }
+        .to_string();
+        Self {
+            age: value.age,
+            gender,
+            medical_info: value.medical_info,
+            name: value.name,
+            pet_type: value.pet_type,
+        }
+    }
 }
 
 async fn create_appointment(
@@ -563,7 +631,7 @@ async fn create_appointment(
         end_date: DateTime::now(),
         groomer_id: payload.groomer_id,
         id: cuid::cuid2(),
-        pets: payload.pet_info,
+        pets: payload.pet_info.into_iter().map(|e| e.into()).collect(),
         start_date: DateTime::now(),
         status: Status::Awaiting,
         user_name: payload.user_name,
