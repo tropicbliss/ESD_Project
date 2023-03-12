@@ -22,8 +22,10 @@
     <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 
-  <!-- bootstrap core css -->
-  <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+  <script src="https://unpkg.com/vue@next"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 
   <!-- fonts style -->
   <link href="https://fonts.googleapis.com/css?family=Dosis:400,500|Poppins:400,700&display=swap" rel="stylesheet">
@@ -32,239 +34,141 @@
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
   <!-- Groomer display style -->
-  <link href="css/grommers_display.css" rel="stylesheet" />
-  <style>
-    .our-team {
-    padding: 30px 0 40px;
-    margin-bottom: 30px;
-    background-color: #f7f5ec;
-    text-align: center;
-    overflow: hidden;
-    position: relative;
-    }
-
-    .our-team .picture {
-    display: inline-block;
-    height: 130px;
-    width: 130px;
-    margin-bottom: 50px;
-    z-index: 1;
-    position: relative;
-    }
-
-    .our-team .picture::before {
-    content: "";
-    width: 100%;
-    height: 0;
-    border-radius: 50%;
-    background-color: #1369ce;
-    position: absolute;
-    bottom: 135%;
-    right: 0;
-    left: 0;
-    opacity: 0.9;
-    transform: scale(3);
-    transition: all 0.3s linear 0s;
-    }
-
-    .our-team:hover .picture::before {
-    height: 100%;
-    }
-
-    .our-team .picture::after {
-    content: "";
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background-color: #1369ce;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-    }
-
-    .our-team .picture img {
-    width: 100%;
-    height: auto;
-    border-radius: 50%;
-    transform: scale(1);
-    transition: all 0.9s ease 0s;
-    }
-
-    .our-team:hover .picture img {
-    box-shadow: 0 0 0 14px #f7f5ec;
-    transform: scale(0.7);
-    }
-
-    .our-team .title {
-    display: block;
-    font-size: 15px;
-    color: #4e5052;
-    text-transform: capitalize;
-    }
-
-    .our-team .social {
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    background-color: #1369ce;
-    position: absolute;
-    bottom: -100px;
-    left: 0;
-    transition: all 0.5s ease 0s;
-    }
-
-    .our-team:hover .social {
-    bottom: 0;
-    }
-
-    .our-team .social li {
-    display: inline-block;
-    }
-
-    .our-team .social li a {
-    display: block;
-    padding: 10px;
-    font-size: 17px;
-    color: white;
-    transition: all 0.3s ease 0s;
-    text-decoration: none;
-    }
-
-    .our-team .social li a:hover {
-    color: #1369ce;
-    background-color: #f7f5ec;
-    }
-  </style>
+  <link href="css/groomers_display.css" rel="stylesheet" />
 </head>
 
 <body>
   <div class="hero_area">
-    <!-- header section strats -->
-    <header class="header_section">
-      <div class="container-fluid">
-        <nav class="navbar navbar-expand-lg custom_nav-container ">
-          <a class="navbar-brand" href="index.html">
-            <img src="images/logo.png" style="width: 70px; height: 70px;">
-            <span style="font-size: medium; margin-top: 0px;">
-              Pawsitively Pampered
-            </span>
-          </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
+  <!-- header section strats -->
+  <header class="header_section">
+    <div class="container-fluid">
+      <nav class="navbar navbar-expand-lg custom_nav-container ">
+        <a class="navbar-brand" href="index.html">
+          <img src="images/logo.png" style="width: 70px; height: 70px;">
+          <span style="font-size: medium; margin-top: 0px;">
+            Pawsitively Pampered
+          </span>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-          <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
-              <ul class="navbar-nav">
-                <li class="nav-item active">
-                  <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="groomers.html">Groomers </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="aboutus.html">About Us </a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="profile.html">Profile</a>
-                </li>
-              </ul>
-              <form class="form-inline my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0">
-                <button class="btn my-2 my-sm-0 nav_search-btn" type="submit"></button>
-              </form>
-            </div>
-            <div class="quote_btn-container d-flex justify-content-center m">
-              <a href="register.html">
-                Register
-              </a>
-            </div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
+            <ul class="navbar-nav">
+              <li class="nav-item active">
+                <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="groomers.html">Groomers </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="aboutus.html">About Us </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="profile.html">Profile</a>
+              </li>
+            </ul>
+            <form class="form-inline my-lg-0 ml-0 ml-lg-4 mb-3 mb-lg-0">
+              <button class="btn my-2 my-sm-0 nav_search-btn" type="submit"></button>
+            </form>
           </div>
-        </nav>
-      </div>
-    </header>
-    <!-- end header section -->
+          <div class="quote_btn-container d-flex justify-content-center m">
+            <a href="register.html">
+              Register
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <!-- end header section -->
 
 
   <!-- Pet Groomer Display -->
   <section class="buy_section layout_padding">
     <div class="container">
       <h2>
-        Discover Our Groomers
+        Discover Our <span style="color:rgb(0, 201, 241)">Groomers</span>
       </h2>
-      <div class="container mt-3">
-        <div class="row">
-          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <div class="our-team">
-              <div class="picture">
-                <img class="img-fluid" src="https://picsum.photos/130/130?image=1027">
-              </div>
-              <div class="team-content">
-                <h3 class="name">Groomer A</h3>
-                <h4 class="title">Hotel A</h4>
-              </div>
-              <ul class="social">
-                <li><a href="..." class="fa fa-facebook" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-twitter" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-google-plus" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-linkedin" aria-hidden="true"></a></li>
-              </ul>
-            </div>
-          </div>
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <div class="our-team">
-              <div class="picture">
-                <img class="img-fluid" src="https://picsum.photos/130/130?image=839">
-              </div>
-              <div class="team-content">
-                <h3 class="name">Groomer B</h3>
-                <h4 class="title">Hotel B</h4>
-              </div>
-              <ul class="social">
-                <li><a href="..." class="fa fa-facebook" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-twitter" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-google-plus" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-linkedin" aria-hidden="true"></a></li>
-              </ul>
-            </div>
-          </div>
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <div class="our-team">
-              <div class="picture">
-                <img class="img-fluid" src="https://picsum.photos/130/130?image=856">
-              </div>
-              <div class="team-content">
-                <h3 class="name">Groomer C</h3>
-                <h4 class="title">Hotel C</h4>
-              </div>
-              <ul class="social">
-                <li><a href="..." class="fa fa-facebook" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-twitter" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-google-plus" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-linkedin" aria-hidden="true"></a></li>
-              </ul>
-            </div>
-          </div>
-              <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <div class="our-team">
-              <div class="picture">
-                <img class="img-fluid" src="https://picsum.photos/130/130?image=836">
-              </div>
-              <div class="team-content">
-                <h3 class="name">Groomer D</h3>
-                <h4 class="title">Hotel D</h4>
-              </div>
-              <ul class="social">
-                <li><a href="..." class="fa fa-facebook" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-twitter" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-google-plus" aria-hidden="true"></a></li>
-                <li><a href="..." class="fa fa-linkedin" aria-hidden="true"></a></li>
-              </ul>
-            </div>
+      <div id="app">
+        <div class="container mt-4">
+          <div class="row">
+            <blog-post v-for="(p,idx) in groomers" v-bind:key="idx" v-bind:grom="p" v-bind:id="p.id" v-bind:name="p.name" v-bind:desc="p.desc">
+            </blog-post>
           </div>
         </div>
-    </div>
+      </div>
+ 
+      <script>
+          const app = Vue.createApp({
+              data() {
+                  return {
+                    groomers: [
+                        { id: 1, name: 'A', desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore' }, 
+                        { id: 2, name: 'B', desc: 'I am Groomer B'}, 
+                        { id: 3, name: 'C', desc: 'I am Groomer C'},
+                        { id: 4, name: 'D', desc: 'I am Groomer D'} 
+                    ]
+                  }
+              },
+              // created() { // created is a hook that executes as soon as Vue instance is created
+              //     axios.get('#') 
+              //     .then(response => {
+              //         // this gets the all groomers
+              //         console.log(response.data)
+              //         this.posts = response.data
+              //     })
+              //     .catch(error => {
+              //         this.posts = [{ entry: 'There was an error: ' + error.message }]
+              //     })
+              // },
+              // methods: {
+              //     info page for each groomer(id) {
+              //     }
+              // }
+      
+          });
+
+          app.component('blog-post', {
+              props: ['id', 'name', 'desc'],
+              template: `    
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                      <div class="our-team">
+                          <div class="picture">
+                            <img class="img-fluid" src="https://picsum.photos/130/130?image=1027">
+                          </div>
+                          <div class="team-content">
+                            <h3 class="name">Groomer {{name}}</h3>
+                            <h4 class="title">Hotel {{name}}</h4>
+                          </div>
+                          <a aria-hidden="true" class="mt-2 btn btn-primary" href="#" role="button" data-bs-toggle="modal" v-bind:data-bs-target="'#'+name">Link</a>
+                          <!-- Modal -->
+                            <div class="modal fade" v-bind:id="name" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                              <div class="modal-dialog modal-dialog-scrollable">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Groomer {{name}} Information</h1>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                  </div>
+                                  <div class="modal-body">
+                                    {{desc}}
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary">Check Out</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                      </div>
+                    </div>
+              ` 
+          })
+
+          app.mount('#app')
+      </script> 
     </div>
   </section>
   <!-- end Pet Groomer Display -->
@@ -274,7 +178,7 @@
     <div class="container">
       <h2 class="custom_heading text-center">
         What Our 
-        <span>
+        <span style="color:rgb(0, 201, 241)">
           clients
         </span>
         Say
@@ -424,7 +328,7 @@
   <!-- footer section -->
 
   <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-  <script type="text/javascript" src="js/bootstrap.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 
 </body>
 
