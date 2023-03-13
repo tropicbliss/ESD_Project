@@ -9,21 +9,22 @@ import os
 from flask import Flask, redirect, request,jsonify,render_template
 import json
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField,RadioField
-from dotenv import load_dotenv
+from wtforms import StringField, SubmitField,RadioField,RadioFieldOption
+# from dotenv import load_dotenv
 
 import stripe
 # This is a public sample test API key.
 # Don’t submit any personally identifiable information in requests made with this key.
 # Sign in to see your own test API key embedded in code samples.
-# stripe.api_key = 'sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H'
+stripe.api_key = 'sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H'
 
-load_dotenv()
-stripe.api_key = os.getenv('STRIPE_API_KEY')
+# load_dotenv()
+# stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 app = Flask(__name__,
             static_url_path='',
             static_folder='../../public/stripeTest')
+app.config['SECRET_KEY'] = 'very_secret_deh'
 
 YOUR_DOMAIN = 'http://localhost:4242'
 
@@ -32,7 +33,7 @@ class checkoutForm(FlaskForm):
     quantity = RadioField("days_stay")
     submit = SubmitField("go_checkout")
 
-@app.route('/',method=["GET"])
+@app.route('/',methods=["GET","POST"])
 def index():
     """
     Render the checkout form.
@@ -68,7 +69,7 @@ def create_checkout_session():
             mode='payment',
             success_url=YOUR_DOMAIN + '/success.html',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
-            discounts = [{"coupon":"d1LybAG0"},{"coupon":"uMPnzcle"}],
+            discounts = [{"coupon":"d1LybAG0"}],
         )
         # Return session ID to client
         
