@@ -33,7 +33,7 @@ class checkoutForm(FlaskForm):
     quantity = RadioField("days_stay")
     submit = SubmitField("go_checkout")
 
-@app.route('/',methods=["GET","POST"])
+@app.route('/test',methods=["GET","POST"])
 def index():
     """
     Render the checkout form.
