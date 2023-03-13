@@ -7,6 +7,19 @@
     <title>Document</title>
 </head>
 <body>
-    
+    <form method="POST">
+        {{checkout_form.hidden_tag()}}
+        <p>
+            {{checkout_form.package.label}}
+            {{checkout_form.package()}}
+        </p>
+        <p>
+            {{checkout_form.quantity.label}}
+            {{checkout_form.quantity()}}
+        </p>
+        <p>
+            {{checkout_form.submit()}}
+        </p>
+    </form>
 </body>
 </html>

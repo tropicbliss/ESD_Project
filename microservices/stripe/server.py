@@ -9,7 +9,7 @@ import os
 from flask import Flask, redirect, request,jsonify,render_template
 import json
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField,RadioField
 
 import stripe
 # This is a public sample test API key.
@@ -22,6 +22,15 @@ app = Flask(__name__,
             static_folder='../../public/stripeTest')
 
 YOUR_DOMAIN = 'http://localhost:4242'
+
+class checkoutForm(FlaskForm):
+    package = RadioField("svc_lvl")
+    quantity = RadioField("days_stay")
+    submit = SubmitField("go_checkout")
+
+@app.route('/',method=["GET","POST"])
+def index():
+    return render_template("checkout_form.html", checkout_form= checkoutForm())
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
