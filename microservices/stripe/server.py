@@ -6,8 +6,10 @@ Stripe Sample.
 Python 3.6 or newer required.
 """
 import os
-from flask import Flask, redirect, request,jsonify
+from flask import Flask, redirect, request,jsonify,render_template
 import json
+from flask_wtf import FlaskForm
+from wtforms import StringField, SubmitField
 
 import stripe
 # This is a public sample test API key.
