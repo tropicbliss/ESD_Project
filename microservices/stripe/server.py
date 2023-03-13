@@ -32,15 +32,15 @@ def create_checkout_session():
             line_items = []
             for item in json_data['cust_checkout']:
                 line_item = {
-                    'price': item['product_id'],
+                    'price': item['price_id'],
                     'quantity': item['quantity']
                 }
                 line_items.append(line_item)
         else:
             # Extract line items from form data
-            print(request.form.get('product_id'))
+            print(request.form.get('price_id'))
             line_items = [{
-                'price': request.form.get('product_id'),
+                'price': request.form.get('price_id'),
                 'quantity': request.form.get('quantity')
             }]
         
@@ -50,18 +50,17 @@ def create_checkout_session():
             mode='payment',
             success_url=YOUR_DOMAIN + '/success.html',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
-            allow_promotion_codes = True,
-            discounts = [
-            {"coupon":"d1LybAG0"}
-            ]
+            discounts = [{"coupon":"d1LybAG0"},{"coupon":"uMPnzcle"}],
         )
         # Return session ID to client
         
     except Exception as e:
         return str(e)
 
-    print(checkout_session.url)
-    return redirect(checkout_session.url, code=303)
+    if request.is_json:
+        return checkout_session.url
+    else:
+        return redirect(checkout_session.url, code=303)
 
 @app.route('/make-refund', methods=['POST'])
 def make_refund():
