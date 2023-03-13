@@ -50,6 +50,10 @@ def create_checkout_session():
             mode='payment',
             success_url=YOUR_DOMAIN + '/success.html',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
+            allow_promotion_codes = True,
+            discounts = [
+            {"coupon":"d1LybAG0"}
+            ]
         )
         # Return session ID to client
         
