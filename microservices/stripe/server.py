@@ -10,12 +10,16 @@ from flask import Flask, redirect, request,jsonify,render_template
 import json
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField,RadioField
+from dotenv import load_dotenv
 
 import stripe
 # This is a public sample test API key.
 # Don’t submit any personally identifiable information in requests made with this key.
 # Sign in to see your own test API key embedded in code samples.
-stripe.api_key = 'sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H'
+# stripe.api_key = 'sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H'
+
+load_dotenv()
+stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 app = Flask(__name__,
             static_url_path='',
@@ -28,8 +32,11 @@ class checkoutForm(FlaskForm):
     quantity = RadioField("days_stay")
     submit = SubmitField("go_checkout")
 
-@app.route('/',method=["GET","POST"])
+@app.route('/',method=["GET"])
 def index():
+    """
+    Render the checkout form.
+    """
     return render_template("checkout_form.html", checkout_form= checkoutForm())
 
 @app.route('/create-checkout-session', methods=['POST'])
@@ -65,11 +72,11 @@ def create_checkout_session():
         )
         # Return session ID to client
         
-    except Exception as e:
-        return str(e)
+    except stripe.error.StripeError as e:
+        return jsonify(error=str(e)), 500
 
     if request.is_json:
-        return checkout_session.url
+        return jsonify(checkout_url=checkout_session.url)
     else:
         return redirect(checkout_session.url, code=303)
 
