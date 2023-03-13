@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <!-- icon -->
+   <link rel="icon" href="style/favicon.ico">
+   <title>Schedule class</title>
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
+   <!-- external style sheet -->
+   <link href='style/style.css' rel='stylesheet'>
+   <style>
+      .container-fluid {
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+         border-radius: 6px;
+         position: relative;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         flex-direction: column;
+         width: 400px;
+         background-color: #FFF;
+         padding: 30px;
+
+
+      }
+
+      body {
+         margin: 0;
+         padding: 0;
+         font-family: 'Open Sans';
+         font-size: 19px;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         min-height: 100vh;
+      }
+
+      .img-thumbnail {
+         border-radius: 50%;
+         width: 120px;
+         height: 120px;
+         object-fit: cover;
+         margin-top: -70%;
+
+      }
+
+      #submit {
+         width: 95%;
+         padding: 10px 20px;
+         background: #fa7979;
+         color: #fff;
+         outline: none;
+         border: 0;
+         font-size: 18px;
+         border-radius: 4px;
+         cursor: pointer;
+         box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+         margin-top: 20px;
+
+      }
+
+      .card {
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+         border-radius: 30px;
+         padding: 30px;
+      }
+
+      .form-control,
+      .form-select{
+         border-radius: 30px;
+         height:40px;
+         padding-top:5px;
+         padding-bottom:5px;
+         margin-top:10px;
+         margin-bottom:10px;
+
+      }
+
+      #location{
+         border-radius: 30px;
+         height:40px;
+         padding-left:15px;
+         padding-top:5px;
+         padding-bottom:5px;
+         margin-top:10px;
+         margin-bottom:10px;
+         border: 1px solid;
+         border-color: lightgray;
+      }
+
+      hr {
+         margin-top: 30px;
+         margin-bottom: 30px;
+      }
+
+      p {
+         margin: 0px;
+      }
+
+      .has-bg {
+         background-image: url("img/Background.png");
+      }
+   </style>
+   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+   <script>
+      function successful(ID) {
+         display = `<lottie-player src="https://assets9.lottiefiles.com/packages/lf20_4qldwfx4.json"  
+         background="transparent"  speed="2"  style="width: 120px; height: 120px; object-fit: cover;
+         margin-top: -70%;"  loop  autoplay></lottie-player>`
+         document.getElementById(ID).innerHTML = display;
+
+         return true
+      }
+   </script>
+   <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.11.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.11.0/firebase-analytics.js";
+      import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.11.0/firebase-auth.js";
+      import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.11.0/firebase-auth.js";
+      import { getDatabase, ref, set, child, push, update } from "https://www.gstatic.com/firebasejs/9.11.0/firebase-database.js";
+
+      // Initialize Firebase
+      const firebaseConfig = {
+         apiKey: "AIzaSyDc714DoZoHSdClJoOi3K95Ho-4nPH4fZY",
+         authDomain: "tutizen-c8f64.firebaseapp.com",
+         databaseURL: "https://tutizen-c8f64-default-rtdb.asia-southeast1.firebasedatabase.app",
+         projectId: "tutizen-c8f64",
+         storageBucket: "tutizen-c8f64.appspot.com",
+         messagingSenderId: "210404368356",
+         appId: "1:210404368356:web:c8d68acf2541de5ab9b1f1"
+      };
+      const appp = initializeApp(firebaseConfig);
+      // Initialize Firebase Authentication and get a reference to the service
+      const analytics = getAnalytics(appp);
+      const auth = getAuth();
+      const database = getDatabase();
+      const user = auth.currentUser;
+      const tutorinfor = JSON.parse(localStorage.getItem('tutorInfo'))
+      const usersession = JSON.parse(localStorage.getItem('userinfo'))
+      const id = tutorinfor.id;
+      console.log(id)
+      const tutorname = tutorinfor.name
+      const tutorimg = tutorinfor.img
+      console.log(tutorinfor)
+      if (usersession !== null) {
+         console.log("success")
+      } else {
+         alert("Only for registered students");
+         window.location.href = "Homepage.html"
+      }
+
+      // console.log(usersession)
+
+      const education = usersession.level;
+      const uid = usersession.uid;
+      const name = usersession.name;
+      // console.log(education)
+
+      const book = document.getElementById("submit")
+      // console.log(uid)
+
+
+
+      const submit_booking = () => {
+         const subjectt = document.getElementById("subject").value
+         var level = document.getElementById("level").value
+         var time = document.getElementById("time").value
+         const date = document.getElementById("date").value
+         const duration = document.getElementById("duration").value
+         const location = document.getElementById("location").value
+         const price = document.getElementById("price").value
+         const updates = {};
+         function tConvert(timee) {
+            // Check correct time format and split into components
+            timee = timee.toString().match(/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+
+            if (timee.length > 1) { // If time format correct
+               timee = timee.slice(1);  // Remove full string match value
+               timee[5] = +timee[0] < 12 ? ' AM' : ' PM'; // Set AM/PM
+               timee[0] = +timee[0] % 12 || 12; // Adjust hours
+            }
+            return timee.join(''); // return adjusted time or original string
+         }
+
+         console.log(time)
+         console.log(date)
+         console.log(duration)
+         const db = getDatabase();
+         var randomid = Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+         console.log(randomid)
+         const reviewData =
+
+         {
+            "level": level,
+            "name": name,
+            "tutor": tutorname,
+            "tutorimg": tutorimg,
+            "score": "",
+            "date": date,
+            "subject": subjectt,
+            "text": "",
+            "tutorid": id,
+
+         }
+            ;
+         const bookingData =
+
+         {
+            "tutor": tutorname,
+            "level": level,
+            "subject": subjectt,
+            "date": date,
+            "time": tConvert(time),
+            "duration": duration,
+            "uid": uid,
+            "img": tutorimg,
+            "location": location,
+         }
+
+         const paymentData =
+
+         {
+            "level": education,
+            "name": name,
+            "tutor": tutorname,
+            "tutorimg": tutorimg,
+            "payment_status": "incomplete",
+            "date": date,
+            "subject": subjectt,
+            "price": price,
+            "tutorid": id,
+         }
+
+
+         updates['/users/' + uid + "/reviews/incomplete/" + randomid] = reviewData;
+         updates['/users/' + uid + "/bookings/" + randomid] = bookingData;
+         updates['/users/' + uid + "/payments/incomplete/" + randomid] = paymentData;
+         localStorage.setItem("bookingData", JSON.stringify(bookingData))
+         update(ref(db), updates)
+         successful("imgChange")
+
+         if (successful("imgChange")) {
+            setTimeout(() => {
+               window.location = 'bookingpage.html'; //After successful login, user will be redirected to home.html
+            }, 1000)
+         }
+
+      }
+      book.addEventListener('click', submit_booking);
+   </script>
+</head>
+
+<body style="background-color: #Ffffff;" class='has-bg'>
+   <div class="container-fluid" id="app" style="margin-top:100px;">
+      <div class="row justify-content-center">
+         <div class="col-5" id="imgChange">
+            <img src="img/calendar.png" class="img-thumbnail">
+         </div>
+         <div>
+            Level:
+            <select v-model="level" id="level" class="form-select" id="level">
+               <option v-for="level in levels">{{level}}</option>
+            </select>
+            Subject:
+            <select name="subjects" id="subject" class="form-select">
+               <option v-for="value in primarysub" v-if="level=='Primary School'">{{value}}</option>
+               <option v-for="value in secondarysub" v-if="level=='Secondary School'">{{value}}</option>
+               <option v-for="value in jcsub" v-if="level=='Tertiary'">{{value}}</option>
+            </select>
+            Price:
+            <select name="prices" id="price" class="form-select">
+               <option v-if="level=='Primary School'">{{primaryprice}}</option>
+               <option v-if="level=='Secondary School'">{{secondaryprice}}</option>
+               <option v-if="level=='Tertiary'">{{jcprice}}</option>
+            </select>
+            
+
+         </div>
+
+         <div>
+            <label for="customRange1" class="form-label">Duration:</label>
+            <input type="range" class="form-range" value="1" min="0" max="3" step="0.5"
+               oninput="this.nextElementSibling.value = this.value" id="duration"><output>1</output> Hour <br>
+         </div>
+
+         <div>
+            <br>Date of First Lesson:<br>
+            <input type="date" class="form-control" id="date">
+            Time:<br>
+            <input type="time" class="form-control" id="time">
+            Location:<br>
+            <input type="text" id="location" style="margin-bottom:7px">
+            
+         </div>
+
+
+
+         <button id="submit">Confirm</button>
+      </div>
+   </div>
+</body>
+<script src="https://unpkg.com/vue@next"></script>
+<script>
+   const tutorinfoo = JSON.parse(localStorage.getItem('tutorInfo'))
+   const mrtstop = tutorinfoo.location
+   const subject_chosen = tutorinfoo.subject
+   const subject_chose = ""
+   var pri_subject = ""
+   var sec_subject = ""
+   var jc_subject = ""
+   const price_chosen = tutorinfoo.price
+   var pri_price = ""
+   var sec_price = ""
+   var jc_price = ""
+
+
+   document.getElementById("location").defaultValue = mrtstop
+   // console.log(tutorinfoo)
+   const length = Object.keys(subject_chosen).length
+   const lvl = Object.keys(subject_chosen)
+   const levels = []
+   for (var i = 0; i < length; i++) {
+      if (lvl[i] == "Primary School") {
+         pri_subject = Object.keys(subject_chosen["Primary School"])
+         levels.push("Primary School")
+      }
+      if (lvl[i] == "Secondary School") {
+         sec_subject = Object.keys(subject_chosen["Secondary School"])
+         levels.push("Secondary School")
+      }
+      if (lvl[i] == "Tertiary") {
+         jc_subject = Object.keys(subject_chosen["Tertiary"])
+         levels.push("Tertiary")
+      }
+   }
+   const price_length = Object.keys(price_chosen).length
+   const price_lvl = Object.keys(price_chosen)
+   for (var i = 0; i < length; i++) {
+      if (price_lvl[i] == "Primary School") {
+         pri_price = price_chosen["Primary School"]
+      }
+      if (price_lvl[i] == "Secondary School") {
+         sec_price = price_chosen["Secondary School"]
+      }
+      if (price_lvl[i] == "Tertiary") {
+         jc_price = price_chosen["Tertiary"]
+      }
+   }
+
+
+
+
+   console.log(sec_subject)
+
+   const app = Vue.createApp(
+      {
+         //options object
+         data() {
+            return {
+               levels: levels,
+               primarysub: pri_subject,
+               secondarysub: sec_subject,
+               jcsub: jc_subject,
+               level: "",
+               primaryprice: pri_price,
+               secondaryprice: sec_price,
+               jcprice: jc_price
+
+            }
+         },
+         methods: {
+            getstatus() {
+               console.log(this.level)
+            }
+
+         },
+      }
+   )
+   // console.log(subject_chose)
+   const mount = app.mount("#app")
+
+</script>
+
+</html>
