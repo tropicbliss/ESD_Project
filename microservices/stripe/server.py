@@ -30,7 +30,7 @@ def create_checkout_session():
             print(json_data)
             # Extract line items from JSON data
             line_items = []
-            for item in json_data['line_items']:
+            for item in json_data['cust_checkout']:
                 line_item = {
                     'price': item['product_id'],
                     'quantity': item['quantity']
