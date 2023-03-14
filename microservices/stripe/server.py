@@ -33,6 +33,18 @@ class checkoutForm(FlaskForm):
     quantity = RadioField("days_stay")
     submit = SubmitField("go_checkout")
 
+category = {
+    1:"price_1Mkpj7LUyNHnHR562PNuXTIX",
+    2: "price_1Mklu5LUyNHnHR56tJ5E1kR0",
+    3: "price_1MkpjGLUyNHnHR56BZTSqRRV",
+    4: "price_1MkpkBLUyNHnHR56ZpfdO6zp",
+    5: "price_1MkluHLUyNHnHR566Fw51VfA",
+    6: "price_1Mkpk3LUyNHnHR561qiXISpN",
+    7: "price_1MkpjfLUyNHnHR56F0R9Jojl",
+    8: "price_1MkpjYLUyNHnHR56Wiw6mTPN",
+    9: "price_1MkluULUyNHnHR56ISQ59eIo"
+}
+
 @app.route('/test',methods=["GET","POST"])
 def index():
     """
