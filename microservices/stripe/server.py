@@ -10,16 +10,16 @@ from flask import Flask, redirect, request,jsonify,render_template
 import json
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField,RadioField
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 import stripe
 # This is a public sample test API key.
 # Don’t submit any personally identifiable information in requests made with this key.
 # Sign in to see your own test API key embedded in code samples.
-stripe.api_key = 'sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H'
+# stripe.api_key = 'sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H'
 
-# load_dotenv()
-# stripe.api_key = os.getenv('STRIPE_API_KEY')
+load_dotenv()
+stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 app = Flask(__name__,
             static_url_path='',

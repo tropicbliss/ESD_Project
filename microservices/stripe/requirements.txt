@@ -13,3 +13,4 @@ stripe==3.0.0
 toml==0.10.2
 WTForms==3.0.1
 Werkzeug==2.0.1
+python-dotenv==1.0.0
