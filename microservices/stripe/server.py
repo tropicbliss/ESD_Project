@@ -34,15 +34,15 @@ class checkoutForm(FlaskForm):
     submit = SubmitField("go_checkout")
 
 category = {
-    1:"price_1Mkpj7LUyNHnHR562PNuXTIX",
-    2: "price_1Mklu5LUyNHnHR56tJ5E1kR0",
-    3: "price_1MkpjGLUyNHnHR56BZTSqRRV",
-    4: "price_1MkpkBLUyNHnHR56ZpfdO6zp",
-    5: "price_1MkluHLUyNHnHR566Fw51VfA",
-    6: "price_1Mkpk3LUyNHnHR561qiXISpN",
-    7: "price_1MkpjfLUyNHnHR56F0R9Jojl",
-    8: "price_1MkpjYLUyNHnHR56Wiw6mTPN",
-    9: "price_1MkluULUyNHnHR56ISQ59eIo"
+    40:"price_1Mkpj7LUyNHnHR562PNuXTIX",
+    50: "price_1Mklu5LUyNHnHR56tJ5E1kR0",
+    60: "price_1MkpjGLUyNHnHR56BZTSqRRV",
+    80: "price_1MkpkBLUyNHnHR56ZpfdO6zp",
+    100: "price_1MkluHLUyNHnHR566Fw51VfA",
+    120: "price_1Mkpk3LUyNHnHR561qiXISpN",
+    160: "price_1MkpjfLUyNHnHR56F0R9Jojl",
+    180: "price_1MkpjYLUyNHnHR56Wiw6mTPN",
+    200: "price_1MkluULUyNHnHR56ISQ59eIo"
 }
 
 @app.route('/test',methods=["GET","POST"])
@@ -63,7 +63,7 @@ def create_checkout_session():
             line_items = []
             for item in json_data['cust_checkout']:
                 line_item = {
-                    'price': item['price_id'],
+                    'price': category[item['price_id']],
                     'quantity': item['quantity']
                 }
                 line_items.append(line_item)
