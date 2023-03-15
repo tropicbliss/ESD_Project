@@ -9,8 +9,9 @@ import os
 from flask import Flask, redirect, request,jsonify,render_template
 import json
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField,RadioField
+from wtforms import StringField, SubmitField,RadioField,SelectField
 from dotenv import load_dotenv
+from wtforms.validators import InputRequired, NumberRange, ValidationError
 
 import stripe
 # This is a public sample test API key.
@@ -33,6 +34,21 @@ class checkoutForm(FlaskForm):
     quantity = RadioField("days_stay")
     submit = SubmitField("go_checkout")
 
+class CustomPriceField(StringField):
+    def validate(self, form, extra_validators=tuple()):
+        super().validate(form, extra_validators)
+        try:
+            int(self.data)
+        except (TypeError, ValueError):
+            raise ValidationError('Price must be a positive integer.')
+        
+class customForm(FlaskForm):
+    options = [(None, '-'), ('30', '30'), ('40', '40'), ('50', '50')]
+    basic = SelectField('Basic', choices=options, validators=[InputRequired()])
+    premium = SelectField('Premium', choices=options, validators=[InputRequired()])
+    luxury = SelectField('Luxury', choices=options, validators=[InputRequired()])
+    custom_price = CustomPriceField('Custom Price', validators=[InputRequired()])
+
 category = {
     40:"price_1Mkpj7LUyNHnHR562PNuXTIX",
     50: "price_1Mklu5LUyNHnHR56tJ5E1kR0",
@@ -45,12 +61,31 @@ category = {
     200: "price_1MkluULUyNHnHR56ISQ59eIo"
 }
 
-@app.route('/test',methods=["GET","POST"])
+@app.route('/checkout-form',methods=["GET","POST"])
 def index():
     """
     Render the checkout form.
     """
     return render_template("checkout_form.html", checkout_form= checkoutForm())
+
+@app.route('/custom-price-form',methods=["GET","POST"])
+def cpf():
+    form = customForm()
+    print("hi", request.method)
+    if request.method == "POST" and request.form:
+        print("bye")
+        print(form.basic.data)
+        print(form.premium.data)
+        print(form.luxury.data)
+        print(form.custom_price.data)
+        # Handle form submission
+        basic_price = int(form.basic.data)
+        premium_price = int(form.premium.data)
+        luxury_price = int(form.luxury.data)
+        custom_price = int(form.custom_price.data) if form.custom_price.data.isdigit() else None
+        # Do something with the form data
+        return render_template("base.html")
+    return render_template("custom_form.html", form=form)
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
@@ -93,26 +128,26 @@ def create_checkout_session():
     else:
         return redirect(checkout_session.url, code=303)
 
-@app.route('/make-refund', methods=['POST'])
-def make_refund():
-    try:
-        stripe.Refund.create(payment_intent="pi_3Mk6SlLUyNHnHR5619vpIbxf")
-    except Exception as e:
-        return str(e)
-    return redirect("success.html")
-
 @app.route('/create-product', methods=['POST'])
 def create_product():
     try:
         stripe.Product.create(
         name="Basic Dashboard",
+        description="nothing much going on in life",
         default_price_data={
-            "unit_amount": 1000,
-            "currency": "usd",
-            "recurring": {"interval": "month"},
+            "unit_amount": 1789,
+            "currency": "sgd",
         },
         expand=["default_price"],
         )
+    except Exception as e:
+        return str(e)
+    return redirect("success.html")
+
+@app.route('/make-refund', methods=['POST'])
+def make_refund():
+    try:
+        stripe.Refund.create(payment_intent="pi_3Mk6SlLUyNHnHR5619vpIbxf")
     except Exception as e:
         return str(e)
     return redirect("success.html")
