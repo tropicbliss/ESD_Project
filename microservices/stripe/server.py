@@ -72,7 +72,9 @@ def index():
 def cpf():
     form = customForm()
     print("hi", request.method)
-    if request.method == "POST" and request.form:
+    print(form.validate())
+    print(form.validate_on_submit())
+    if form.validate_on_submit():
         print("bye")
         print(form.basic.data)
         print(form.premium.data)
