@@ -19,6 +19,6 @@
       <label for="{{ form.custom_price.id }}">Custom Price:</label>
       {{ form.custom_price(class="form-control") }}
     </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    {{ form.submit(class='btn btn-primary') }}
   </form>
 {% endblock %}

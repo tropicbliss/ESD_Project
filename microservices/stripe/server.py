@@ -9,7 +9,7 @@ import os
 from flask import Flask, redirect, request,jsonify,render_template
 import json
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField,RadioField,SelectField
+from wtforms import StringField, SubmitField,RadioField,SelectField,IntegerField
 from dotenv import load_dotenv
 from wtforms.validators import InputRequired, NumberRange, ValidationError
 
@@ -33,21 +33,14 @@ class checkoutForm(FlaskForm):
     package = RadioField("svc_lvl")
     quantity = RadioField("days_stay")
     submit = SubmitField("go_checkout")
-
-class CustomPriceField(StringField):
-    def validate(self, form, extra_validators=tuple()):
-        super().validate(form, extra_validators)
-        try:
-            int(self.data)
-        except (TypeError, ValueError):
-            raise ValidationError('Price must be a positive integer.')
         
 class customForm(FlaskForm):
     options = [(None, '-'), ('30', '30'), ('40', '40'), ('50', '50')]
     basic = SelectField('Basic', choices=options, validators=[InputRequired()])
     premium = SelectField('Premium', choices=options, validators=[InputRequired()])
     luxury = SelectField('Luxury', choices=options, validators=[InputRequired()])
-    custom_price = CustomPriceField('Custom Price', validators=[InputRequired()])
+    custom_price = IntegerField('Custom Price', validators=[InputRequired(), NumberRange(min=0)])
+    submit = SubmitField('Submit')
 
 category = {
     40:"price_1Mkpj7LUyNHnHR562PNuXTIX",
@@ -71,20 +64,16 @@ def index():
 @app.route('/custom-price-form',methods=["GET","POST"])
 def cpf():
     form = customForm()
-    print("hi", request.method)
-    print(form.validate())
-    print(form.validate_on_submit())
     if form.validate_on_submit():
         print("bye")
-        print(form.basic.data)
-        print(form.premium.data)
-        print(form.luxury.data)
-        print(form.custom_price.data)
         # Handle form submission
         basic_price = int(form.basic.data)
         premium_price = int(form.premium.data)
         luxury_price = int(form.luxury.data)
-        custom_price = int(form.custom_price.data) if form.custom_price.data.isdigit() else None
+        if isinstance(form.custom_price.data, str) and form.custom_price.data.isdigit():
+            custom_price = int(form.custom_price.data)
+        else:
+            custom_price = None
         # Do something with the form data
         return render_template("base.html")
     return render_template("custom_form.html", form=form)
