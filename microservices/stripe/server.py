@@ -26,7 +26,7 @@ app = Flask(__name__,
             static_url_path='',
             static_folder='../../public/stripeTest')
 app.config['SECRET_KEY'] = 'very_secret_deh'
-
+# app.debug = True
 YOUR_DOMAIN = 'http://localhost:4242'
 
 class checkoutForm(FlaskForm):
@@ -78,13 +78,18 @@ def cpf():
         return render_template("base.html")
     return render_template("custom_form.html", form=form)
 
+@app.route('/yo-man',)
+def yo_man():
+    print(request.get_json())
+    print(request.data)
+    return render_template("base.html")
+
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
     try:
         if request.is_json:
             # Parse JSON data from request
             json_data = request.get_json()
-            print(json_data)
             # Extract line items from JSON data
             line_items = []
             for item in json_data['cust_checkout']:
@@ -105,7 +110,7 @@ def create_checkout_session():
         checkout_session = stripe.checkout.Session.create(
             line_items=line_items,
             mode='payment',
-            success_url=YOUR_DOMAIN + '/success.html',
+            success_url=YOUR_DOMAIN + '/checkout.html',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
             discounts = [{"coupon":"d1LybAG0"}],
         )
@@ -113,9 +118,9 @@ def create_checkout_session():
         
     except stripe.error.StripeError as e:
         return jsonify(error=str(e)), 500
-
+    id=checkout_session.id
     if request.is_json:
-        return jsonify(checkout_url=checkout_session.url)
+        return jsonify(checkout_url=checkout_session.url,id=id)
     else:
         return redirect(checkout_session.url, code=303)
 
@@ -138,7 +143,12 @@ def create_product():
 @app.route('/make-refund', methods=['POST'])
 def make_refund():
     try:
-        stripe.Refund.create(payment_intent="pi_3Mk6SlLUyNHnHR5619vpIbxf")
+        json_data = request.get_json()
+        print(json_data)
+        retrievable=json_data["id"]
+        payment_intent = stripe.checkout.Session.retrieve(retrievable).payment_intent
+        print(payment_intent)
+        stripe.Refund.create(payment_intent=payment_intent)
     except Exception as e:
         return str(e)
     return redirect("success.html")
