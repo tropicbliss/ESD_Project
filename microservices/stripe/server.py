@@ -147,26 +147,30 @@ def make_refund():
     try:
         json_data = request.get_json()
         print(json_data)
-        retrievable=json_data["id"]
-        payment_intent = stripe.checkout.Session.retrieve(retrievable).payment_intent
+        if "id" in json_data and json_data["id"]:
+            retrievable=json_data["id"]
+            print(retrievable)
+            payment_intent = stripe.checkout.Session.retrieve(retrievable).payment_intent
+        else:
+            payment_intent=json_data["payment_intent"]
         print(payment_intent)
         stripe.Refund.create(payment_intent=payment_intent)
     except Exception as e:
         return str(e)
-    return redirect("success.html")
+    return "success"
 
-@app.route('/edit-product', methods=['POST'])
-def edit_product():
-    stripe.Product.modify("id", name="Updated Product")
+# @app.route('/edit-product', methods=['POST'])
+# def edit_product():
+#     stripe.Product.modify("id", name="Updated Product")
 
-@app.route('/create-price',methods=['POST'])
-def create_price():
-    stripe.Price.create(
-        product='{{PRODUCT_ID}}',
-        unit_amount=1000,
-        currency="usd",
-        recurring={"interval": "month"},
-    )
+# @app.route('/create-price',methods=['POST'])
+# def create_price():
+#     stripe.Price.create(
+#         product='{{PRODUCT_ID}}',
+#         unit_amount=1000,
+#         currency="usd",
+#         recurring={"interval": "month"},
+#     )
 
 if __name__ == '__main__':
     app.run(port=4242)
