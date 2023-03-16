@@ -53,6 +53,7 @@ category = {
     180: "price_1MkpjYLUyNHnHR56Wiw6mTPN",
     200: "price_1MkluULUyNHnHR56ISQ59eIo"
 }
+id = ""
 
 @app.route('/checkout-form',methods=["GET","POST"])
 def index():
@@ -78,11 +79,11 @@ def cpf():
         return render_template("base.html")
     return render_template("custom_form.html", form=form)
 
-@app.route('/yo-man',)
-def yo_man():
-    print(request.get_json())
-    print(request.data)
-    return render_template("base.html")
+@app.route('/finish-liao',)
+def finish_liao():
+    global id
+    payment_intent = stripe.checkout.Session.retrieve(id).payment_intent
+    return jsonify(payment_intent=payment_intent)
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
@@ -110,7 +111,7 @@ def create_checkout_session():
         checkout_session = stripe.checkout.Session.create(
             line_items=line_items,
             mode='payment',
-            success_url=YOUR_DOMAIN + '/checkout.html',
+            success_url=YOUR_DOMAIN + '/finish-liao',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
             discounts = [{"coupon":"d1LybAG0"}],
         )
@@ -118,6 +119,7 @@ def create_checkout_session():
         
     except stripe.error.StripeError as e:
         return jsonify(error=str(e)), 500
+    global id
     id=checkout_session.id
     if request.is_json:
         return jsonify(checkout_url=checkout_session.url,id=id)
