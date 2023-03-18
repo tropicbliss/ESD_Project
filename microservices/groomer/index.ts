@@ -9,7 +9,6 @@ const prisma = new PrismaClient();
 
 // const PORT = parseInt(process.env.PORT);
 
-// middleware & static files
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -81,7 +80,7 @@ app.get("/search/keyword/:keyword", async (req, res) => {
       res.send()
     }
   } catch (err) {
-    res.status(500);
+    res.status(400);
     res.send({ message: "internal server error" });
   }
 })
@@ -113,7 +112,7 @@ app.get("/search/name/:name", async (req, res) => {
       res.send({ message: "groomer not found" })
     }
   } catch (err) {
-    res.status(500);
+    res.status(400);
     res.send({ message: "internal server error" });
   }
 })
@@ -149,7 +148,81 @@ app.post("/accepts/:name", async (req, res) => {
       res.send({ message: "groomer not found" })
     }
   } catch (err) {
-    res.status(500);
+    res.status(400);
+    res.send({ message: "an error has occurred" });
+  }
+})
+
+app.post("/update/:name", async (req, res) => {
+  const { name } = req.params;
+  const json = req.body
+  const schema = z.object({
+    pictureUrl: z.string().url().optional(),
+    capacity: z.number().min(1).optional(),
+    address: z.string().optional(),
+    contactNo: z.string().optional(),
+    email: z.string().email().optional(),
+    acceptedPets: z.array(z.nativeEnum(PetType)).optional()
+  })
+  try {
+    const parsed = schema.parse(json)
+    await prisma.groomer.update({
+      where: {
+        name,
+      },
+      data: {
+        address: parsed.address,
+        capacity: parsed.capacity,
+        contactNo: parsed.contactNo,
+        email: parsed.email,
+        pictureUrl: parsed.pictureUrl,
+        acceptedPets: parsed.acceptedPets ? {
+        } : undefined
+      }
+    })
+    res.status(200)
+    res.send()
+  } catch (err) {
+    res.status(400);
+    res.send({ message: "an error has occurred" });
+  }
+})
+
+app.post("/read", async (req, res) => {
+  const json = req.body;
+  const schema = z.object({
+    petType: z.nativeEnum(PetType).optional()
+  })
+  try {
+    const parsed = schema.parse(json);
+    const result = await prisma.groomer.findMany({
+      where: {
+        acceptedPets: {
+          some: {
+            petType: {
+              equals: parsed.petType
+            }
+          }
+        }
+      },
+      select: {
+        acceptedPets: true,
+        address: true,
+        capacity: true,
+        contactNo: true,
+        email: true,
+        name: true,
+        pictureUrl: true
+      }
+    });
+    const j = result.map((groomer) => {
+      let pets = groomer.acceptedPets.map((pet) => pet.petType.toString());
+      return { ...groomer, acceptedPets: pets }
+    })
+    res.status(200)
+    res.send(j)
+  } catch (err) {
+    res.status(400);
     res.send({ message: "an error has occurred" });
   }
 })
