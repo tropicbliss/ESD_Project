@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Groomer {
+  name         String         @unique
+  pictureUrl   String         @db.Text
+  capacity     Int
+  address      String         @db.Text
+  contactNo    String
+  email        String
+  acceptedPets AcceptedPets[]
+}
+
+model AcceptedPets {
+  groomerName String
+  petType     PetType
+  Groomer     Groomer @relation(fields: [groomerName], references: [name], onDelete: Cascade)
+
+  @@unique([petType, groomerName])
+}
+
+enum PetType {
+  Birds
+  Hamsters
+  Cats
+  Dogs
+  Rabbits
+  GuineaPigs
+  Chinchillas
+  Mice
+  Fishes
+}
