@@ -25,7 +25,7 @@ app = Flask(__name__,
             static_folder='../../public/stripeTest')
 app.config['SECRET_KEY'] = 'very_secret_deh'
 # app.debug = True
-YOUR_DOMAIN = 'http://localhost:4242'
+YOUR_DOMAIN = os.getenv("YOUR_DOMAIN")
 
 
 class checkoutForm(FlaskForm):
@@ -185,4 +185,4 @@ def make_refund():
 
 
 if __name__ == '__main__':
-    app.run(port=4242)
+    app.run(port=os.getenv("PORT"))
