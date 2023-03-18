@@ -397,8 +397,8 @@ a:focus {
 }
 
 .buy_section a:hover {
-  background-color: transparent;
-  color: #023b48;
+  background-color: #1369ce;
+  color: white;
 }
 
 .client_section .pl-100 {
