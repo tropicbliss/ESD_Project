@@ -68,3 +68,53 @@ services:
       STRIPE_API_KEY: sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H
       YOUR_DOMAIN: http://localhost:5000
       PORT: 5000
+  kong-database:
+    image: postgres:9.6
+    restart: always
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: kong
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  kong:
+    restart: always
+    image: kong
+    ports:
+      - 8000:8000
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: password
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    command: kong migrations bootstrap
+    depends_on:
+      - kong-database
+      - stripe
+      - orchestrator
+  konga:
+    image: pantsel/konga
+    restart: always
+    ports:
+      - 1337:1337
+    volumes:
+      - kongadata:/app/kongadata
+    depends_on:
+      - kong
+  orchestrator:
+    build:
+      context: orchestrator
+    restart: always
+    environment:
+      PORT: 5000
+    depends_on:
+      - censorer
+      - user
+      - comments
+      - esd-rabbit
+      - logger
+      - appointments
+      - groomer
+      - stripe
