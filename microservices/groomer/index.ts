@@ -25,6 +25,21 @@ app.post("/create", async (req, res) => {
       petType: z.nativeEnum(PetType)
     });
     const parsed = schema.parse(json);
+    await prisma.groomer.create({
+      data: {
+        address: parsed.address,
+        capacity: parsed.capacity,
+        contactNo: parsed.contactNo,
+        email: parsed.email,
+        name: parsed.name,
+        pictureUrl: parsed.pictureUrl,
+        acceptedPets: {
+          create: {
+            petType: parsed.petType
+          }
+        }
+      }
+    })
   } catch (err) {
     console.error(err);
     res.status(400);

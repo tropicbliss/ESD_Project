@@ -49,30 +49,53 @@ var prisma = new client_1.PrismaClient();
 app.use(express_1.default.urlencoded({ extended: false }));
 app.use(express_1.default.json());
 app.post("/create", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var json, schema, parsed;
+    var json, schema, parsed, err_1;
     return __generator(this, function (_a) {
-        json = req.body;
-        try {
-            schema = zod_1.z.object({
-                name: zod_1.z.string(),
-                pictureUrl: zod_1.z.string().url(),
-                capacity: zod_1.z.number().min(1),
-                address: zod_1.z.string(),
-                contactNo: zod_1.z.string(),
-                email: zod_1.z.string().email(),
-                petType: zod_1.z.nativeEnum(client_1.PetType)
-            });
-            parsed = schema.parse(json);
+        switch (_a.label) {
+            case 0:
+                json = req.body;
+                _a.label = 1;
+            case 1:
+                _a.trys.push([1, 3, , 4]);
+                schema = zod_1.z.object({
+                    name: zod_1.z.string(),
+                    pictureUrl: zod_1.z.string().url(),
+                    capacity: zod_1.z.number().min(1),
+                    address: zod_1.z.string(),
+                    contactNo: zod_1.z.string(),
+                    email: zod_1.z.string().email(),
+                    petType: zod_1.z.nativeEnum(client_1.PetType)
+                });
+                parsed = schema.parse(json);
+                return [4 /*yield*/, prisma.groomer.create({
+                        data: {
+                            address: parsed.address,
+                            capacity: parsed.capacity,
+                            contactNo: parsed.contactNo,
+                            email: parsed.email,
+                            name: parsed.name,
+                            pictureUrl: parsed.pictureUrl,
+                            acceptedPets: {
+                                create: {
+                                    petType: parsed.petType
+                                }
+                            }
+                        }
+                    })];
+            case 2:
+                _a.sent();
+                return [3 /*break*/, 4];
+            case 3:
+                err_1 = _a.sent();
+                console.error(err_1);
+                res.status(400);
+                res.send({ message: "message is invalid" });
+                return [2 /*return*/];
+            case 4:
+                res.status(200);
+                res.send();
+                return [2 /*return*/];
         }
-        catch (err) {
-            console.error(err);
-            res.status(400);
-            res.send({ message: "message is invalid" });
-            return [2 /*return*/];
-        }
-        res.status(200);
-        res.send();
-        return [2 /*return*/];
     });
 }); });
 app.listen(5000, function () {
