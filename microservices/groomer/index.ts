@@ -1,5 +1,6 @@
 import { PetType, PrismaClient } from "@prisma/client";
 import express from "express";
+import { every } from "lodash";
 import { z } from "zod";
 
 const app = express();
@@ -80,8 +81,76 @@ app.get("/search/keyword/:keyword", async (req, res) => {
       res.send()
     }
   } catch (err) {
-    res.status(400);
-    res.send({ message: "message is invalid" });
+    res.status(500);
+    res.send({ message: "internal server error" });
+  }
+})
+
+app.get("/search/name/:name", async (req, res) => {
+  const { name } = req.params;
+  try {
+    const result = await prisma.groomer.findFirst({
+      where: {
+        name
+      },
+      select: {
+        acceptedPets: true,
+        address: true,
+        capacity: true,
+        contactNo: true,
+        email: true,
+        name: true,
+        pictureUrl: true
+      }
+    });
+    if (result) {
+      const pets = result.acceptedPets.map((pet) => pet.petType.toString());
+      const json = { ...result, acceptedPets: pets };
+      res.status(200)
+      res.send(json)
+    } else {
+      res.status(404);
+      res.send({ message: "groomer not found" })
+    }
+  } catch (err) {
+    res.status(500);
+    res.send({ message: "internal server error" });
+  }
+})
+
+app.post("/accepts/:name", async (req, res) => {
+  const { name } = req.params;
+  const json = req.body;
+  const schema = z.object({
+    petTypes: z.array(z.nativeEnum(PetType))
+  })
+  try {
+    const parsed = schema.parse(json);
+    const result = await prisma.groomer.findFirst({
+      where: {
+        name
+      },
+      select: {
+        acceptedPets: true,
+      }
+    });
+    if (result) {
+      const pets = result.acceptedPets.map((pet) => pet.petType.toString());
+      let isAllValid = every(parsed.petTypes, (pet) => pets.includes(pet));
+      if (isAllValid) {
+        res.status(200)
+        res.send()
+      } else {
+        res.status(400)
+        res.send({ message: "pet type not accepted" })
+      }
+    } else {
+      res.status(404);
+      res.send({ message: "groomer not found" })
+    }
+  } catch (err) {
+    res.status(500);
+    res.send({ message: "an error has occurred" });
   }
 })
 
