@@ -65,4 +65,4 @@ services:
       context: stripe
     restart: always
     environment:
-      STRIPE_API_KEY: whatever
+      STRIPE_API_KEY: sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H
