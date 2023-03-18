@@ -64,7 +64,7 @@ struct SharedState {
 struct Comment {
     id: String,
     user_name: String,
-    groomer_id: String,
+    groomer_name: String,
     title: String,
     message: String,
     rating: u8,
@@ -74,7 +74,7 @@ struct Comment {
 #[serde(rename_all = "camelCase")]
 struct CreateInput {
     user_name: String,
-    groomer_id: String,
+    groomer_name: String,
     title: String,
     message: String,
     #[validate(range(min = 1, max = 5))]
@@ -146,7 +146,7 @@ async fn create_comment(
     payload.validate().map_err(|_| ApiError::InvalidData)?;
     let (user_exists, groomer_exists) = tokio::join!(
         does_user_exist(&state.http, &payload.user_name),
-        does_groomer_exist(&state.http, &payload.groomer_id)
+        does_groomer_exist(&state.http, &payload.groomer_name)
     );
     if !user_exists? {
         return Err(ApiError::UserDoesNotExist);
@@ -159,7 +159,7 @@ async fn create_comment(
         censor_comment(&state.http, &payload.message)
     );
     let payload = Comment {
-        groomer_id: payload.groomer_id,
+        groomer_name: payload.groomer_name,
         id: cuid::cuid2(),
         message: message?,
         rating: 5,
@@ -189,14 +189,14 @@ struct GetOutput {
 }
 
 async fn get_comment(
-    Path(groomer_id): Path<String>,
+    Path(groomer_name): Path<String>,
     state: State<SharedState>,
 ) -> Result<Json<Vec<GetOutput>>, ApiError> {
-    let groomer_exist = does_groomer_exist(&state.http, &groomer_id).await?;
+    let groomer_exist = does_groomer_exist(&state.http, &groomer_name).await?;
     if !groomer_exist {
         return Err(ApiError::GroomerDoesNotExist);
     }
-    let filter = doc! {"groomer_id": groomer_id};
+    let filter = doc! {"groomer_name": groomer_name};
     let res = state
         .db
         .find(filter, None)

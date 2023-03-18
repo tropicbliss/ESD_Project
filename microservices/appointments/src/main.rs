@@ -115,7 +115,7 @@ struct SharedState {
 struct Appointment {
     id: String,
     user_name: String,
-    groomer_id: String,
+    groomer_name: String,
     start_date: DateTime,
     end_date: DateTime,
     status: Status,
@@ -124,7 +124,7 @@ struct Appointment {
 
 #[derive(Serialize, Deserialize)]
 struct Capacity {
-    groomer_id: String,
+    groomer_name: String,
     date: String,
     current_capacity: usize,
 }
@@ -141,7 +141,6 @@ struct Pet {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct UserEndpointOutput {
-    groomer_id: String,
     groomer_name: String,
     start_date: DateTime,
     end_date: DateTime,
@@ -152,7 +151,7 @@ struct UserEndpointOutput {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct CheckAddInput {
-    groomer_id: String,
+    groomer_name: String,
     start_time: DateTime,
     end_time: DateTime,
     quantity: u32,
@@ -173,7 +172,7 @@ async fn check_add(
     }
     let groomer = state
         .http
-        .post(format!("http://groomer:5000/read/{}", payload.groomer_id))
+        .post(format!("http://groomer:5000/read/{}", payload.groomer_name))
         .json(&json!({}))
         .send()
         .await
@@ -196,7 +195,7 @@ async fn check_add(
         .collect();
     let filter = doc! {"date": {
         "$in": &days
-    }, "groomer_id": &payload.groomer_id};
+    }, "groomer_name": &payload.groomer_name};
     let res = state
         .capacity
         .find(filter.clone(), None)
@@ -229,11 +228,11 @@ struct CapacityInfoOutput {
 
 async fn check(
     state: State<SharedState>,
-    Path(groomer_id): Path<String>,
+    Path(groomer_name): Path<String>,
 ) -> Result<Json<Vec<CapacityInfoOutput>>, ApiError> {
     let groomer = state
         .http
-        .post(format!("http://groomer:5000/read/{}", groomer_id))
+        .post(format!("http://groomer:5000/read/{}", groomer_name))
         .json(&json!({}))
         .send()
         .await
@@ -247,7 +246,7 @@ async fn check(
     };
     let filter = doc! {"date": {
         "$gte": DateTime::now()
-    }, "groomer_id": groomer_id};
+    }, "groomer_name": groomer_name};
     let res = state
         .capacity
         .find(filter, FindOptions::builder().limit(27).build())
@@ -291,7 +290,7 @@ async fn get_user(
         .try_collect()
         .await
         .map_err(|_| ApiError::InternalError)?;
-    let groomers: HashSet<String> = res.iter().map(|app| app.groomer_id.clone()).collect();
+    let groomers: HashSet<String> = res.iter().map(|app| app.groomer_name.clone()).collect();
     let groomer_info: HashMap<String, UserReadEndpointOutput> = stream::iter(groomers)
         .map(|id| {
             let client = &state.http;
@@ -316,13 +315,12 @@ async fn get_user(
         .into_iter()
         .map(|app| UserEndpointOutput {
             end_date: app.end_date,
-            groomer_name: groomer_info.get(&app.groomer_id).unwrap().name.clone(),
+            groomer_name: groomer_info.get(&app.groomer_name).unwrap().name.clone(),
             groomer_picture_url: groomer_info
-                .get(&app.groomer_id)
+                .get(&app.groomer_name)
                 .unwrap()
                 .picture_url
                 .clone(),
-            groomer_id: app.groomer_id,
             pet_names: app.pets.into_iter().map(|pet| pet.name).collect(),
             start_date: app.start_date,
         })
@@ -359,7 +357,7 @@ enum PetGender {
 }
 
 async fn get_arriving_customers(
-    Path(groomer_id): Path<String>,
+    Path(groomer_name): Path<String>,
     state: State<SharedState>,
 ) -> Result<Json<Vec<SignInOutput>>, ApiError> {
     #[derive(Deserialize)]
@@ -367,10 +365,10 @@ async fn get_arriving_customers(
         name: String,
     }
 
-    if !does_groomer_exist(&state.http, &groomer_id).await? {
+    if !does_groomer_exist(&state.http, &groomer_name).await? {
         return Err(ApiError::GroomerDoesNotExist);
     }
-    let filter = doc! {"groomer_id": groomer_id, "status": "awaiting"};
+    let filter = doc! {"groomer_id": groomer_name, "status": "awaiting"};
     let res = state
         .appointments
         .find(filter, None)
@@ -414,7 +412,7 @@ async fn get_arriving_customers(
 }
 
 async fn get_staying_customers(
-    Path(groomer_id): Path<String>,
+    Path(groomer_name): Path<String>,
     state: State<SharedState>,
 ) -> Result<Json<Vec<SignInOutput>>, ApiError> {
     #[derive(Deserialize)]
@@ -422,10 +420,10 @@ async fn get_staying_customers(
         name: String,
     }
 
-    if !does_groomer_exist(&state.http, &groomer_id).await? {
+    if !does_groomer_exist(&state.http, &groomer_name).await? {
         return Err(ApiError::GroomerDoesNotExist);
     }
-    let filter = doc! {"groomer_id": groomer_id, "status": "staying"};
+    let filter = doc! {"groomer_id": groomer_name, "status": "staying"};
     let res = state
         .appointments
         .find(filter, None)
@@ -524,7 +522,7 @@ async fn change_appointment_status(
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct StayedCustomersInput {
-    groomer_id: String,
+    groomer_name: String,
     user_name: String,
 }
 
@@ -534,7 +532,7 @@ async fn stayed_customers(
 ) -> Result<StatusCode, ApiError> {
     let (user_exists, groomer_exists) = tokio::join!(
         does_user_exist(&state.http, &payload.user_name),
-        does_groomer_exist(&state.http, &payload.groomer_id)
+        does_groomer_exist(&state.http, &payload.groomer_name)
     );
     if !user_exists? {
         return Err(ApiError::UserDoesNotExist);
@@ -542,8 +540,7 @@ async fn stayed_customers(
     if !groomer_exists? {
         return Err(ApiError::GroomerDoesNotExist);
     }
-    let filter =
-        doc! {"groomer_id": payload.groomer_id, "user_name": payload.user_name, "status": "left"};
+    let filter = doc! {"groomer_name": payload.groomer_name, "user_name": payload.user_name, "status": "left"};
     let mut res = state
         .appointments
         .find(filter, None)
@@ -565,7 +562,7 @@ async fn stayed_customers(
 #[serde(rename_all = "camelCase")]
 struct CreateInput {
     user_name: String,
-    groomer_id: String,
+    groomer_name: String,
     pet_info: Vec<PetInputOutput>,
 }
 
@@ -619,7 +616,7 @@ async fn create_appointment(
 ) -> Result<Json<CreateOutput>, ApiError> {
     let (user_exists, groomer_exists) = tokio::join!(
         does_user_exist(&state.http, &payload.user_name),
-        does_groomer_exist(&state.http, &payload.groomer_id)
+        does_groomer_exist(&state.http, &payload.groomer_name)
     );
     if !user_exists? {
         return Err(ApiError::UserDoesNotExist);
@@ -629,7 +626,7 @@ async fn create_appointment(
     }
     let payload = Appointment {
         end_date: DateTime::now(),
-        groomer_id: payload.groomer_id,
+        groomer_name: payload.groomer_name,
         id: cuid::cuid2(),
         pets: payload.pet_info.into_iter().map(|e| e.into()).collect(),
         start_date: DateTime::now(),
