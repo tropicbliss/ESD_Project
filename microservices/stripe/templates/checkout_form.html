@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form method="POST">
+        {{checkout_form.hidden_tag()}}
+        <p>
+            {{checkout_form.package.label}}
+            {{checkout_form.package()}}
+        </p>
+        <p>
+            {{checkout_form.quantity.label}}
+            {{checkout_form.quantity()}}
+        </p>
+        <p>
+            {{checkout_form.submit()}}
+        </p>
+    </form>
+</body>
+</html>
