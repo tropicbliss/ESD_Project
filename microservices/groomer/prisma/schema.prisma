@@ -24,7 +24,7 @@ model Groomer {
 model AcceptedPets {
   groomerName String
   petType     PetType
-  Groomer     Groomer @relation(fields: [groomerName], references: [name], onDelete: Cascade)
+  groomer     Groomer @relation(fields: [groomerName], references: [name], onDelete: Cascade)
 
   @@unique([petType, groomerName])
 }

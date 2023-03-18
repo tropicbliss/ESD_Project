@@ -1,4 +1,4 @@
-import { PetType, PrismaClient } from "@prisma/client";
+import { AcceptedPets, PetType, PrismaClient } from "@prisma/client";
 import express from "express";
 import { every } from "lodash";
 import { z } from "zod";
@@ -6,8 +6,6 @@ import { z } from "zod";
 const app = express();
 
 const prisma = new PrismaClient();
-
-// const PORT = parseInt(process.env.PORT);
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -22,7 +20,7 @@ app.post("/create", async (req, res) => {
       address: z.string(),
       contactNo: z.string(),
       email: z.string().email(),
-      petType: z.nativeEnum(PetType)
+      petType: z.array(z.nativeEnum(PetType)).min(1)
     });
     const parsed = schema.parse(json);
     await prisma.groomer.create({
@@ -34,9 +32,9 @@ app.post("/create", async (req, res) => {
         name: parsed.name,
         pictureUrl: parsed.pictureUrl,
         acceptedPets: {
-          create: {
-            petType: parsed.petType
-          }
+          create: parsed.petType.map((pet) => {
+            return { petType: pet }
+          })
         }
       }
     })
@@ -162,11 +160,14 @@ app.post("/update/:name", async (req, res) => {
     address: z.string().optional(),
     contactNo: z.string().optional(),
     email: z.string().email().optional(),
-    acceptedPets: z.array(z.nativeEnum(PetType)).optional()
+    acceptedPets: z.array(z.nativeEnum(PetType)).min(1).optional()
   })
   try {
     const parsed = schema.parse(json)
-    await prisma.groomer.update({
+    const updatedAcceptedPets = parsed.acceptedPets?.map((pet) => {
+      return { petType: pet }
+    });
+    const e = await prisma.groomer.update({
       where: {
         name,
       },
@@ -176,8 +177,13 @@ app.post("/update/:name", async (req, res) => {
         contactNo: parsed.contactNo,
         email: parsed.email,
         pictureUrl: parsed.pictureUrl,
-        acceptedPets: parsed.acceptedPets ? {
+        acceptedPets: updatedAcceptedPets ? {
+          deleteMany: {},
+          create: updatedAcceptedPets
         } : undefined
+      },
+      select: {
+        acceptedPets: true,
       }
     })
     res.status(200)
@@ -227,6 +233,6 @@ app.post("/read", async (req, res) => {
   }
 })
 
-app.listen(5000, () => {
-  console.log(`Censorer listening on port ${5000}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Censorer listening on port ${process.env.PORT}`);
 });
