@@ -349,7 +349,6 @@ struct PetInputOutput {
 }
 
 #[derive(Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
 enum PetType {
     Birds,
     Hamsters,
@@ -597,15 +596,15 @@ impl TryFrom<Pet> for PetInputOutput {
             _ => return Err("unknown pet gender"),
         };
         let pet_type = match value.pet_type.as_str() {
-            "birds" => PetType::Birds,
-            "cats" => PetType::Cats,
-            "chinchillas" => PetType::Chinchillas,
-            "dogs" => PetType::Dogs,
-            "fishes" => PetType::Fishes,
-            "guineapigs" => PetType::GuineaPigs,
-            "hamsters" => PetType::Hamsters,
-            "mice" => PetType::Mice,
-            "rabbits" => PetType::Rabbits,
+            "Birds" => PetType::Birds,
+            "Cats" => PetType::Cats,
+            "Chinchillas" => PetType::Chinchillas,
+            "Dogs" => PetType::Dogs,
+            "Fishes" => PetType::Fishes,
+            "GuineaPigs" => PetType::GuineaPigs,
+            "Hamsters" => PetType::Hamsters,
+            "Mice" => PetType::Mice,
+            "Rabbits" => PetType::Rabbits,
             _ => return Err("unknown pet type"),
         };
         Ok(Self {
@@ -627,15 +626,15 @@ impl From<PetInputOutput> for Pet {
         }
         .to_string();
         let pet_type = match value.pet_type {
-            PetType::Birds => "birds",
-            PetType::Cats => "cats",
-            PetType::Chinchillas => "chinchillas",
-            PetType::Dogs => "dogs",
-            PetType::Fishes => "fishes",
-            PetType::GuineaPigs => "guineapigs",
-            PetType::Hamsters => "hamsters",
-            PetType::Mice => "mice",
-            PetType::Rabbits => "rabbits",
+            PetType::Birds => "Birds",
+            PetType::Cats => "Cats",
+            PetType::Chinchillas => "Chinchillas",
+            PetType::Dogs => "Dogs",
+            PetType::Fishes => "Fishes",
+            PetType::GuineaPigs => "GuineaPigs",
+            PetType::Hamsters => "Hamsters",
+            PetType::Mice => "Mice",
+            PetType::Rabbits => "Rabbits",
         }
         .to_string();
         Self {

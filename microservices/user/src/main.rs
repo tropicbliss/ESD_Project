@@ -100,13 +100,9 @@ impl MutationRoot {
         contact_no: String,
         email: String,
     ) -> async_graphql::Result<ID> {
-        let is_valid_phone = validator::validate_phone(&contact_no);
         let is_valid_email = validator::validate_email(&email);
         if !is_valid_email {
             return Err(ApiError::EmailValidation.into());
-        }
-        if !is_valid_phone {
-            return Err(ApiError::ContactNoValidation.into());
         }
         let user_exists = ctx
             .data_unchecked::<Collection<User>>()
@@ -137,9 +133,6 @@ impl MutationRoot {
         let query = doc! {"name": name};
         let mut update = Document::new();
         if let Some(contact_no) = &contact_no {
-            if !validator::validate_phone(contact_no) {
-                return Err(ApiError::ContactNoValidation.into());
-            }
             update.insert("contact_no", contact_no);
         }
         if let Some(email) = &email {
@@ -166,8 +159,6 @@ async fn graphiql() -> impl IntoResponse {
 
 #[derive(Error, Debug)]
 enum ApiError {
-    #[error("contact number provided is invalid")]
-    ContactNoValidation,
     #[error("email provided is invalid")]
     EmailValidation,
     #[error("user already exists")]
