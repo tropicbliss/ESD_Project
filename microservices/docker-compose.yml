@@ -16,8 +16,6 @@ services:
       DATABASE: esdproject
       COLLECTION: user
       ADDR: 0.0.0.0:5000
-    networks:
-      - my-net
   comments:
     build:
       context: comments
@@ -31,21 +29,15 @@ services:
       - groomer
       - user
       - censorer
-    networks:
-      - my-net
   esd-rabbit:
     image: rabbitmq:3-management
     restart: always
-    networks:
-      - my-net
   logger:
     build:
       context: logging
     restart: always
     environment:
       AMQP_ADDR: amqp://esd-rabbit:5672/%2f
-    networks:
-      - my-net
     depends_on:
       - esd-rabbit
   appointments:
@@ -61,8 +53,6 @@ services:
     depends_on:
       - groomer
       - user
-    networks:
-      - my-net
   groomer:
     build:
       context: groomer
@@ -70,9 +60,7 @@ services:
     environment:
       DB_URI: cwcwea
       PORT: 5000
-    networks:
-      - my-net
-
-networks:
-  my-net:
-    driver: bridge
+  stripe:
+    build:
+      context: stripe
+    restart: always
