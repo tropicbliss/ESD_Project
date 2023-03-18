@@ -64,3 +64,5 @@ services:
     build:
       context: stripe
     restart: always
+    environment:
+      STRIPE_API_KEY: whatever

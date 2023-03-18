@@ -6,11 +6,10 @@ Stripe Sample.
 Python 3.6 or newer required.
 """
 import os
-from flask import Flask, redirect, request,jsonify,render_template
+from flask import Flask, redirect, request, jsonify, render_template
 import json
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField,RadioField,SelectField,IntegerField
-from dotenv import load_dotenv
+from wtforms import StringField, SubmitField, RadioField, SelectField, IntegerField
 from wtforms.validators import InputRequired, NumberRange, ValidationError
 
 import stripe
@@ -19,7 +18,6 @@ import stripe
 # Sign in to see your own test API key embedded in code samples.
 # stripe.api_key = 'sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H'
 
-load_dotenv()
 stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 app = Flask(__name__,
@@ -29,21 +27,27 @@ app.config['SECRET_KEY'] = 'very_secret_deh'
 # app.debug = True
 YOUR_DOMAIN = 'http://localhost:4242'
 
+
 class checkoutForm(FlaskForm):
     package = RadioField("svc_lvl")
     quantity = RadioField("days_stay")
     submit = SubmitField("go_checkout")
-        
+
+
 class customForm(FlaskForm):
     options = [(None, '-'), ('30', '30'), ('40', '40'), ('50', '50')]
     basic = SelectField('Basic', choices=options, validators=[InputRequired()])
-    premium = SelectField('Premium', choices=options, validators=[InputRequired()])
-    luxury = SelectField('Luxury', choices=options, validators=[InputRequired()])
-    custom_price = IntegerField('Custom Price', validators=[InputRequired(), NumberRange(min=0)])
+    premium = SelectField('Premium', choices=options,
+                          validators=[InputRequired()])
+    luxury = SelectField('Luxury', choices=options,
+                         validators=[InputRequired()])
+    custom_price = IntegerField('Custom Price', validators=[
+                                InputRequired(), NumberRange(min=0)])
     submit = SubmitField('Submit')
 
+
 category = {
-    40:"price_1Mkpj7LUyNHnHR562PNuXTIX",
+    40: "price_1Mkpj7LUyNHnHR562PNuXTIX",
     50: "price_1Mklu5LUyNHnHR56tJ5E1kR0",
     60: "price_1MkpjGLUyNHnHR56BZTSqRRV",
     80: "price_1MkpkBLUyNHnHR56ZpfdO6zp",
@@ -55,14 +59,16 @@ category = {
 }
 id = ""
 
-@app.route('/checkout-form',methods=["GET","POST"])
+
+@app.route('/checkout-form', methods=["GET", "POST"])
 def index():
     """
     Render the checkout form.
     """
-    return render_template("checkout_form.html", checkout_form= checkoutForm())
+    return render_template("checkout_form.html", checkout_form=checkoutForm())
 
-@app.route('/custom-price-form',methods=["GET","POST"])
+
+@app.route('/custom-price-form', methods=["GET", "POST"])
 def cpf():
     form = customForm()
     if form.validate_on_submit():
@@ -79,11 +85,13 @@ def cpf():
         return render_template("base.html")
     return render_template("custom_form.html", form=form)
 
+
 @app.route('/finish-liao',)
 def finish_liao():
     global id
     payment_intent = stripe.checkout.Session.retrieve(id).payment_intent
     return jsonify(payment_intent=payment_intent)
+
 
 @app.route('/create-checkout-session', methods=['POST'])
 def create_checkout_session():
@@ -106,41 +114,43 @@ def create_checkout_session():
                 'price': request.form.get('price_id'),
                 'quantity': request.form.get('quantity')
             }]
-        
+
         # Create Stripe checkout session
         checkout_session = stripe.checkout.Session.create(
             line_items=line_items,
             mode='payment',
             success_url=YOUR_DOMAIN + '/finish-liao',
             cancel_url=YOUR_DOMAIN + '/cancel.html',
-            discounts = [{"coupon":"d1LybAG0"}],
+            discounts=[{"coupon": "d1LybAG0"}],
         )
         # Return session ID to client
-        
+
     except stripe.error.StripeError as e:
         return jsonify(error=str(e)), 500
     global id
-    id=checkout_session.id
+    id = checkout_session.id
     if request.is_json:
-        return jsonify(checkout_url=checkout_session.url,id=id)
+        return jsonify(checkout_url=checkout_session.url, id=id)
     else:
         return redirect(checkout_session.url, code=303)
+
 
 @app.route('/create-product', methods=['POST'])
 def create_product():
     try:
         stripe.Product.create(
-        name="Basic Dashboard",
-        description="nothing much going on in life",
-        default_price_data={
-            "unit_amount": 1789,
-            "currency": "sgd",
-        },
-        expand=["default_price"],
+            name="Basic Dashboard",
+            description="nothing much going on in life",
+            default_price_data={
+                "unit_amount": 1789,
+                "currency": "sgd",
+            },
+            expand=["default_price"],
         )
     except Exception as e:
         return str(e)
     return redirect("success.html")
+
 
 @app.route('/make-refund', methods=['POST'])
 def make_refund():
@@ -148,11 +158,12 @@ def make_refund():
         json_data = request.get_json()
         print(json_data)
         if "id" in json_data and json_data["id"]:
-            retrievable=json_data["id"]
+            retrievable = json_data["id"]
             print(retrievable)
-            payment_intent = stripe.checkout.Session.retrieve(retrievable).payment_intent
+            payment_intent = stripe.checkout.Session.retrieve(
+                retrievable).payment_intent
         else:
-            payment_intent=json_data["payment_intent"]
+            payment_intent = json_data["payment_intent"]
         print(payment_intent)
         stripe.Refund.create(payment_intent=payment_intent)
     except Exception as e:
@@ -171,6 +182,7 @@ def make_refund():
 #         currency="usd",
 #         recurring={"interval": "month"},
 #     )
+
 
 if __name__ == '__main__':
     app.run(port=4242)
