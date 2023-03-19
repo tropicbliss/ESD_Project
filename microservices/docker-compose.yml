@@ -32,14 +32,6 @@ services:
   esd-rabbit:
     image: rabbitmq:3-management
     restart: always
-  logger:
-    build:
-      context: logging
-    restart: always
-    environment:
-      AMQP_ADDR: amqp://esd-rabbit:5672/%2f
-    depends_on:
-      - esd-rabbit
   appointments:
     build:
       context: appointments
