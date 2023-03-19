@@ -210,3 +210,21 @@ async def change_appointment_status(appointment_id: str, status: input.Status):
             json = await resp.json()
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
+
+
+@app.post("/comments/create", status_code=201, response_model=output.CensoredComment, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
+async def create_comment(comment: input.CreateComment):
+    # check if customer has stayed (only customers that stayed are allowed to comment)
+    async with HttpClient.get_client().post("http://appointments:5000/stayed", json={"groomerName": comment.groomerName, "userName": comment.userName}) as resp:
+        if not resp.ok:
+            json = await resp.json()
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+    # censor and post the comment
+    async with HttpClient.get_client().post("http://comments:5000/", json=vars(comment)) as resp:
+        json = await resp.json()
+        if resp.ok:
+            return json
+        else:
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])

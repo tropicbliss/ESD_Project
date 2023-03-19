@@ -34,6 +34,12 @@ class Comment(BaseModel):
     rating: int
 
 
+class CensoredComment(BaseModel):
+    id: str
+    title: str
+    message: str
+
+
 class Appointment(BaseModel):
     groomerName: str
     startDate: str

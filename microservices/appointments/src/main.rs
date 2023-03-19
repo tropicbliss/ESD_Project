@@ -567,7 +567,7 @@ async fn stayed_customers(
     {
         Ok(StatusCode::OK)
     } else {
-        Ok(StatusCode::NOT_FOUND)
+        Err(ApiError::AppointmentDoesNotExist)
     }
 }
 

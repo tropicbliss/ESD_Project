@@ -67,6 +67,14 @@ class StatusType(str, Enum):
     left = "left"
 
 
+class CreateComment(BaseModel):
+    groomerName: str
+    userName: str
+    title: str
+    message: str
+    rating: int
+
+
 class Status(BaseModel):
     status: StatusType
 

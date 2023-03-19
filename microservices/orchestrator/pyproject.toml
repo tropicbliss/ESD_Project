@@ -10,7 +10,6 @@ python = "^3.10"
 fastapi = "^0.94.1"
 uvicorn = {extras = ["standard"], version = "^0.21.1"}
 aiohttp = "^3.8.4"
-aio-pika = "^9.0.5"
 aiographql-client = "^1.0.3"
 
 
