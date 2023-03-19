@@ -1,5 +1,17 @@
 from pydantic import BaseModel
-from input import PetType
+from enum import Enum
+
+
+class PetType(str, Enum):
+    birds = "Birds"
+    hamsters = "Hamsters"
+    cats = "Cats"
+    dogs = "Dogs"
+    rabbits = "Rabbits"
+    guinea_pigs = "GuineaPigs"
+    chinchillas = "Chinchillas"
+    mice = "Mice"
+    fishes = "Fishes"
 
 
 class ReadUser(BaseModel):
