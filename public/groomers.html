@@ -35,6 +35,8 @@
   <link href="css/responsive.css" rel="stylesheet" />
   <!-- Groomer display style -->
   <link href="css/groomers_display.css" rel="stylesheet" />
+
+  <script src="./js/groomer.js"></script>
 </head>
 
 <body>
@@ -87,13 +89,14 @@
 
 
   <!-- Pet Groomer Display -->
-  <section>
+  <section id="delete">
     <div class="container">
-      <h2 class="mt-5">
-        Discover Our <span style="color:rgb(0, 201, 241)">Groomers</span>
-      </h2>
-
       <div id="app">
+        <div v-if="display=='true'">
+          <h2 class="mt-5">
+            Discover Our <span style="color:rgb(0, 201, 241)">Groomers</span>
+          </h2>
+
           <div class="row d-flex justify-content-center">
               <div class="col-md-12">
                   <div class="pb-1">
@@ -187,13 +190,13 @@
               </div>
           </div>
                   
-
           <div class="container mt-2 buy_section">
             <div class="row">
-              <blog-post v-for="(p,idx) in groomers" v-bind:key="idx" v-bind:grom="p" v-bind:id="p.id" v-bind:name="p.name" v-bind:desc="p.desc" v-bind:pic="p.pic">
+              <blog-post v-for="(p,idx) in groomers" v-bind:key="idx" v-bind:grom="p" v-bind:id="p.id" v-bind:name="p.name" v-bind:desc="p.desc" v-bind:pic="p.pic" v-on:show="onShow">
               </blog-post>
             </div>
           </div>
+        </div>
       </div>
  
       <script>
@@ -205,7 +208,8 @@
                         { id: 2, name: 'B', pic: './images/g-2.png'}, 
                         { id: 3, name: 'C', pic: './images/g-3.png'},
                         { id: 4, name: 'D', pic: './images/g-4.png'} 
-                    ]
+                    ],
+                    display: 'true'
                   }
               },
               // created() { // created is a hook that executes as soon as Vue instance is created
@@ -218,11 +222,11 @@
               //     .catch(error => {
               //         this.posts = [{ entry: 'There was an error: ' + error.message }]
               //     })
-              // },
-              // methods: {
-              //     info page for each groomer(id) {
-              //     }
-              // }
+              methods: {
+                onShow: function () {
+                  this.display = 'false'
+                }, // this is also a valid vue method syntax
+             }
       
           });
 
@@ -238,10 +242,16 @@
                               <h3 class="name">Groomer {{name}}</h3>
                               <h4 class="title">Hotel {{name}}</h4>
                             </div>
-                            <a class="mt-2" style="border-radius: 8px;" href="#" >Link</a>
+                            <a class="mt-2" style="border-radius: 8px;" href="#" v-on:click="showGroomerInfo()">Link</a>
                         </div>
                     </div>
-              ` 
+              `,
+              methods: {
+                showGroomerInfo() {
+                    // Another way to emit events.
+                    this.$emit('show');
+                }
+            }
           })
 
           app.mount('#app')
