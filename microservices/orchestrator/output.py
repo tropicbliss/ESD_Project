@@ -55,6 +55,9 @@ class Pet(BaseModel):
     age: int
     medicalInfo: str
 
+    class Config:
+        use_enum_values = True
+
 
 class CustomerAppointments(BaseModel):
     id: str
@@ -66,3 +69,8 @@ class CustomerAppointments(BaseModel):
 
 class Error(BaseModel):
     detail: str
+
+
+class Checkout(BaseModel):
+    checkoutUrl: str
+    appointmentId: str

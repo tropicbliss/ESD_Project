@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from enum import Enum
+from output import Pet
 
 
 class CreateUser(BaseModel):
@@ -77,6 +78,24 @@ class CreateComment(BaseModel):
 
 class Status(BaseModel):
     status: StatusType
+
+    class Config:
+        use_enum_values = True
+
+
+class PriceTier(str, Enum):
+    basic = "basic"
+    premium = "premium"
+    luxury = "luxury"
+
+
+class Checkout(BaseModel):
+    groomerName: str
+    pets: list[Pet]
+    startTime: str
+    endDate: str
+    userName: str
+    priceTier: PriceTier
 
     class Config:
         use_enum_values = True

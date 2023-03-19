@@ -228,3 +228,41 @@ async def create_comment(comment: input.CreateComment):
         else:
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
+
+
+@app.post("/checkout", status_code=200, response_model=output.Checkout, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
+async def checkout(checkout: input.Checkout):
+    # check if groomer accepts the pets specified by the customer and return pricing info of the groomer
+    async with HttpClient.get_client().post(f"http://groomer:5000/accepts/{checkout.groomerName}", json={"petTypes": list(map(lambda x: x.petType, checkout.pets))}) as resp:
+        json = await resp.json()
+        if resp.ok:
+            price_tiers = json
+        else:
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+    # check and add capacity
+    async with HttpClient.get_client().post("http://appointments:5000/checkadd", json={"groomerName": checkout.groomerName, "startTime": checkout.startTime, "endTime": checkout.endDate, "quantity": len(checkout.pets)}) as resp:
+        json = await resp.json()
+        if resp.ok:
+            number_of_days = json["dayLength"]
+        else:
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+    # create appointment entry
+    async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": checkout.pets}) as resp:
+        json = await resp.json()
+        if resp.ok:
+            appointment_id = json["id"]
+        else:
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+    pricing = price_tiers[checkout.priceTier]
+    # get stripe payment URL
+    async with HttpClient.get_client().post("http://stripe:5000/create-checkout-session", json={"packages": [{"price_id": pricing, "quantity": number_of_days}]}) as resp:
+        json = await resp.json()
+        if resp.ok:
+            checkout_url = json["checkout_url"]
+        else:
+            raise HTTPException(status_code=resp.status,
+                                detail="internal server error")
+    return {"checkoutUrl": checkout_url, "appointmentId": appointment_id}

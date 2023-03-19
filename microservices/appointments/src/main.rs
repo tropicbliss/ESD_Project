@@ -142,8 +142,8 @@ struct Pet {
 #[serde(rename_all = "camelCase")]
 struct UserEndpointOutput {
     groomer_name: String,
-    start_date: DateTime,
-    end_date: DateTime,
+    start_date: String,
+    end_date: String,
     groomer_picture_url: String,
     pet_names: Vec<String>,
 }
@@ -152,8 +152,8 @@ struct UserEndpointOutput {
 #[serde(rename_all = "camelCase")]
 struct CheckAddInput {
     groomer_name: String,
-    start_time: DateTime,
-    end_time: DateTime,
+    start_time: String,
+    end_time: String,
     quantity: u32,
 }
 
@@ -163,10 +163,16 @@ struct GroomerOutput {
     capacity: usize,
 }
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CheckAddOutput {
+    day_length: usize,
+}
+
 async fn check_add(
     state: State<SharedState>,
     Json(payload): Json<CheckAddInput>,
-) -> Result<StatusCode, ApiError> {
+) -> Result<Json<CheckAddOutput>, ApiError> {
     if payload.start_time > payload.end_time {
         return Err(ApiError::StartEndDateMismatch);
     }
@@ -184,8 +190,14 @@ async fn check_add(
     } else {
         return Err(ApiError::GroomerDoesNotExist);
     };
-    let start_date_raw = payload.start_time.to_chrono().date_naive();
-    let end_date_raw = payload.end_time.to_chrono().date_naive();
+    let start_date_raw = DateTime::parse_rfc3339_str(payload.start_time)
+        .map_err(|_| ApiError::IncorrectTimeFormat)?
+        .to_chrono()
+        .date_naive();
+    let end_date_raw = DateTime::parse_rfc3339_str(payload.end_time)
+        .map_err(|_| ApiError::IncorrectTimeFormat)?
+        .to_chrono()
+        .date_naive();
     let days: Vec<_> = start_date_raw
         .iter_days()
         .map(|day| if day == end_date_raw { None } else { Some(day) })
@@ -193,6 +205,7 @@ async fn check_add(
         .flatten()
         .map(|date| date.to_string())
         .collect();
+    let number_of_days = days.len();
     let filter = doc! {"date": {
         "$in": &days
     }, "groomer_name": &payload.groomer_name};
@@ -216,7 +229,9 @@ async fn check_add(
         .update_many(filter, update, None)
         .await
         .map_err(|_| ApiError::InternalError)?;
-    Ok(StatusCode::ACCEPTED)
+    Ok(Json(CheckAddOutput {
+        day_length: number_of_days,
+    }))
 }
 
 #[derive(Serialize)]
@@ -314,7 +329,7 @@ async fn get_user(
     let res = res
         .into_iter()
         .map(|app| UserEndpointOutput {
-            end_date: app.end_date,
+            end_date: app.end_date.try_to_rfc3339_string().unwrap(),
             groomer_name: groomer_info.get(&app.groomer_name).unwrap().name.clone(),
             groomer_picture_url: groomer_info
                 .get(&app.groomer_name)
@@ -322,7 +337,7 @@ async fn get_user(
                 .picture_url
                 .clone(),
             pet_names: app.pets.into_iter().map(|pet| pet.name).collect(),
-            start_date: app.start_date,
+            start_date: app.start_date.try_to_rfc3339_string().unwrap(),
         })
         .collect();
     Ok(Json(res))
@@ -333,8 +348,8 @@ async fn get_user(
 struct SignInOutput {
     id: String,
     user_name: String,
-    start_date: DateTime,
-    end_date: DateTime,
+    start_date: String,
+    end_date: String,
     pets: Vec<PetInputOutput>,
 }
 
@@ -410,10 +425,10 @@ async fn get_arriving_customers(
                     .collect::<Result<Vec<_>, _>>()
                     .unwrap();
                 SignInOutput {
-                    end_date: app.end_date,
+                    end_date: app.end_date.try_to_rfc3339_string().unwrap(),
                     id: app.id,
                     pets,
-                    start_date: app.start_date,
+                    start_date: app.start_date.try_to_rfc3339_string().unwrap(),
                     user_name: res.name,
                 }
             }
@@ -465,10 +480,10 @@ async fn get_staying_customers(
                     .collect::<Result<Vec<_>, _>>()
                     .unwrap();
                 SignInOutput {
-                    end_date: app.end_date,
+                    end_date: app.end_date.try_to_rfc3339_string().unwrap(),
                     id: app.id,
                     pets,
-                    start_date: app.start_date,
+                    start_date: app.start_date.try_to_rfc3339_string().unwrap(),
                     user_name: res.name,
                 }
             }
@@ -687,6 +702,7 @@ enum ApiError {
     StartEndDateMismatch,
     OverCapacity,
     AppointmentDoesNotExist,
+    IncorrectTimeFormat,
 }
 
 impl IntoResponse for ApiError {
@@ -704,6 +720,7 @@ impl IntoResponse for ApiError {
                 "the end date is earlier than the start date",
             ),
             ApiError::OverCapacity => (StatusCode::NOT_FOUND, "one or multiple dates at capacity"),
+            ApiError::IncorrectTimeFormat => (StatusCode::BAD_REQUEST, "incorrect time format"),
         };
         let body = Json(json!({ "message": error_message }));
         (status, body).into_response()
