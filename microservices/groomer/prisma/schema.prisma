@@ -18,6 +18,9 @@ model Groomer {
   address      String         @db.Text
   contactNo    String
   email        String
+  basic        Int
+  premium      Int
+  luxury       Int
   acceptedPets AcceptedPets[]
 }
 

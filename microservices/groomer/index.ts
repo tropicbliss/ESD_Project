@@ -1,7 +1,7 @@
 import { AcceptedPets, PetType, PrismaClient } from "@prisma/client";
 import express from "express";
 import { every } from "lodash";
-import { z } from "zod";
+import { number, z } from "zod";
 
 const app = express();
 
@@ -10,18 +10,23 @@ const prisma = new PrismaClient();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+const priceList = [40, 50, 60, 80, 100, 120, 160, 180, 200]
+
 app.post("/create", async (req, res) => {
   const json = req.body;
+  const schema = z.object({
+    name: z.string(),
+    pictureUrl: z.string().url(),
+    capacity: z.number().int().finite().safe().min(1),
+    address: z.string(),
+    contactNo: z.string(),
+    email: z.string().email(),
+    petType: z.array(z.nativeEnum(PetType)).min(1),
+    basic: z.number().refine((num) => priceList.includes(num)),
+    premium: z.number().refine((num) => priceList.includes(num)),
+    luxury: z.number().refine((num) => priceList.includes(num))
+  });
   try {
-    const schema = z.object({
-      name: z.string(),
-      pictureUrl: z.string().url(),
-      capacity: z.number().min(1),
-      address: z.string(),
-      contactNo: z.string(),
-      email: z.string().email(),
-      petType: z.array(z.nativeEnum(PetType)).min(1)
-    });
     const parsed = schema.parse(json);
     await prisma.groomer.create({
       data: {
@@ -35,7 +40,10 @@ app.post("/create", async (req, res) => {
           create: parsed.petType.map((pet) => {
             return { petType: pet }
           })
-        }
+        },
+        basic: parsed.basic,
+        premium: parsed.premium,
+        luxury: parsed.luxury
       }
     })
     res.status(200);
@@ -63,7 +71,10 @@ app.get("/search/keyword/:keyword", async (req, res) => {
         contactNo: true,
         email: true,
         name: true,
-        pictureUrl: true
+        pictureUrl: true,
+        basic: true,
+        premium: true,
+        luxury: true
       }
     })
     if (result) {
@@ -97,7 +108,10 @@ app.get("/search/name/:name", async (req, res) => {
         contactNo: true,
         email: true,
         name: true,
-        pictureUrl: true
+        pictureUrl: true,
+        basic: true,
+        premium: true,
+        luxury: true
       }
     });
     if (result) {
@@ -156,18 +170,21 @@ app.post("/update/:name", async (req, res) => {
   const json = req.body
   const schema = z.object({
     pictureUrl: z.string().url().optional(),
-    capacity: z.number().min(1).optional(),
+    capacity: z.number().int().finite().safe().optional(),
     address: z.string().optional(),
     contactNo: z.string().optional(),
     email: z.string().email().optional(),
-    acceptedPets: z.array(z.nativeEnum(PetType)).min(1).optional()
+    acceptedPets: z.array(z.nativeEnum(PetType)).min(1).optional(),
+    basic: z.number().refine((num) => priceList.includes(num)).optional(),
+    premium: z.number().refine((num) => priceList.includes(num)).optional(),
+    luxury: z.number().refine((num) => priceList.includes(num)).optional()
   })
   try {
     const parsed = schema.parse(json)
     const updatedAcceptedPets = parsed.acceptedPets?.map((pet) => {
       return { petType: pet }
     });
-    const e = await prisma.groomer.update({
+    await prisma.groomer.update({
       where: {
         name,
       },
@@ -180,7 +197,10 @@ app.post("/update/:name", async (req, res) => {
         acceptedPets: updatedAcceptedPets ? {
           deleteMany: {},
           create: updatedAcceptedPets
-        } : undefined
+        } : undefined,
+        basic: parsed.basic,
+        premium: parsed.premium,
+        luxury: parsed.luxury
       },
       select: {
         acceptedPets: true,
@@ -218,7 +238,10 @@ app.post("/read", async (req, res) => {
         contactNo: true,
         email: true,
         name: true,
-        pictureUrl: true
+        pictureUrl: true,
+        basic: true,
+        premium: true,
+        luxury: true
       }
     });
     const j = result.map((groomer) => {

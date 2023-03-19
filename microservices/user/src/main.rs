@@ -26,7 +26,7 @@ async fn main() -> Result<()> {
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
-    let client_options = ClientOptions::parse(&std::env::var("DB_URI")?).await?;
+    let client_options = ClientOptions::parse("mongodb+srv://esduser:esdproject@esdproject.j8dxyud.mongodb.net/?retryWrites=true&w=majority").await?;
     let client = Client::with_options(client_options)?;
     let database =
         client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "esdproject".into()));
