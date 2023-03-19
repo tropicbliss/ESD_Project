@@ -1,7 +1,7 @@
-import { AcceptedPets, PetType, PrismaClient } from "@prisma/client";
+import { PetType, PrismaClient } from "@prisma/client";
 import express from "express";
 import { every } from "lodash";
-import { number, z } from "zod";
+import { z } from "zod";
 
 const app = express();
 
@@ -257,5 +257,5 @@ app.post("/read", async (req, res) => {
 })
 
 app.listen(process.env.PORT, () => {
-  console.log(`Censorer listening on port ${process.env.PORT}`);
+  console.log(`Groomer listening on port ${process.env.PORT}`);
 });

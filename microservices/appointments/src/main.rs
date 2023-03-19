@@ -57,7 +57,7 @@ async fn main() -> Result<()> {
         .route("/create", post(create_appointment))
         .route("/stayed", post(stayed_customers))
         .route("/checkadd", post(check_add))
-        .route("/check", get(check))
+        .route("/check/:id", get(check))
         .with_state(shared_state);
     let addr = std::env::var("ADDR").unwrap_or_else(|_| "127.0.0.1:3000".into());
     let addr: SocketAddr = addr.parse()?;
@@ -528,7 +528,7 @@ async fn change_appointment_status(
             .map_err(|_| ApiError::InternalError)?;
         Ok(StatusCode::OK)
     } else {
-        Ok(StatusCode::NOT_FOUND)
+        Err(ApiError::AppointmentDoesNotExist)
     }
 }
 
@@ -686,6 +686,7 @@ enum ApiError {
     GroomerDoesNotExist,
     StartEndDateMismatch,
     OverCapacity,
+    AppointmentDoesNotExist,
 }
 
 impl IntoResponse for ApiError {
@@ -695,6 +696,9 @@ impl IntoResponse for ApiError {
             ApiError::IncorrectStatusFlow => (StatusCode::BAD_REQUEST, "incorrect status flow"),
             ApiError::UserDoesNotExist => (StatusCode::NOT_FOUND, "user cannot be found"),
             ApiError::GroomerDoesNotExist => (StatusCode::NOT_FOUND, "groomer cannot be found"),
+            ApiError::AppointmentDoesNotExist => {
+                (StatusCode::NOT_FOUND, "appointment cannot be found")
+            }
             ApiError::StartEndDateMismatch => (
                 StatusCode::BAD_REQUEST,
                 "the end date is earlier than the start date",

@@ -126,7 +126,7 @@ impl MutationRoot {
     async fn update_user(
         &self,
         ctx: &Context<'_>,
-        name: Option<String>,
+        name: String,
         contact_no: Option<String>,
         email: Option<String>,
     ) -> Result<bool> {
@@ -142,9 +142,13 @@ impl MutationRoot {
             update.insert("email", email);
         }
         let update_final = doc! {"$set": update};
-        ctx.data_unchecked::<Collection<User>>()
-            .update_one(query, update_final, None)
+        let e = ctx
+            .data_unchecked::<Collection<User>>()
+            .find_one_and_update(query, update_final, None)
             .await?;
+        if e.is_none() {
+            return Err(ApiError::UserExists.into());
+        }
         Ok(true)
     }
 }

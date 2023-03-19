@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::post,
+    routing::{get, post},
     Json, Router,
 };
 use futures::TryStreamExt;
@@ -39,7 +39,7 @@ async fn main() -> Result<()> {
     };
     let app = Router::new()
         .route("/", post(create_comment))
-        .route("/:id", post(get_comment))
+        .route("/:id", get(get_comment))
         .with_state(shared_state);
     let addr = std::env::var("ADDR").unwrap_or_else(|_| "127.0.0.1:3000".into());
     let addr: SocketAddr = addr.parse()?;
