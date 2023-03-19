@@ -102,11 +102,9 @@ services:
     environment:
       PORT: 5000
     depends_on:
-      - censorer
       - user
       - comments
       - esd-rabbit
-      - logger
       - appointments
       - groomer
       - stripe
