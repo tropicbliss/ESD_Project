@@ -22,7 +22,7 @@ class HttpClient:
         return cls.aiohttp_client
 
     @classmethod
-    async def close(cls) -> ClientSession:
+    async def close(cls):
         if cls.aiohttp_client is not None:
             await cls.aiohttp_client.close()
 
