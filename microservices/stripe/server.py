@@ -22,7 +22,7 @@ stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 app = Flask(__name__,
             static_url_path='',
-            static_folder='../../public/stripeTest')
+            static_folder='/public')
 app.config['SECRET_KEY'] = 'very_secret_deh'
 # app.debug = True
 YOUR_DOMAIN = os.getenv("YOUR_DOMAIN")
