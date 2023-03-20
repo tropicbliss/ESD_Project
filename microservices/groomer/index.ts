@@ -17,7 +17,6 @@ app.post("/create", async (req, res) => {
   const schema = z.object({
     name: z.string(),
     pictureUrl: z.string().url(),
-    capacity: z.number().int().finite().safe().min(1),
     address: z.string(),
     contactNo: z.string(),
     email: z.string().email(),
@@ -31,7 +30,6 @@ app.post("/create", async (req, res) => {
     await prisma.groomer.create({
       data: {
         address: parsed.address,
-        capacity: parsed.capacity,
         contactNo: parsed.contactNo,
         email: parsed.email,
         name: parsed.name,
@@ -67,7 +65,6 @@ app.get("/search/keyword/:keyword", async (req, res) => {
       select: {
         acceptedPets: true,
         address: true,
-        capacity: true,
         contactNo: true,
         email: true,
         name: true,
@@ -104,7 +101,6 @@ app.get("/search/name/:name", async (req, res) => {
       select: {
         acceptedPets: true,
         address: true,
-        capacity: true,
         contactNo: true,
         email: true,
         name: true,
@@ -172,15 +168,14 @@ app.post("/update/:name", async (req, res) => {
   const { name } = req.params;
   const json = req.body
   const schema = z.object({
-    pictureUrl: z.string().url().optional(),
-    capacity: z.number().int().finite().safe().optional(),
-    address: z.string().optional(),
-    contactNo: z.string().optional(),
-    email: z.string().email().optional(),
-    acceptedPets: z.array(z.nativeEnum(PetType)).min(1).optional(),
-    basic: z.number().refine((num) => priceList.includes(num)).optional(),
-    premium: z.number().refine((num) => priceList.includes(num)).optional(),
-    luxury: z.number().refine((num) => priceList.includes(num)).optional()
+    pictureUrl: z.string().url().nullable(),
+    address: z.string().nullable(),
+    contactNo: z.string().nullable(),
+    email: z.string().email().nullable(),
+    acceptedPets: z.array(z.nativeEnum(PetType)).min(1).nullable(),
+    basic: z.number().refine((num) => priceList.includes(num)).nullable(),
+    premium: z.number().refine((num) => priceList.includes(num)).nullable(),
+    luxury: z.number().refine((num) => priceList.includes(num)).nullable()
   })
   try {
     const parsed = schema.parse(json)
@@ -192,18 +187,17 @@ app.post("/update/:name", async (req, res) => {
         name,
       },
       data: {
-        address: parsed.address,
-        capacity: parsed.capacity,
-        contactNo: parsed.contactNo,
-        email: parsed.email,
-        pictureUrl: parsed.pictureUrl,
+        address: parsed.address ?? undefined,
+        contactNo: parsed.contactNo ?? undefined,
+        email: parsed.email ?? undefined,
+        pictureUrl: parsed.pictureUrl ?? undefined,
         acceptedPets: updatedAcceptedPets ? {
           deleteMany: {},
           create: updatedAcceptedPets
         } : undefined,
-        basic: parsed.basic,
-        premium: parsed.premium,
-        luxury: parsed.luxury
+        basic: parsed.basic ?? undefined,
+        premium: parsed.premium ?? undefined,
+        luxury: parsed.luxury ?? undefined
       },
       select: {
         acceptedPets: true,
@@ -220,7 +214,7 @@ app.post("/update/:name", async (req, res) => {
 app.post("/read", async (req, res) => {
   const json = req.body;
   const schema = z.object({
-    petType: z.nativeEnum(PetType).optional()
+    petType: z.nativeEnum(PetType).nullable()
   })
   try {
     const parsed = schema.parse(json);
@@ -229,7 +223,7 @@ app.post("/read", async (req, res) => {
         acceptedPets: {
           some: {
             petType: {
-              equals: parsed.petType
+              equals: parsed.petType ?? undefined
             }
           }
         }
@@ -237,7 +231,6 @@ app.post("/read", async (req, res) => {
       select: {
         acceptedPets: true,
         address: true,
-        capacity: true,
         contactNo: true,
         email: true,
         name: true,
@@ -252,7 +245,7 @@ app.post("/read", async (req, res) => {
       return { ...groomer, acceptedPets: pets }
     })
     res.status(200)
-    res.send(j)
+    res.send({ result: j })
   } catch (err) {
     res.status(400);
     res.send({ message: "an error has occurred" });

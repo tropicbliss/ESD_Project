@@ -10,7 +10,7 @@ use futures::{stream, StreamExt, TryStreamExt};
 use graphql_client::{GraphQLQuery, Response};
 use mongodb::{
     bson::{doc, Bson, DateTime},
-    options::{ClientOptions, FindOptions},
+    options::ClientOptions,
     Client, Collection,
 };
 use reqwest::Client as HttpClient;
@@ -39,14 +39,10 @@ async fn main() -> Result<()> {
     let appointments_collection = database.collection::<Appointment>(
         &std::env::var("APPOINTMENTS_COLLECTION").unwrap_or_else(|_| "appointments".into()),
     );
-    let capacity_collection = database.collection::<Capacity>(
-        &std::env::var("CAPACITY_COLLECTION").unwrap_or_else(|_| "capacity".into()),
-    );
     let shared_state = SharedState {
         appointments: appointments_collection,
-        capacity: capacity_collection,
         http: HttpClient::builder()
-            .timeout(Duration::from_secs(3))
+            .timeout(Duration::from_secs(9))
             .build()?,
     };
     let app = Router::new()
@@ -56,8 +52,7 @@ async fn main() -> Result<()> {
         .route("/status/:id", post(change_appointment_status))
         .route("/create", post(create_appointment))
         .route("/stayed", post(stayed_customers))
-        .route("/checkadd", post(check_add))
-        .route("/check/:id", get(check))
+        .route("/quantity", post(get_quantity))
         .with_state(shared_state);
     let addr = std::env::var("ADDR").unwrap_or_else(|_| "127.0.0.1:3000".into());
     let addr: SocketAddr = addr.parse()?;
@@ -74,14 +69,12 @@ struct GetUser;
 
 async fn does_groomer_exist(client: &HttpClient, id: &str) -> Result<bool, ApiError> {
     Ok(client
-        .post(format!("http://groomer:5000/read/{id}"))
-        .json(&json!({}))
+        .get(format!("http://groomer:5000/search/name/{id}"))
         .send()
         .await
         .map_err(|_| ApiError::InternalError)?
         .status()
-        .as_u16()
-        == 200)
+        .is_success())
 }
 
 async fn does_user_exist(client: &HttpClient, name: &str) -> Result<bool, ApiError> {
@@ -107,7 +100,6 @@ async fn does_user_exist(client: &HttpClient, name: &str) -> Result<bool, ApiErr
 #[derive(Clone)]
 struct SharedState {
     appointments: Collection<Appointment>,
-    capacity: Collection<Capacity>,
     http: HttpClient,
 }
 
@@ -120,13 +112,6 @@ struct Appointment {
     end_date: DateTime,
     status: Status,
     pets: Vec<Pet>,
-}
-
-#[derive(Serialize, Deserialize)]
-struct Capacity {
-    groomer_name: String,
-    date: String,
-    current_capacity: usize,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -151,16 +136,8 @@ struct UserEndpointOutput {
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct CheckAddInput {
-    groomer_name: String,
     start_time: String,
     end_time: String,
-    quantity: u32,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct GroomerOutput {
-    capacity: usize,
 }
 
 #[derive(Serialize)]
@@ -169,27 +146,12 @@ struct CheckAddOutput {
     day_length: usize,
 }
 
-async fn check_add(
-    state: State<SharedState>,
+async fn get_quantity(
     Json(payload): Json<CheckAddInput>,
 ) -> Result<Json<CheckAddOutput>, ApiError> {
     if payload.start_time > payload.end_time {
         return Err(ApiError::StartEndDateMismatch);
     }
-    let groomer = state
-        .http
-        .post(format!("http://groomer:5000/read/{}", payload.groomer_name))
-        .json(&json!({}))
-        .send()
-        .await
-        .map_err(|_| ApiError::InternalError)?
-        .json::<GroomerOutput>()
-        .await;
-    let groomer_capacity = if let Ok(groomer) = groomer {
-        groomer.capacity
-    } else {
-        return Err(ApiError::GroomerDoesNotExist);
-    };
     let start_date_raw = DateTime::parse_rfc3339_str(payload.start_time)
         .map_err(|_| ApiError::IncorrectTimeFormat)?
         .to_chrono()
@@ -200,85 +162,15 @@ async fn check_add(
         .date_naive();
     let days: Vec<_> = start_date_raw
         .iter_days()
-        .map(|day| if day == end_date_raw { None } else { Some(day) })
+        .map(|day| if day >= end_date_raw { None } else { Some(day) })
         .fuse()
         .flatten()
         .map(|date| date.to_string())
         .collect();
     let number_of_days = days.len();
-    let filter = doc! {"date": {
-        "$in": &days
-    }, "groomer_name": &payload.groomer_name};
-    let res = state
-        .capacity
-        .find(filter.clone(), None)
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    let res: Vec<_> = res
-        .try_collect()
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    for capacity in res {
-        if capacity.current_capacity + payload.quantity as usize > groomer_capacity {
-            return Err(ApiError::OverCapacity);
-        }
-    }
-    let update = doc! {"current_capacity": payload.quantity as i64};
-    state
-        .capacity
-        .update_many(filter, update, None)
-        .await
-        .map_err(|_| ApiError::InternalError)?;
     Ok(Json(CheckAddOutput {
         day_length: number_of_days,
     }))
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct CapacityInfoOutput {
-    date: String,
-    remaining_capacity: usize,
-}
-
-async fn check(
-    state: State<SharedState>,
-    Path(groomer_name): Path<String>,
-) -> Result<Json<Vec<CapacityInfoOutput>>, ApiError> {
-    let groomer = state
-        .http
-        .post(format!("http://groomer:5000/read/{}", groomer_name))
-        .json(&json!({}))
-        .send()
-        .await
-        .map_err(|_| ApiError::InternalError)?
-        .json::<GroomerOutput>()
-        .await;
-    let groomer_capacity = if let Ok(groomer) = groomer {
-        groomer.capacity
-    } else {
-        return Err(ApiError::GroomerDoesNotExist);
-    };
-    let filter = doc! {"date": {
-        "$gte": DateTime::now()
-    }, "groomer_name": groomer_name};
-    let res = state
-        .capacity
-        .find(filter, FindOptions::builder().limit(27).build())
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    let res: Vec<_> = res
-        .try_collect()
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    let res: Vec<_> = res
-        .into_iter()
-        .map(|cap| CapacityInfoOutput {
-            remaining_capacity: groomer_capacity - cap.current_capacity,
-            date: cap.date,
-        })
-        .collect();
-    Ok(Json(res))
 }
 
 async fn get_user(
@@ -307,20 +199,18 @@ async fn get_user(
         .map_err(|_| ApiError::InternalError)?;
     let groomers: HashSet<String> = res.iter().map(|app| app.groomer_name.clone()).collect();
     let groomer_info: HashMap<String, UserReadEndpointOutput> = stream::iter(groomers)
-        .map(|id| {
+        .map(|name| {
             let client = &state.http;
             async move {
-                let json = json!({ "id": id });
                 let res: UserReadEndpointOutput = client
-                    .post("http://groomer:5000/read")
-                    .json(&json)
+                    .get(format!("http://groomer:5000/search/name/{}", name))
                     .send()
                     .await
                     .unwrap()
                     .json()
                     .await
                     .unwrap();
-                (id, res)
+                (name, res)
             }
         })
         .buffer_unordered(3)
@@ -700,7 +590,6 @@ enum ApiError {
     UserDoesNotExist,
     GroomerDoesNotExist,
     StartEndDateMismatch,
-    OverCapacity,
     AppointmentDoesNotExist,
     IncorrectTimeFormat,
 }
@@ -719,7 +608,6 @@ impl IntoResponse for ApiError {
                 StatusCode::BAD_REQUEST,
                 "the end date is earlier than the start date",
             ),
-            ApiError::OverCapacity => (StatusCode::NOT_FOUND, "one or multiple dates at capacity"),
             ApiError::IncorrectTimeFormat => (StatusCode::BAD_REQUEST, "incorrect time format"),
         };
         let body = Json(json!({ "message": error_message }));

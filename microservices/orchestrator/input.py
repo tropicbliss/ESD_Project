@@ -3,6 +3,18 @@ from enum import Enum
 from output import Pet
 
 
+class PetType(str, Enum):
+    birds = "Birds"
+    hamsters = "Hamsters"
+    cats = "Cats"
+    dogs = "Dogs"
+    rabbits = "Rabbits"
+    guinea_pigs = "GuineaPigs"
+    chinchillas = "Chinchillas"
+    mice = "Mice"
+    fishes = "Fishes"
+
+
 class CreateUser(BaseModel):
     name: str
     contactNo: str
@@ -14,45 +26,40 @@ class UpdateUser(BaseModel):
     email: str | None = None
 
 
-class CreateGroomer(BaseModel):
-    name: str
-    pictureUrl: str
-    capacity: int
-    address: str
-    contactNo: str
-    email: str
-    petType: str
-    basic: int
-    premium: int
-    luxury: int
-
-
 class GroomerAccepts(BaseModel):
-    petTypes: list[str]
+    petTypes: list[PetType]
+
+    class Config:
+        use_enum_values = True
 
 
 class UpdateGroomer(BaseModel):
     pictureUrl: str | None = None
-    capacity: int | None = None
     address: str | None = None
     contactNo: str | None = None
     email: str | None = None
-    petType: str | None = None
+    petType: list[PetType] | None = None
     basic: int | None = None
     premium: int | None = None
     luxury: int | None = None
 
+    class Config:
+        use_enum_values = True
 
-class PetType(str, Enum):
-    birds = "Birds"
-    hamsters = "Hamsters"
-    cats = "Cats"
-    dogs = "Dogs"
-    rabbits = "Rabbits"
-    guinea_pigs = "GuineaPigs"
-    chinchillas = "Chinchillas"
-    mice = "Mice"
-    fishes = "Fishes"
+
+class CreateGroomer(BaseModel):
+    name: str
+    pictureUrl: str
+    address: str
+    contactNo: str
+    email: str
+    petType: list[PetType]
+    basic: int
+    premium: int
+    luxury: int
+
+    class Config:
+        use_enum_values = True
 
 
 class ReadGroomer(BaseModel):
@@ -93,7 +100,7 @@ class Checkout(BaseModel):
     groomerName: str
     pets: list[Pet]
     startTime: str
-    endDate: str
+    endTime: str
     userName: str
     priceTier: PriceTier
 

@@ -40,7 +40,6 @@ services:
       DB_URI: mongodb+srv://esduser:esdproject@esdproject.j8dxyud.mongodb.net/?retryWrites=true&w=majority
       DATABASE: esdproject
       APPOINTMENTS_COLLECTION: appointments
-      CAPACITY_COLLECTION: capacity
       ADDR: 0.0.0.0:5000
     depends_on:
       - groomer
@@ -50,7 +49,7 @@ services:
       context: groomer
     restart: always
     environment:
-      DATABASE_URL: postgresql://postgres:fo1cSteLH9JAnVA2IXyU@containers-us-west-51.railway.app:6061/railway
+      DATABASE_URL: postgresql://postgres:joVkG12S3wsJrR1FdbzE@containers-us-west-49.railway.app:7889/railway
       PORT: 5000
   stripe:
     build:

@@ -40,7 +40,7 @@ async def lifespan(_: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(CORSMiddleware, allow_origins=origins,
-                   allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+                   allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
 
 
 @app.post("/user/create", status_code=201, responses={400: {"model": output.Error}})
@@ -77,7 +77,7 @@ async def get_user(name: str):
         return res
 
 
-@app.post("/user/update/{name}", status_code=200, responses={404: {"model": output.Error}})
+@app.post("/user/update/{name}", status_code=200, responses={404: {"model": output.Error}}, description="None of the JSON fields are optional, you must send all the information together with the updated field to update an entry.")
 async def update_user(name: str, info: input.UpdateUser):
     if info.contactNo != None:
         info.contactNo = f"\"{info.contactNo}\""
@@ -102,15 +102,15 @@ async def update_user(name: str, info: input.UpdateUser):
 @app.post("/groomer/create", status_code=201, responses={400: {"model": output.Error}})
 async def create_groomer(groomer: input.CreateGroomer):
     async with HttpClient.get_client().post("http://groomer:5000/create", json=vars(groomer)) as resp:
-        json = await resp.json()
         if resp.ok:
-            return json
+            return
         else:
+            json = await resp.json()
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
 
 
-@app.get("/groomer/search/keyword/{keyword}", status_code=200, response_model=list[output.Groomer], responses={404: {"model": output.Error}, 400: {"model": output.Error}})
+@app.get("/groomer/search/keyword/{keyword}", status_code=200, response_model=list[output.Groomer], responses={404: {"model": output.Error}, 400: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
 async def search_groomer_by_keyword(keyword: str):
     async with HttpClient.get_client().get(f"http://groomer:5000/search/keyword/{keyword}") as resp:
         json = await resp.json()
@@ -121,7 +121,7 @@ async def search_groomer_by_keyword(keyword: str):
                                 detail=json["message"])
 
 
-@app.get("/groomer/search/name/{name}", status_code=200, response_model=output.Groomer, responses={404: {"model": output.Error}, 400: {"model": output.Error}})
+@app.get("/groomer/search/name/{name}", status_code=200, response_model=output.Groomer, responses={404: {"model": output.Error}, 400: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
 async def get_groomer_by_name(name: str):
     async with HttpClient.get_client().get(f"http://groomer:5000/search/name/{name}") as resp:
         json = await resp.json()
@@ -132,7 +132,7 @@ async def get_groomer_by_name(name: str):
                                 detail=json["message"])
 
 
-@app.post("/groomer/update/{name}", status_code=200, responses={400: {"model": output.Error}})
+@app.post("/groomer/update/{name}", status_code=200, responses={400: {"model": output.Error}}, description="All of the input fields are optional. If you want to search a keyword or name with a space, replace the space with %20")
 async def update_groomer(name: str, updated: input.UpdateGroomer):
     async with HttpClient.get_client().post(f"http://groomer:5000/update/{name}", json=vars(updated)) as resp:
         if resp.ok:
@@ -143,7 +143,7 @@ async def update_groomer(name: str, updated: input.UpdateGroomer):
                                 detail=json["message"])
 
 
-@app.post("/groomer/read", status_code=200, response_model=output.Groomer, responses={400: {"model": output.Error}})
+@app.post("/groomer/read", status_code=200, response_model=output.GroomerRead, responses={400: {"model": output.Error}}, summary="Filter groomers by accepted pet type or get every single groomer", description="All of the input fields are optional. Send an empty JSON (with no fields) to get every single groomer.")
 async def read_groomer(filters: input.ReadGroomer):
     async with HttpClient.get_client().post("http://groomer:5000/read", json=vars(filters)) as resp:
         json = await resp.json()
@@ -154,18 +154,7 @@ async def read_groomer(filters: input.ReadGroomer):
                                 detail=json["message"])
 
 
-@app.get("/capacity/check/{groomer_name}", status_code=200, response_model=list[output.FutureCapacity], responses={500: {"model": output.Error}, 404: {"model": output.Error}})
-async def get_future_capacities(groomer_name: str):
-    async with HttpClient.get_client().get(f"http://appointments:5000/check/{groomer_name}") as resp:
-        json = await resp.json()
-        if resp.ok:
-            return json
-        else:
-            raise HTTPException(status_code=resp.status,
-                                detail=json["message"])
-
-
-@app.get("/comments/read/{groomer_name}", status_code=200, response_model=list[output.Comment], responses={500: {"model": output.Error}, 404: {"model": output.Error}})
+@app.get("/comments/read/{groomer_name}", status_code=200, response_model=list[output.Comment], responses={500: {"model": output.Error}, 404: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
 async def get_comments(groomer_name: str):
     async with HttpClient.get_client().get(f"http://comments:5000/{groomer_name}") as resp:
         json = await resp.json()
@@ -176,7 +165,7 @@ async def get_comments(groomer_name: str):
                                 detail=json["message"])
 
 
-@app.get("/appointments/user/{user_name}", status_code=200, response_model=list[output.Appointment], responses={500: {"model": output.Error}, 404: {"model": output.Error}})
+@app.get("/appointments/user/{user_name}", status_code=200, response_model=list[output.Appointment], responses={500: {"model": output.Error}, 404: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
 async def get_appointments_of_user(user_name: str):
     async with HttpClient.get_client().get(f"http://appointments:5000/user/{user_name}") as resp:
         json = await resp.json()
@@ -187,7 +176,7 @@ async def get_appointments_of_user(user_name: str):
                                 detail=json["message"])
 
 
-@app.get("/appointments/signin/{groomer_name}", status_code=200, response_model=list[output.CustomerAppointments], responses={500: {"model": output.Error}, 404: {"model": output.Error}})
+@app.get("/appointments/signin/{groomer_name}", status_code=200, response_model=list[output.CustomerAppointments], responses={500: {"model": output.Error}, 404: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
 async def get_arriving_customers(groomer_name: str):
     async with HttpClient.get_client().get(f"http://appointments:5000/signin/{groomer_name}") as resp:
         json = await resp.json()
@@ -198,7 +187,7 @@ async def get_arriving_customers(groomer_name: str):
                                 detail=json["message"])
 
 
-@app.get("/appointments/staying/{groomer_name}", status_code=200, response_model=list[output.CustomerAppointments], responses={500: {"model": output.Error}, 404: {"model": output.Error}})
+@app.get("/appointments/staying/{groomer_name}", status_code=200, response_model=list[output.CustomerAppointments], responses={500: {"model": output.Error}, 404: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
 async def get_staying_customers(groomer_name: str):
     async with HttpClient.get_client().get(f"http://appointments:5000/staying/{groomer_name}") as resp:
         json = await resp.json()
@@ -238,7 +227,7 @@ async def create_comment(comment: input.CreateComment):
                                 detail=json["message"])
 
 
-@app.post("/checkout", status_code=200, response_model=output.Checkout, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
+@app.post("/checkout", status_code=200, response_model=output.Checkout, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}}, description="To send the time in Javascript, call `date.toISOString()` on a `Date` object.")
 async def checkout(checkout: input.Checkout):
     # check if groomer accepts the pets specified by the customer and return pricing info of the groomer
     async with HttpClient.get_client().post(f"http://groomer:5000/accepts/{checkout.groomerName}", json={"petTypes": list(map(lambda x: x.petType, checkout.pets))}) as resp:
@@ -248,8 +237,8 @@ async def checkout(checkout: input.Checkout):
         else:
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
-    # check and add capacity
-    async with HttpClient.get_client().post("http://appointments:5000/checkadd", json={"groomerName": checkout.groomerName, "startTime": checkout.startTime, "endTime": checkout.endDate, "quantity": len(checkout.pets)}) as resp:
+    # get number of days
+    async with HttpClient.get_client().post("http://appointments:5000/quantity", json={"startTime": checkout.startTime, "endTime": checkout.endTime}) as resp:
         json = await resp.json()
         if resp.ok:
             number_of_days = json["dayLength"]
@@ -257,20 +246,18 @@ async def checkout(checkout: input.Checkout):
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
     # create appointment entry
-    async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": checkout.pets}) as resp:
-        json = await resp.json()
-        if resp.ok:
-            appointment_id = json["id"]
-        else:
+    async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": [vars(pet) for pet in checkout.pets]}) as resp:
+        if not resp.ok:
+            json = await resp.json()
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
     pricing = price_tiers[checkout.priceTier]
     # get stripe payment URL
-    async with HttpClient.get_client().post("http://stripe:5000/create-checkout-session", json={"packages": [{"price_id": pricing, "quantity": number_of_days}]}) as resp:
-        json = await resp.json()
+    async with HttpClient.get_client().post("http://stripe:5000/create-checkout-session", json={"cust_checkout": [{"price_id": pricing, "quantity": number_of_days}]}) as resp:
         if resp.ok:
+            json = await resp.json()
             checkout_url = json["checkout_url"]
         else:
             raise HTTPException(status_code=resp.status,
                                 detail="internal server error")
-    return {"checkoutUrl": checkout_url, "appointmentId": appointment_id}
+    return {"checkoutUrl": checkout_url}

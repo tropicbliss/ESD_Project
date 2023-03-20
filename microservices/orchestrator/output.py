@@ -23,7 +23,6 @@ class ReadUser(BaseModel):
 class Groomer(BaseModel):
     acceptedPets: list[PetType]
     address: str
-    capacity: int
     contactNo: str
     email: str
     name: str
@@ -33,9 +32,8 @@ class Groomer(BaseModel):
     luxury: int
 
 
-class FutureCapacity(BaseModel):
-    date: str
-    remainingCapacity: int
+class GroomerRead(BaseModel):
+    result: list[Groomer]
 
 
 class Comment(BaseModel):
@@ -85,4 +83,3 @@ class Error(BaseModel):
 
 class Checkout(BaseModel):
     checkoutUrl: str
-    appointmentId: str

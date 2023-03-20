@@ -14,7 +14,6 @@ datasource db {
 model Groomer {
   name         String         @unique
   pictureUrl   String         @db.Text
-  capacity     Int
   address      String         @db.Text
   contactNo    String
   email        String

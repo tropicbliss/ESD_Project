@@ -34,7 +34,7 @@ async fn main() -> Result<()> {
     let shared_state = SharedState {
         db: collection,
         http: HttpClient::builder()
-            .timeout(Duration::from_secs(3))
+            .timeout(Duration::from_secs(9))
             .build()?,
     };
     let app = Router::new()
@@ -91,13 +91,12 @@ struct CreateOutput {
 
 async fn does_groomer_exist(client: &HttpClient, id: &str) -> Result<bool, ApiError> {
     Ok(client
-        .get(format!("http://groomer:5000/read/{id}"))
+        .get(format!("http://groomer:5000/search/name/{id}"))
         .send()
         .await
         .map_err(|_| ApiError::InternalError)?
         .status()
-        .as_u16()
-        == 200)
+        .is_success())
 }
 
 async fn does_user_exist(client: &HttpClient, name: &str) -> Result<bool, ApiError> {
