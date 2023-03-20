@@ -1,6 +1,6 @@
-FROM rust:slim-buster
+FROM rust:1.67
 WORKDIR /usr/src/app
 COPY . .
 RUN cargo install --path .
 RUN rm -r *
-ENTRYPOINT [ "comments" ]
+ENTRYPOINT [ "user" ]

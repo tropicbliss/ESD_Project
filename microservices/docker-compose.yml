@@ -1,5 +1,9 @@
 version: '3.8'
 
+volumes:
+  pgdata: 
+  kongadata:
+
 services:
   censorer:
     build:
@@ -67,13 +71,27 @@ services:
       POSTGRES_USER: kong
       POSTGRES_PASSWORD: password
       POSTGRES_DB: kong
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data
+  kong-migration:
+    image: kong:2.0.4
+    command: "kong migrations bootstrap"
+    restart: on-failure
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: password
+    depends_on:
+      - kong-database
   kong:
+    image: kong:2.0.4
     restart: always
-    image: kong
-    ports:
-      - 8000:8000
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-database
@@ -81,20 +99,27 @@ services:
       KONG_PG_PASSWORD: password
       KONG_PROXY_LISTEN: 0.0.0.0:8000
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
-    command: kong migrations bootstrap
     depends_on:
-      - kong-database
+      - kong-migration
       - stripe
       - orchestrator
+    ports:
+      - "8000:8000"
   konga:
     image: pantsel/konga
     restart: always
-    ports:
-      - 1337:1337
-    volumes:
-      - kongadata:/app/kongadata
+    environment:
+      DB_ADAPTER: postgres
+      DB_HOST: kong-database
+      DB_USER: kong
+      DB_PASSWORD: password
+      DB_DATABASE: konga_db
     depends_on:
       - kong
+    ports:
+      - "1337:1337"
+    volumes:
+      - kongadata:/app/kongadata
   orchestrator:
     build:
       context: orchestrator
