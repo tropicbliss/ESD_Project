@@ -134,6 +134,33 @@ def create_checkout_session():
     else:
         return redirect(checkout_session.url, code=303)
 
+@app.route('/stripe_webhooks', methods=['POST'])
+def webhook():
+    event = None
+    try:
+        # Verify the signature of the incoming webhook request
+        payload = request.data
+        sig_header = request.headers.get('Stripe-Signature', None)
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, stripe.api_key
+        )
+    except ValueError as e:
+        # Invalid payload or signature
+        return jsonify(error=str(e)), 400
+    except stripe.error.SignatureVerificationError as e:
+        # Invalid signature
+        return jsonify(error=str(e)), 400
+
+    # Handle the event
+    if event.type == 'payment_intent.succeeded':
+        print(f"Payment succeeded: {event['data']['object']['id']}")
+        return render_template('success_webhook.html', event_json=json.dumps(event))
+    elif event.type == 'charge.failed':
+        # Do something when a charge fails
+        print(f"Charge failed for charge id: {event.data.object.id}")
+        return render_template('success_webhook.html', event_json=json.dumps(event))
+
+    return jsonify(success=True), 200
 
 @app.route('/create-product', methods=['POST'])
 def create_product():
