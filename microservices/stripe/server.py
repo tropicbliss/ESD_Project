@@ -25,8 +25,8 @@ app = Flask(__name__,
             static_folder='/public')
 app.config['SECRET_KEY'] = 'very_secret_deh'
 # app.debug = True
+#YOUR_DOMAIN = "http://localhost:4242"
 YOUR_DOMAIN = os.getenv("YOUR_DOMAIN")
-
 
 class checkoutForm(FlaskForm):
     package = RadioField("svc_lvl")
@@ -159,6 +159,8 @@ def webhook():
         # Do something when a charge fails
         print(f"Charge failed for charge id: {event.data.object.id}")
         return render_template('success_webhook.html', event_json=json.dumps(event))
+    else:
+      print('Unhandled event type {}'.format(event['type']))
 
     return jsonify(success=True), 200
 
@@ -213,3 +215,4 @@ def make_refund():
 
 if __name__ == '__main__':
     app.run(port=os.getenv("PORT"))
+    #app.run(port=4242)
