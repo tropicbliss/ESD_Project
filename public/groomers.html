@@ -197,6 +197,11 @@
             </div>
           </div>
         </div>
+        <div v-else>
+          <div v-html="elsePart">
+          </div>
+          <button v-on:click="display = 'true'">back to main page</button>
+        </div>
       </div>
  
       <script>
@@ -209,7 +214,8 @@
                         { id: 3, name: 'C', pic: './images/g-3.png'},
                         { id: 4, name: 'D', pic: './images/g-4.png'} 
                     ],
-                    display: 'true'
+                    display: 'true',
+                    elsePart: ''
                   }
               },
               // created() { // created is a hook that executes as soon as Vue instance is created
@@ -223,11 +229,11 @@
               //         this.posts = [{ entry: 'There was an error: ' + error.message }]
               //     })
               methods: {
-                onShow: function () {
-                  this.display = 'false'
+                onShow: function (id, pic) {
+                  this.display = 'false';
+                  this.elsePart = `<h1>Groomer Display Page - ${id}</h1> <img class="img-fluid" src="${pic}" >`
                 }, // this is also a valid vue method syntax
              }
-      
           });
 
           app.component('blog-post', {
@@ -248,8 +254,7 @@
               `,
               methods: {
                 showGroomerInfo() {
-                    // Another way to emit events.
-                    this.$emit('show');
+                    this.$emit('show',this.id, this.pic);
                 }
             }
           })
