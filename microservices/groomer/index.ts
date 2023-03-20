@@ -143,6 +143,9 @@ app.post("/accepts/:name", async (req, res) => {
       },
       select: {
         acceptedPets: true,
+        basic: true,
+        premium: true,
+        luxury: true
       }
     });
     if (result) {
@@ -150,7 +153,7 @@ app.post("/accepts/:name", async (req, res) => {
       let isAllValid = every(parsed.petTypes, (pet) => pets.includes(pet));
       if (isAllValid) {
         res.status(200)
-        res.send()
+        res.send({ basic: result.basic, premium: result.premium, luxury: result.luxury })
       } else {
         res.status(400)
         res.send({ message: "pet type not accepted" })

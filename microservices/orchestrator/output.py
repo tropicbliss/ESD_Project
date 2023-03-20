@@ -1,5 +1,17 @@
 from pydantic import BaseModel
-from input import PetType
+from enum import Enum
+
+
+class PetType(str, Enum):
+    birds = "Birds"
+    hamsters = "Hamsters"
+    cats = "Cats"
+    dogs = "Dogs"
+    rabbits = "Rabbits"
+    guinea_pigs = "GuineaPigs"
+    chinchillas = "Chinchillas"
+    mice = "Mice"
+    fishes = "Fishes"
 
 
 class ReadUser(BaseModel):
@@ -55,6 +67,9 @@ class Pet(BaseModel):
     age: int
     medicalInfo: str
 
+    class Config:
+        use_enum_values = True
+
 
 class CustomerAppointments(BaseModel):
     id: str
@@ -66,3 +81,8 @@ class CustomerAppointments(BaseModel):
 
 class Error(BaseModel):
     detail: str
+
+
+class Checkout(BaseModel):
+    checkoutUrl: str
+    appointmentId: str
