@@ -11,6 +11,7 @@ import json
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, RadioField, SelectField, IntegerField
 from wtforms.validators import InputRequired, NumberRange, ValidationError
+from flask_cors import CORS
 
 import stripe
 # This is a public sample test API key.
@@ -24,9 +25,11 @@ app = Flask(__name__,
             static_url_path='',
             static_folder='/public')
 app.config['SECRET_KEY'] = 'very_secret_deh'
+CORS(app)
 # app.debug = True
-#YOUR_DOMAIN = "http://localhost:4242"
+# YOUR_DOMAIN = "http://localhost:4242"
 YOUR_DOMAIN = os.getenv("YOUR_DOMAIN")
+
 
 class checkoutForm(FlaskForm):
     package = RadioField("svc_lvl")
@@ -134,6 +137,7 @@ def create_checkout_session():
     else:
         return redirect(checkout_session.url, code=303)
 
+
 @app.route('/stripe_webhooks', methods=['POST'])
 def webhook():
     event = None
@@ -160,9 +164,10 @@ def webhook():
         print(f"Charge failed for charge id: {event.data.object.id}")
         return render_template('success_webhook.html', event_json=json.dumps(event))
     else:
-      print('Unhandled event type {}'.format(event['type']))
+        print('Unhandled event type {}'.format(event['type']))
 
     return jsonify(success=True), 200
+
 
 @app.route('/create-product', methods=['POST'])
 def create_product():
@@ -214,5 +219,5 @@ def make_refund():
 
 
 if __name__ == '__main__':
-    app.run(port=os.getenv("PORT"))
-    #app.run(port=4242)
+    app.run(port=os.getenv("PORT"), host="0.0.0.0")
+    # app.run(port=4242)

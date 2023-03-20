@@ -27,6 +27,6 @@ app.post("/", (req, res) => {
   res.send({ sanitised });
 });
 
-app.listen(PORT, () => {
+app.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`Censorer listening on port ${PORT}`);
 });

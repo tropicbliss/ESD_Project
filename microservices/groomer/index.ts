@@ -259,6 +259,6 @@ app.post("/read", async (req, res) => {
   }
 })
 
-app.listen(process.env.PORT, () => {
+app.listen(Number(process.env.PORT), "0.0.0.0", () => {
   console.log(`Groomer listening on port ${process.env.PORT}`);
 });

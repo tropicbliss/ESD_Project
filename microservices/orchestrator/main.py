@@ -5,6 +5,11 @@ from aiographql.client import GraphQLClient
 from aiohttp import ClientSession, ClientTimeout
 from typing import Optional
 from contextlib import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "http://localhost:5000"
+]
 
 
 graphql_client = GraphQLClient(
@@ -33,6 +38,9 @@ async def lifespan(_: FastAPI):
     await HttpClient.close()
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(CORSMiddleware, allow_origins=origins,
+                   allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 
 @app.post("/user/create", status_code=201, responses={400: {"model": output.Error}})
