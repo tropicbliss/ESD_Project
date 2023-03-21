@@ -32,6 +32,8 @@ services:
   esd-rabbit:
     image: rabbitmq:3-management
     restart: always
+    ports:
+      - 15672:15672
   appointments:
     build:
       context: appointments
@@ -74,3 +76,13 @@ services:
       - appointments
       - groomer
       - stripe
+  smssender:
+    build:
+      context: smssender
+    restart: always
+    depends_on:
+      - esd-rabbit
+    environment:
+      ACCOUNT_SID: ACba07114e38390191daec7e148175b126
+      AUTH_TOKEN: 549fc8b00e1f2cefbdf4549350c403f8
+      MESSAGING_SERVICE_SID: MGb166494597737f7ddd53521d8d411c58

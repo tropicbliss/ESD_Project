@@ -6,6 +6,28 @@ from aiohttp import ClientSession, ClientTimeout
 from typing import Optional
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
+import pika
+
+hostname = "esd-rabbit"
+port = 5672
+
+connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host=hostname, port=port,
+                              heartbeat=3600, blocked_connection_timeout=3600)
+)
+
+channel = connection.channel()
+exchange_name = "main"
+exchange_type = "topic"
+channel.exchange_declare(exchange=exchange_name,
+                         exchange_type=exchange_type, durable=True)
+
+queue_name = "sms"
+channel.queue_declare(queue=queue_name, durable=True)
+
+channel.queue_bind(exchange=exchange_name,
+                   queue=queue_name, routing_key="sms.*")
+
 
 origins = [
     "http://localhost:5000"
@@ -55,6 +77,9 @@ async def create_user(user: input.CreateUser):
     if is_error:
         return HTTPException(
             status_code=400, detail=res.json["errors"][0]["message"])
+    else:
+        channel.basic_publish(exchange=exchange_name, routing_key="sms.user",
+                              body=user.contactNo, properties=pika.BasicProperties(delivery_mode=2))
 
 
 @app.get("/user/read/{name}", status_code=200, response_model=output.ReadUser, responses={404: {"model": output.Error}})
@@ -103,7 +128,8 @@ async def update_user(name: str, info: input.UpdateUser):
 async def create_groomer(groomer: input.CreateGroomer):
     async with HttpClient.get_client().post("http://groomer:5000/create", json=vars(groomer)) as resp:
         if resp.ok:
-            return
+            channel.basic_publish(exchange=exchange_name, routing_key="sms.groomer",
+                                  body=groomer.contactNo, properties=pika.BasicProperties(delivery_mode=2))
         else:
             json = await resp.json()
             raise HTTPException(status_code=resp.status,
