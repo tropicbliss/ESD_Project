@@ -29,11 +29,6 @@ channel.queue_bind(exchange=exchange_name,
                    queue=queue_name, routing_key="sms.*")
 
 
-origins = [
-    "http://localhost:5000"
-]
-
-
 graphql_client = GraphQLClient(
     endpoint="http://user:5000/"
 )
@@ -61,8 +56,8 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
-app.add_middleware(CORSMiddleware, allow_origins=origins,
-                   allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=[
+                   "*"], allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
 
 
 @app.post("/user/create", status_code=201, responses={400: {"model": output.Error}})
