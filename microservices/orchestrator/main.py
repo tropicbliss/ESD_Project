@@ -164,7 +164,7 @@ async def update_groomer(name: str, updated: input.UpdateGroomer):
                                 detail=json["message"])
 
 
-@app.post("/groomer/read", status_code=200, response_model=output.GroomerRead, responses={400: {"model": output.Error}}, summary="Filter groomers by accepted pet type or get every single groomer", description="All of the input fields are optional. Send an empty JSON (with no fields) to get every single groomer.")
+@app.post("/groomer/read", status_code=200, response_model=output.GroomerRead, responses={400: {"model": output.Error}}, summary="Filter groomers by accepted pet type or get every single groomer", description="All of the input fields are optional. Send an empty JSON: `{}`, to get every single groomer.")
 async def read_groomer(filters: input.ReadGroomer):
     async with HttpClient.get_client().post("http://groomer:5000/read", json=vars(filters)) as resp:
         json = await resp.json()
