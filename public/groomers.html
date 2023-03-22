@@ -17,155 +17,126 @@
   <!-- slider stylesheet / groomer display stylesheet-->
   <link rel="stylesheet" type="text/css"
     href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.3/assets/owl.carousel.min.css" />
-    <link rel="stylesheet" type="text/css"
-    href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+  <link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
 
+  <!-- Vue & axios & bootstrap -->
   <script src="https://unpkg.com/vue@next"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 
   <!-- fonts style -->
   <link href="https://fonts.googleapis.com/css?family=Dosis:400,500|Poppins:400,700&display=swap" rel="stylesheet">
-  <!-- Custom styles for this template -->
+  <!-- Custom styles -->
   <link href="css/style.css" rel="stylesheet" />
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
   <!-- Groomer display style -->
   <link href="css/groomers_display.css" rel="stylesheet" />
 
+  <!-- JS -->
   <script src="./js/groomer.js"></script>
 </head>
 
 <body>
   <div class="hero_area">
-  <!-- header section strats -->
-  <header class="header_section">
-    <div class="container-fluid">
-      <nav class="navbar navbar-expand-lg custom_nav-container ">
-        <a class="navbar-brand" href="index.html">
-          <img src="images/logo.png" style="width: 70px; height: 70px;">
-          <span style="font-size: medium; margin-top: 0px;">
-            Pawsitively Pampered
-          </span>
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+    <!-- header section strats -->
+    <header class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="index.html">
+            <img src="images/logo.png" style="width: 70px; height: 70px;">
+            <span style="font-size: medium; margin-top: 0px;">
+              Pawsitively Pampered
+            </span>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
-            <ul class="navbar-nav">
-              <li class="nav-item active">
-                <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="groomers.html">Groomers </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="aboutus.html">About Us </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="profile.html">Profile</a>
-              </li>
-            </ul>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
+              <ul class="navbar-nav">
+                <li class="nav-item active">
+                  <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="groomers.html">Groomers </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="aboutus.html">About Us </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+              </ul>
+            </div>
+            <div class="quote_btn-container d-flex justify-content-center m">
+              <a href="login.html">
+                Log In
+              </a>
+            </div>
           </div>
-          <div class="quote_btn-container d-flex justify-content-center m">
-            <a href="login.html">
-              Log In
-            </a>
-          </div>
-        </div>
-      </nav>
-    </div>
-  </header>
-  <!-- end header section -->
+        </nav>
+      </div>
+    </header>
+    <!-- end header section -->
 
 
-  <!-- Pet Groomer Display -->
-  <section id="delete">
-    <div class="container">
-      <div id="app">
-        <div v-if="display=='true'">
-          <h2 class="mt-5">
-            Discover Our <span style="color:rgb(0, 201, 241)">Groomers</span>
-          </h2>
+    <!-- Pet Groomer Display -->
+    <section id="delete">
+      <div class="container">
+        <div id="app">
+          <div v-if="display=='true'">
+            <h2 class="mt-5">
+              Discover Our <span style="color:rgb(0, 201, 241)">Groomers</span>
+            </h2>
 
-          <div class="row d-flex justify-content-center">
-              <div class="col-md-12">
-                  <div class="pb-1">
-                      <div class="row g-3 mt-2">
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-12">
+                    <div class="pb-1">
+                        <div class="row g-3 mt-2">
 
-                          <div class="col-md-6">
-                              <input type="text" class="form-control" placeholder="Enter the key word of the groomer you want to search">
-                          </div>
-      
-                          <div class="col-md-2">
-                              <button class="btn btn-secondary btn-block">Search</button>
-                          </div>
-
-                      </div>
-                      <div class="mt-3">   
-                        <!-- <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" class="advanced">
-                        Advance Search <i class="fa fa-angle-down"></i>
-                        </a> -->
-                        <p>
-                          <a class="advanced px-5" role="button" href="#multiCollapseExample1" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample1" aria-expanded="false" aria-controls="multiCollapseExample1">Advance Search <i class="fa fa-angle-down"></i></a>
-                          <a class="advanced px-5" role="button" href="#multiCollapseExample2" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample2" aria-expanded="false" aria-controls="multiCollapseExample2">Filter <i class="fa fa-angle-down"></i></a>
-                        </p>
-                        <div class="row">
-                          <div class="col">
-                            <div class="collapse multi-collapse" id="multiCollapseExample1">
-                              <div class="card card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <input type="text" placeholder="By ID" class="form-control">        
-                                    </div>
-                                    <div class="col-md-6">
-                                      <button class="btn btn-secondary btn-block">Search by ID</button>
-                                    </div>
-                                </div>
-                              </div>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" placeholder="Enter the key word of the groomer you want to search">
                             </div>
-                          </div>
-                          <div class="col">
-                            <div class="collapse multi-collapse" id="multiCollapseExample2">
-                              <div class="card card-body">
-                                <div class="row">
-                                  <div class="col-md-6">
-                                    <div class="form-check form-check-inline">
-                                      <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                                      <label class="form-check-label" for="inlineCheckbox1">Cat</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                      <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-                                      <label class="form-check-label" for="inlineCheckbox2">Dog</label>
-                                    </div>
-                                  </div>
-
-                                  <div class="col-md-6">
-                                    <button class="btn btn-secondary btn-block">Filter</button>
-                                  </div>
-                                </div>
-                              </div>
+        
+                            <div class="col-md-2">
+                                <button class="btn btn-secondary btn-block">Search</button>
                             </div>
-                          </div>
+
                         </div>
-                        <!-- <div class="collapse" id="collapseExample">
-                          <div class="card card-body">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <input type="text" placeholder="By ID" class="form-control">        
+                        <div class="mt-3">   
+                          <!-- <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" class="advanced">
+                          Advance Search <i class="fa fa-angle-down"></i>
+                          </a> -->
+                          <p>
+                            <a class="advanced px-5" role="button" href="#multiCollapseExample1" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample1" aria-expanded="false" aria-controls="multiCollapseExample1">Advance Search <i class="fa fa-angle-down"></i></a>
+                            <a class="advanced px-5" role="button" href="#multiCollapseExample2" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample2" aria-expanded="false" aria-controls="multiCollapseExample2">Filter <i class="fa fa-angle-down"></i></a>
+                          </p>
+                          <div class="row">
+                            <div class="col">
+                              <div class="collapse multi-collapse" id="multiCollapseExample1">
+                                <div class="card card-body">
+                                  <div class="row">
+                                      <div class="col-md-6">
+                                          <input type="text" placeholder="By ID" class="form-control">        
+                                      </div>
+                                      <div class="col-md-6">
+                                        <button class="btn btn-secondary btn-block">Search by ID</button>
+                                      </div>
+                                  </div>
                                 </div>
-                                <div class="col-md-2">
-                                  <button class="btn btn-secondary btn-block">Search by ID</button>
-                                </div>
-                                <div class="col-md-2">
-                                </div>
-                                <div class="col-md-2">
+                              </div>
+                            </div>
+                            <div class="col">
+                              <div class="collapse multi-collapse" id="multiCollapseExample2">
+                                <div class="card card-body">
+                                  <div class="row">
+                                    <div class="col-md-6">
                                       <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
                                         <label class="form-check-label" for="inlineCheckbox1">Cat</label>
@@ -174,147 +145,354 @@
                                         <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
                                         <label class="form-check-label" for="inlineCheckbox2">Dog</label>
                                       </div>
-                                </div>
-                                <div class="col-md-2">
-                                  <button class="btn btn-secondary btn-block">Filter</button>
-                                </div>
-                            </div>
-                          </div>      
-                        </div> -->
-                        
-                      </div>
-                  </div>
-              </div>
-          </div>
-                  
-          <div class="container mt-2 buy_section">
-            <div class="row">
-              <blog-post v-for="(p,idx) in groomers" v-bind:key="idx" v-bind:grom="p" v-bind:id="p.id" v-bind:name="p.name" v-bind:desc="p.desc" v-bind:pic="p.pic" v-on:show="onShow">
-              </blog-post>
-            </div>
-          </div>
-        </div>
-        <div v-else>
-          <div v-html="elsePart">
-          </div>
-          <button v-on:click="display = 'true'">back to main page</button>
-        </div>
-      </div>
- 
-      <script>
-          const app = Vue.createApp({
-              data() {
-                  return {
-                    groomers: [
-                        { id: 1, name: 'A', pic: './images/g-1.png'}, 
-                        { id: 2, name: 'B', pic: './images/g-2.png'}, 
-                        { id: 3, name: 'C', pic: './images/g-3.png'},
-                        { id: 4, name: 'D', pic: './images/g-4.png'} 
-                    ],
-                    display: 'true',
-                    elsePart: ''
-                  }
-              },
-              // created() { // created is a hook that executes as soon as Vue instance is created
-              //     axios.get('#') 
-              //     .then(response => {
-              //         // this gets the all groomers
-              //         console.log(response.data)
-              //         this.posts = response.data
-              //     })
-              //     .catch(error => {
-              //         this.posts = [{ entry: 'There was an error: ' + error.message }]
-              //     })
-              methods: {
-                onShow: function (id, pic) {
-                  this.display = 'false';
-                  this.elsePart = `<h1>Groomer Display Page - ${id}</h1> <img class="img-fluid" src="${pic}" >`
-                }, // this is also a valid vue method syntax
-             }
-          });
+                                    </div>
 
-          app.component('blog-post', {
-              props: ['id', 'name', 'desc', 'pic'],
-              template: `    
-                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-                        <div class="our-team">
-                            <div class="picture">
-                              <img class="img-fluid" v-bind:src=pic >
+                                    <div class="col-md-6">
+                                      <button class="btn btn-secondary btn-block">Filter</button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                            <div class="team-content">
-                              <h3 class="name">Groomer {{name}}</h3>
-                              <h4 class="title">Hotel {{name}}</h4>
-                            </div>
-                            <a class="mt-2" style="border-radius: 8px;" href="#" v-on:click="showGroomerInfo()">Link</a>
+                          </div>
+                          <!-- <div class="collapse" id="collapseExample">
+                            <div class="card card-body">
+                              <div class="row">
+                                  <div class="col-md-4">
+                                      <input type="text" placeholder="By ID" class="form-control">        
+                                  </div>
+                                  <div class="col-md-2">
+                                    <button class="btn btn-secondary btn-block">Search by ID</button>
+                                  </div>
+                                  <div class="col-md-2">
+                                  </div>
+                                  <div class="col-md-2">
+                                        <div class="form-check form-check-inline">
+                                          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
+                                          <label class="form-check-label" for="inlineCheckbox1">Cat</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                          <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
+                                          <label class="form-check-label" for="inlineCheckbox2">Dog</label>
+                                        </div>
+                                  </div>
+                                  <div class="col-md-2">
+                                    <button class="btn btn-secondary btn-block">Filter</button>
+                                  </div>
+                              </div>
+                            </div>      
+                          </div> -->
+                          
                         </div>
                     </div>
-              `,
-              methods: {
-                showGroomerInfo() {
-                    this.$emit('show',this.id, this.pic);
-                }
-            }
-          })
+                </div>
+            </div>
+                    
+            <div class="container mt-2 buy_section">
+              <div class="row">
+                <blog-post v-for="(p,idx) in groomers" v-bind:key="idx" v-bind:grom="p" v-bind:id="p.id" v-bind:name="p.name" v-bind:desc="p.desc" v-bind:pic="p.pic" v-on:show="onShow">
+                </blog-post>
+              </div>
+            </div>
+          </div>
+          <div v-else>
+            <div v-html="elsePart">
+            </div>
+            <section style="background-color: #eee;">
+              <div class="container py-5">
+                <div class="row">
+                  <div class="col">
+                    <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
+                      <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="groomers.html">Groomers</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">User Profile</li>
+                      </ol>
+                    </nav>
+                  </div>
+                </div>
+            
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="card mb-4">
+                      <div class="card-body text-center">
+                        <!-- <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
+                          class="rounded-circle img-fluid" style="width: 150px;"> -->
+                        <div v-html="elsePart">
+                        </div>
+                        <h5 class="my-3">John Smith</h5>
+                        <p class="text-muted mb-1">Full Stack Developer</p>
+                        <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
+                        <div class="d-flex justify-content-center mb-2">
+                          <button type="button" class="btn btn-primary">Follow</button>
+                          <button type="button" class="btn btn-outline-primary ms-1">Message</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card mb-4 mb-lg-0">
+                      <div class="card-body p-0">
+                        <ul class="list-group list-group-flush rounded-3">
+                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                            <i class="fas fa-globe fa-lg text-warning"></i>
+                            <p class="mb-0">https://mdbootstrap.com</p>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                            <i class="fab fa-github fa-lg" style="color: #333333;"></i>
+                            <p class="mb-0">mdbootstrap</p>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                            <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
+                            <p class="mb-0">@mdbootstrap</p>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                            <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
+                            <p class="mb-0">mdbootstrap</p>
+                          </li>
+                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+                            <i class="fab fa-facebook-f fa-lg" style="color: #3b5998;"></i>
+                            <p class="mb-0">mdbootstrap</p>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-lg-8">
+                    <div class="card mb-4">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-sm-3">
+                            <p class="mb-0">Full Name</p>
+                          </div>
+                          <div class="col-sm-9">
+                            <p class="text-muted mb-0">Johnatan Smith</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                          <div class="col-sm-3">
+                            <p class="mb-0">Email</p>
+                          </div>
+                          <div class="col-sm-9">
+                            <p class="text-muted mb-0">example@example.com</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                          <div class="col-sm-3">
+                            <p class="mb-0">Phone</p>
+                          </div>
+                          <div class="col-sm-9">
+                            <p class="text-muted mb-0">(097) 234-5678</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                          <div class="col-sm-3">
+                            <p class="mb-0">Mobile</p>
+                          </div>
+                          <div class="col-sm-9">
+                            <p class="text-muted mb-0">(098) 765-4321</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                          <div class="col-sm-3">
+                            <p class="mb-0">Address</p>
+                          </div>
+                          <div class="col-sm-9">
+                            <p class="text-muted mb-0">Bay Area, San Francisco, CA</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="card mb-4 mb-md-0">
+                          <div class="card-body">
+                            <p class="mb-4"><span class="text-primary font-italic me-1">assigment</span> Project Status
+                            </p>
+                            <p class="mb-1" style="font-size: .77rem;">Web Design</p>
+                            <div class="progress rounded" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-4 mb-1" style="font-size: .77rem;">Website Markup</p>
+                            <div class="progress rounded" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 72%" aria-valuenow="72"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-4 mb-1" style="font-size: .77rem;">One Page</p>
+                            <div class="progress rounded" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 89%" aria-valuenow="89"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-4 mb-1" style="font-size: .77rem;">Mobile Template</p>
+                            <div class="progress rounded" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-4 mb-1" style="font-size: .77rem;">Backend API</p>
+                            <div class="progress rounded mb-2" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="card mb-4 mb-md-0">
+                          <div class="card-body">
+                            <p class="mb-4"><span class="text-primary font-italic me-1">assigment</span> Project Status
+                            </p>
+                            <p class="mb-1" style="font-size: .77rem;">Web Design</p>
+                            <div class="progress rounded" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-4 mb-1" style="font-size: .77rem;">Website Markup</p>
+                            <div class="progress rounded" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 72%" aria-valuenow="72"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-4 mb-1" style="font-size: .77rem;">One Page</p>
+                            <div class="progress rounded" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 89%" aria-valuenow="89"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-4 mb-1" style="font-size: .77rem;">Mobile Template</p>
+                            <div class="progress rounded" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <p class="mt-4 mb-1" style="font-size: .77rem;">Backend API</p>
+                            <div class="progress rounded mb-2" style="height: 5px;">
+                              <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66"
+                                aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+  
+        <script>
+            const app = Vue.createApp({
+                data() {
+                    return {
+                      groomers: [
+                          { id: 1, name: 'A', pic: './images/g-1.png'}, 
+                          { id: 2, name: 'B', pic: './images/g-2.png'}, 
+                          { id: 3, name: 'C', pic: './images/g-3.png'},
+                          { id: 4, name: 'D', pic: './images/g-4.png'} 
+                      ],
+                      display: 'true',
+                      elsePart: ''
+                    }
+                },
+                // created() { // created is a hook that executes as soon as Vue instance is created
+                //     axios.get('#') 
+                //     .then(response => {
+                //         // this gets the all groomers
+                //         console.log(response.data)
+                //         this.posts = response.data
+                //     })
+                //     .catch(error => {
+                //         this.posts = [{ entry: 'There was an error: ' + error.message }]
+                //     })
+                methods: {
+                  onShow: function (id, pic) {
+                    this.display = 'false';
+                    this.elsePart = `<h1>Groomer Display Page - ${id}</h1> <img class="img-fluid" src="${pic}" >`
+                  }, // this is also a valid vue method syntax
+              }
+            });
 
-          app.mount('#app')
-      </script> 
-    </div>
-  </section>
-  <!-- end Pet Groomer Display -->
+            app.component('blog-post', {
+                props: ['id', 'name', 'desc', 'pic'],
+                template: `    
+                      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                          <div class="our-team">
+                              <div class="picture">
+                                <img class="img-fluid" v-bind:src=pic >
+                              </div>
+                              <div class="team-content">
+                                <h3 class="name">Groomer {{name}}</h3>
+                                <h4 class="title">Hotel {{name}}</h4>
+                              </div>
+                              <a class="mt-2" style="border-radius: 8px;" href="#" v-on:click="showGroomerInfo()">Link</a>
+                          </div>
+                      </div>
+                `,
+                methods: {
+                  showGroomerInfo() {
+                      this.$emit('show',this.id, this.pic);
+                  }
+              }
+            })
 
-  <!-- info section -->
-  <section class="info_section layout_padding2">
-    <div class="container">
-      <div class="info_items">
-        <a href="">
-          <div class="item ">
-            <div class="img-box box-1">
-              <img src="" alt="">
-            </div>
-            <div class="detail-box">
-              <p>
-                Location: Singapore
-              </p>
-            </div>
-          </div>
-        </a>
-        <a href="">
-          <div class="item ">
-            <div class="img-box box-2">
-              <img src="" alt="">
-            </div>
-            <div class="detail-box">
-              <p>
-                +65 1234567890
-              </p>
-            </div>
-          </div>
-        </a>
-        <a href="">
-          <div class="item ">
-            <div class="img-box box-3">
-              <img src="" alt="">
-            </div>
-            <div class="detail-box">
-              <p>
-                pawstivelypampered@gmail.com
-              </p>
-            </div>
-          </div>
-        </a>
+            app.mount('#app')
+        </script> 
       </div>
-    </div>
-  </section>
+    </section>
+    <!-- end Pet Groomer Display -->
 
-  <!-- end info_section -->
+    <!-- info section -->
+    <section class="info_section layout_padding2">
+      <div class="container">
+        <div class="info_items">
+          <a href="">
+            <div class="item ">
+              <div class="img-box box-1">
+                <img src="" alt="">
+              </div>
+              <div class="detail-box">
+                <p>
+                  Location: Singapore
+                </p>
+              </div>
+            </div>
+          </a>
+          <a href="">
+            <div class="item ">
+              <div class="img-box box-2">
+                <img src="" alt="">
+              </div>
+              <div class="detail-box">
+                <p>
+                  +65 1234567890
+                </p>
+              </div>
+            </div>
+          </a>
+          <a href="">
+            <div class="item ">
+              <div class="img-box box-3">
+                <img src="" alt="">
+              </div>
+              <div class="detail-box">
+                <p>
+                  pawstivelypampered@gmail.com
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+    <!-- end info_section -->
 
-  <!-- footer section -->
-  <section class="container-fluid footer_section">
-    <p>
-      &copy; ESD G5 T2-Barley
-    </p>
-  </section>
-  <!-- footer section -->
+    <!-- footer section -->
+    <section class="container-fluid footer_section">
+      <p>
+        &copy; ESD G5 T2-Barley
+      </p>
+    </section>
+    <!-- footer section -->
+  </div>
 
   <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
