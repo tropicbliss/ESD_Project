@@ -376,11 +376,21 @@
                 methods: {
                   getAllGroomers () {
                     // on Vue instance created, load the Groomer List
+                    let jsonData = JSON.stringify({
+                    });
                     const response =
-                        fetch(get_all_URL)
+                        fetch(get_all_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
                             .then(response => response.json())
                             .then(data => {
-                                console.log(response);
+                                console.log(data);
                                 if (data.code === 400) {
                                     // no book in db
                                     this.message = data.detail;
