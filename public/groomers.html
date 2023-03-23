@@ -27,17 +27,13 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 
-  <!-- fonts style -->
+  <!-- CSS style -->
   <link href="https://fonts.googleapis.com/css?family=Dosis:400,500|Poppins:400,700&display=swap" rel="stylesheet">
-  <!-- Custom styles -->
   <link href="css/style.css" rel="stylesheet" />
-  <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
-  <!-- Groomer display style -->
   <link href="css/groomers_display.css" rel="stylesheet" />
-
-  <!-- JS -->
-  <script src="./js/groomer.js"></script>
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css'> 
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
 </head>
 
 <body>
@@ -87,10 +83,10 @@
 
 
     <!-- Pet Groomer Display -->
-    <section id="delete">
+    <section>
       <div class="container">
         <div id="app">
-          <div v-if="display=='true'">
+          <div v-if="display=='listGroomer'">
             <h2 class="mt-5">
               Discover Our <span style="color:rgb(0, 201, 241)">Groomers</span>
             </h2>
@@ -155,34 +151,6 @@
                               </div>
                             </div>
                           </div>
-                          <!-- <div class="collapse" id="collapseExample">
-                            <div class="card card-body">
-                              <div class="row">
-                                  <div class="col-md-4">
-                                      <input type="text" placeholder="By ID" class="form-control">        
-                                  </div>
-                                  <div class="col-md-2">
-                                    <button class="btn btn-secondary btn-block">Search by ID</button>
-                                  </div>
-                                  <div class="col-md-2">
-                                  </div>
-                                  <div class="col-md-2">
-                                        <div class="form-check form-check-inline">
-                                          <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                                          <label class="form-check-label" for="inlineCheckbox1">Cat</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                          <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-                                          <label class="form-check-label" for="inlineCheckbox2">Dog</label>
-                                        </div>
-                                  </div>
-                                  <div class="col-md-2">
-                                    <button class="btn btn-secondary btn-block">Filter</button>
-                                  </div>
-                              </div>
-                            </div>      
-                          </div> -->
-                          
                         </div>
                     </div>
                 </div>
@@ -190,16 +158,14 @@
                     
             <div class="container mt-2 buy_section">
               <div class="row">
-                <blog-post v-for="(p,idx) in groomers" v-bind:key="idx" v-bind:grom="p" v-bind:id="p.id" v-bind:name="p.name" v-bind:desc="p.desc" v-bind:pic="p.pic" v-on:show="onShow">
+                <blog-post v-for="(g,idx) in groomers" v-bind:key="idx" v-bind:grom="g" v-bind:name="g.name" v-bind:addr="g.address" v-bind:pic="g.pictureUrl" v-bind:contactNo="g.contactNo" v-bind:email="g.email" v-bind:pic="g.pictureUrl" v-bind:basic="g.basic" v-bind:premium="g.premium" v-bind:lux="g.luxury" v-on:show="onShow">
                 </blog-post>
               </div>
             </div>
           </div>
-          <div v-else>
-            <div v-html="elsePart">
-            </div>
-            <section style="background-color: #eee;">
-              <div class="container py-5">
+          <div v-show="display=='Groomer'">
+            <section style="background-color: #ffffff;">
+              <div class="container py-3">
                 <div class="row">
                   <div class="col">
                     <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
@@ -215,12 +181,10 @@
                   <div class="col-lg-4">
                     <div class="card mb-4">
                       <div class="card-body text-center">
-                        <!-- <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
-                          class="rounded-circle img-fluid" style="width: 150px;"> -->
+
                         <div v-html="elsePart">
                         </div>
-                        <h5 class="my-3">John Smith</h5>
-                        <p class="text-muted mb-1">Full Stack Developer</p>
+                        <h5 class="my-3">{{disName}}</h5>
                         <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
                         <div class="d-flex justify-content-center mb-2">
                           <button type="button" class="btn btn-primary">Follow</button>
@@ -228,33 +192,8 @@
                         </div>
                       </div>
                     </div>
-                    <div class="card mb-4 mb-lg-0">
-                      <div class="card-body p-0">
-                        <ul class="list-group list-group-flush rounded-3">
-                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                            <i class="fas fa-globe fa-lg text-warning"></i>
-                            <p class="mb-0">https://mdbootstrap.com</p>
-                          </li>
-                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                            <i class="fab fa-github fa-lg" style="color: #333333;"></i>
-                            <p class="mb-0">mdbootstrap</p>
-                          </li>
-                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                            <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
-                            <p class="mb-0">@mdbootstrap</p>
-                          </li>
-                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                            <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
-                            <p class="mb-0">mdbootstrap</p>
-                          </li>
-                          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                            <i class="fab fa-facebook-f fa-lg" style="color: #3b5998;"></i>
-                            <p class="mb-0">mdbootstrap</p>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
                   </div>
+
                   <div class="col-lg-8">
                     <div class="card mb-4">
                       <div class="card-body">
@@ -305,70 +244,10 @@
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-md-6">
-                        <div class="card mb-4 mb-md-0">
-                          <div class="card-body">
-                            <p class="mb-4"><span class="text-primary font-italic me-1">assigment</span> Project Status
-                            </p>
-                            <p class="mb-1" style="font-size: .77rem;">Web Design</p>
-                            <div class="progress rounded" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mt-4 mb-1" style="font-size: .77rem;">Website Markup</p>
-                            <div class="progress rounded" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 72%" aria-valuenow="72"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mt-4 mb-1" style="font-size: .77rem;">One Page</p>
-                            <div class="progress rounded" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 89%" aria-valuenow="89"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mt-4 mb-1" style="font-size: .77rem;">Mobile Template</p>
-                            <div class="progress rounded" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mt-4 mb-1" style="font-size: .77rem;">Backend API</p>
-                            <div class="progress rounded mb-2" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-md-6">
-                        <div class="card mb-4 mb-md-0">
-                          <div class="card-body">
-                            <p class="mb-4"><span class="text-primary font-italic me-1">assigment</span> Project Status
-                            </p>
-                            <p class="mb-1" style="font-size: .77rem;">Web Design</p>
-                            <div class="progress rounded" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 80%" aria-valuenow="80"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mt-4 mb-1" style="font-size: .77rem;">Website Markup</p>
-                            <div class="progress rounded" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 72%" aria-valuenow="72"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mt-4 mb-1" style="font-size: .77rem;">One Page</p>
-                            <div class="progress rounded" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 89%" aria-valuenow="89"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mt-4 mb-1" style="font-size: .77rem;">Mobile Template</p>
-                            <div class="progress rounded" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 55%" aria-valuenow="55"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <p class="mt-4 mb-1" style="font-size: .77rem;">Backend API</p>
-                            <div class="progress rounded mb-2" style="height: 5px;">
-                              <div class="progress-bar" role="progressbar" style="width: 66%" aria-valuenow="66"
-                                aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                          </div>
+                      <div class="col-md-12">
+                        <div class="input-group mb-4">
+                          <i class="bi bi-calendar-date input-group-text"></i>
+                          <input ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Date input 3 placeholder" required aria-label="Date input 3 (using aria-label)">
                         </div>
                       </div>
                     </div>
@@ -378,19 +257,18 @@
             </section>
           </div>
         </div>
-  
+
         <script>
+            const get_all_URL = "http://localhost:5000/groomer/read";
+            const place_order_URL = "http://localhost:5100/place_order";
             const app = Vue.createApp({
                 data() {
                     return {
-                      groomers: [
-                          { id: 1, name: 'A', pic: './images/g-1.png'}, 
-                          { id: 2, name: 'B', pic: './images/g-2.png'}, 
-                          { id: 3, name: 'C', pic: './images/g-3.png'},
-                          { id: 4, name: 'D', pic: './images/g-4.png'} 
-                      ],
-                      display: 'true',
-                      elsePart: ''
+                      groomers: [],
+                      message: "There is a problem retrieving groomers data, please try again later.",
+                      display: 'listGroomer',
+                      elsePart: '',
+                      disName: ''
                     }
                 },
                 // created() { // created is a hook that executes as soon as Vue instance is created
@@ -404,15 +282,52 @@
                 //         this.posts = [{ entry: 'There was an error: ' + error.message }]
                 //     })
                 methods: {
-                  onShow: function (id, pic) {
-                    this.display = 'false';
-                    this.elsePart = `<h1>Groomer Display Page - ${id}</h1> <img class="img-fluid" src="${pic}" >`
-                  }, // this is also a valid vue method syntax
+                  getAllGroomers () {
+                    // on Vue instance created, load the Groomer List
+                    let jsonData = JSON.stringify({
+                    });
+                    const response =
+                        fetch(get_all_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    // no book in db
+                                    this.message = data.detail;
+                                } else {
+                                    this.groomers = data.result;
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+
+                },
+                  onShow: function (name, pic) {
+                    this.display = 'Groomer';
+                    this.elsePart = `<img class="img-fluid" src="${pic}">`;
+                    this.disName = name
+                  },
+              },
+              created () {
+                // on Vue instance created, load the book list
+                this.getAllGroomers();
               }
             });
 
             app.component('blog-post', {
-                props: ['id', 'name', 'desc', 'pic'],
+                props: ['name', 'addr', 'contactNo', 'email', 'basic', 'premium', 'lux',  'pic'],
                 template: `    
                       <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                           <div class="our-team">
@@ -429,7 +344,7 @@
                 `,
                 methods: {
                   showGroomerInfo() {
-                      this.$emit('show',this.id, this.pic);
+                      this.$emit('show',this.name, this.pic);
                   }
               }
             })
@@ -496,7 +411,8 @@
 
   <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-  <script type="text/javascript" src="js/bootstrap.js"></script>
-
+  <!-- Vanilla Datepicker JS -->
+  <script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
+  <script src="./js/groomer.js"></script>
 </body>
 </html>
