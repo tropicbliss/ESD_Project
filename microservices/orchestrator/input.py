@@ -106,8 +106,3 @@ class Checkout(BaseModel):
 
     class Config:
         use_enum_values = True
-
-
-class AppointmentUpdate(BaseModel):
-    startDate: str
-    endDate: str

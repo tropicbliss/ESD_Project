@@ -53,7 +53,6 @@ async fn main() -> Result<()> {
         .route("/create", post(create_appointment))
         .route("/stayed", post(stayed_customers))
         .route("/quantity", post(get_quantity))
-        .route("/update/:id", post(update_appointment_date))
         .with_state(shared_state);
     let addr = std::env::var("ADDR").unwrap_or_else(|_| "127.0.0.1:3000".into());
     let addr: SocketAddr = addr.parse()?;
@@ -113,8 +112,6 @@ struct Appointment {
     end_date: DateTime,
     status: Status,
     pets: Vec<Pet>,
-    total_price: f64,
-    price_tier: String,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -240,8 +237,6 @@ struct SignInOutput {
     start_date: String,
     end_date: String,
     pets: Vec<PetInputOutput>,
-    price_tier: String,
-    total_price: f64,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -321,8 +316,6 @@ async fn get_arriving_customers(
                     pets,
                     start_date: app.start_date.try_to_rfc3339_string().unwrap(),
                     user_name: res.name,
-                    total_price: app.total_price,
-                    price_tier: app.price_tier,
                 }
             }
         })
@@ -330,41 +323,6 @@ async fn get_arriving_customers(
         .collect()
         .await;
     Ok(Json(res))
-}
-
-#[derive(Deserialize)]
-struct UpdateInput {
-    start_date: String,
-    end_date: String,
-}
-
-async fn update_appointment_date(
-    Path(groomer_name): Path<String>,
-    state: State<SharedState>,
-    Json(payload): Json<UpdateInput>,
-) -> Result<StatusCode, ApiError> {
-    let start_date = DateTime::parse_rfc3339_str(payload.start_date)
-        .map_err(|_| ApiError::IncorrectTimeFormat)?;
-    let end_date =
-        DateTime::parse_rfc3339_str(payload.end_date).map_err(|_| ApiError::IncorrectTimeFormat)?;
-    if !does_groomer_exist(&state.http, &groomer_name).await? {
-        return Err(ApiError::GroomerDoesNotExist);
-    }
-    let filter = doc! {"groomer_id": groomer_name, "status": "awaiting"};
-    let res = state
-        .appointments
-        .find_one_and_update(
-            filter,
-            doc! {"$set": {"start_date": start_date, "end_date": end_date}},
-            None,
-        )
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    if res.is_some() {
-        Ok(StatusCode::OK)
-    } else {
-        Err(ApiError::AppointmentDoesNotExist)
-    }
 }
 
 async fn get_staying_customers(
@@ -413,8 +371,6 @@ async fn get_staying_customers(
                     pets,
                     start_date: app.start_date.try_to_rfc3339_string().unwrap(),
                     user_name: res.name,
-                    total_price: app.total_price,
-                    price_tier: app.price_tier,
                 }
             }
         })
@@ -522,8 +478,6 @@ struct CreateInput {
     user_name: String,
     groomer_name: String,
     pet_info: Vec<PetInputOutput>,
-    price_tier: String,
-    total_price: f64,
 }
 
 #[derive(Serialize)]
@@ -616,8 +570,6 @@ async fn create_appointment(
         start_date: DateTime::now(),
         status: Status::Awaiting,
         user_name: payload.user_name,
-        total_price: payload.total_price,
-        price_tier: payload.price_tier,
     };
     state
         .appointments
