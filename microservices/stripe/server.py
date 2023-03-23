@@ -23,7 +23,7 @@ stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 app = Flask(__name__,
             static_url_path='',
-            static_folder='/public')
+            static_folder='../../public')
 app.config['SECRET_KEY'] = 'very_secret_deh'
 CORS(app)
 # app.debug = True
@@ -122,8 +122,8 @@ def create_checkout_session():
         checkout_session = stripe.checkout.Session.create(
             line_items=line_items,
             mode='payment',
-            success_url=YOUR_DOMAIN + '/success.html',
-            cancel_url=YOUR_DOMAIN + '/cancel.html',
+            success_url=YOUR_DOMAIN + '/stripe_success/success.html',
+            cancel_url=YOUR_DOMAIN + '/stripe_success/cancel.html',
             discounts=[{"coupon": "d1LybAG0"}],
         )
         # Return session ID to client
