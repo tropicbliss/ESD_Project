@@ -273,7 +273,7 @@ async def checkout(checkout: input.Checkout):
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
     pricing = price_tiers[checkout.priceTier]
-    # get stripe payment URL
+    # get stripe payment URL (you may realise that we did not check whether the user has paid for the service, this is a limitation of our microservices being locally hosted, resulting in the Stripe servers not being able to contact this microservice)
     async with HttpClient.get_client().post("http://stripe:5000/create-checkout-session", json={"cust_checkout": [{"price_id": pricing, "quantity": number_of_days}]}) as resp:
         if resp.ok:
             json = await resp.json()
