@@ -156,6 +156,15 @@ async def get_groomer_by_name(name: str):
                                 detail=json["message"])
 
 
+@app.get("/groomer/delete/{name}", status_code=200, responses={400: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
+async def delete_groomer(name: str):
+    async with HttpClient.get_client().get(f"http://groomer:5000/delete/{name}") as resp:
+        if not resp.ok:
+            json = await resp.json()
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+
+
 @app.post("/groomer/update/{name}", status_code=200, responses={400: {"model": output.Error}}, description="All of the input fields are optional. If you want to search a keyword or name with a space, replace the space with %20")
 async def update_groomer(name: str, updated: input.UpdateGroomer):
     async with HttpClient.get_client().post(f"http://groomer:5000/update/{name}", json=vars(updated)) as resp:

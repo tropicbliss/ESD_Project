@@ -252,6 +252,22 @@ app.post("/read", async (req, res) => {
   }
 })
 
+app.get("/delete/:name", async (req, res) => {
+  const { name } = req.params;
+  try {
+    await prisma.groomer.delete({
+      where: {
+        name
+      }
+    })
+    res.status(200)
+    res.send()
+  } catch (err) {
+    res.status(400);
+    res.send({ message: "an error has occurred" });
+  }
+})
+
 app.listen(Number(process.env.PORT), "0.0.0.0", () => {
   console.log(`Groomer listening on port ${process.env.PORT}`);
 });
