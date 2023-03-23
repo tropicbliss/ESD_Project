@@ -27,26 +27,13 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 
-  <!-- fonts style -->
+  <!-- CSS style -->
   <link href="https://fonts.googleapis.com/css?family=Dosis:400,500|Poppins:400,700&display=swap" rel="stylesheet">
-  <!-- Custom styles -->
   <link href="css/style.css" rel="stylesheet" />
-  <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
-  <!-- Groomer display style -->
   <link href="css/groomers_display.css" rel="stylesheet" />
-
-  <!-- JS -->
-  <script src="./js/groomer.js"></script>
-
-    <!-- Font Awesome CSS -->
-    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css'>
-      
-    <!-- Vanilla Datepicker CSS -->
-    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
-      
-    <!-- Style CSS -->
-    <link rel="stylesheet" href="css/datePicker.css">
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css'> 
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
 </head>
 
 <body>
@@ -176,13 +163,7 @@
               </div>
             </div>
           </div>
-
-          <div class="input-group mb-4">
-            <i class="bi bi-calendar-date input-group-text"></i>
-            <input type="text" class="datepicker_input form-control" placeholder="Date input 3 placeholder" required aria-label="Date input 3 (using aria-label)">
-          </div>
-          
-          <div v-if="display=='Groomer'">
+          <div v-show="display=='Groomer'">
             <section style="background-color: #ffffff;">
               <div class="container py-3">
                 <div class="row">
@@ -263,8 +244,11 @@
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-md-6">
-
+                      <div class="col-md-12">
+                        <div class="input-group mb-4">
+                          <i class="bi bi-calendar-date input-group-text"></i>
+                          <input ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Date input 3 placeholder" required aria-label="Date input 3 (using aria-label)">
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -273,8 +257,7 @@
             </section>
           </div>
         </div>
-        
-  
+
         <script>
             const get_all_URL = "http://localhost:5000/groomer/read";
             const place_order_URL = "http://localhost:5100/place_order";
@@ -428,33 +411,8 @@
 
   <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-
   <!-- Vanilla Datepicker JS -->
   <script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
-
-    <script>
-    /* Bootstrap 5 JS included */
-    /* vanillajs-datepicker 1.1.4 JS included */
-    
-    const getDatePickerTitle = elem => {
-      // From the label or the aria-label
-      const label = elem.nextElementSibling;
-      let titleText = '';
-      if (label && label.tagName === 'LABEL') {
-        titleText = label.textContent;
-      } else {
-        titleText = elem.getAttribute('aria-label') || '';
-      }
-      return titleText;
-    }
-    
-    const elems = document.querySelectorAll('.datepicker_input');
-    for (const elem of elems) {
-      const datepicker = new Datepicker(elem, {
-        'format': 'dd/mm/yyyy', // UK format
-        title: getDatePickerTitle(elem)
-      });
-    }      
-    </script>
+  <script src="./js/groomer.js"></script>
 </body>
 </html>
