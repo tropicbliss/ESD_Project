@@ -8,6 +8,9 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 import pika
 
+# Making an API gateway-like microservice is not our initial intention, but it is our goal to provide user-friendly API docs in a single place
+# Hence, the advantages of using an actual API gateway like Kong quickly becomes more murky
+
 hostname = "esd-rabbit"
 port = 5672
 
