@@ -69,12 +69,23 @@ class Pet(BaseModel):
         use_enum_values = True
 
 
+class PriceTier(str, Enum):
+    basic = "basic"
+    premium = "premium"
+    luxury = "luxury"
+
+
 class CustomerAppointments(BaseModel):
     id: str
     userName: str
     startDate: str
     endDate: str
     pets: list[Pet]
+    priceTier: PriceTier
+    totalPrice: float
+
+    class Config:
+        use_enum_values = True
 
 
 class Error(BaseModel):

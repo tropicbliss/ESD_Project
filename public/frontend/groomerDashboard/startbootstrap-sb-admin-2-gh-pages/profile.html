@@ -47,32 +47,9 @@
   
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
-                <ul class="navbar-nav">
-                  <li class="nav-item active">
-                    <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="groomers.html">Groomers </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="aboutus.html">About Us </a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="profile.html">Profile</a>
-                  </li>
-                </ul>
+                
               </div>
-              <div class="quote_btn-container d-flex justify-content-center m">
-                <a href="account/loginuser.html">
-                  Log In
-                </a>
-                <a>
-                  /
-                </a>
-                <a href="account/registeruser.html">
-                  Register
-                </a>
-              </div>
+             
             </div>
           </nav>
         </div>
@@ -122,7 +99,7 @@
               <hr>
               <div class="row">
                 <div class="col-sm-3">
-                  <p class="mb-0">Pet Owned</p>
+                  <p class="mb-0">Pet Type allowed</p>
                 </div>
                 <div class="col-sm-9">
                   <p class="text-muted mb-0">Dog</p>
@@ -146,3 +123,55 @@
   </body>
   </section>
 </html>
+
+<script>
+    const get_groomer_info_URL = `http://localhost:5000/groomer/search/name/${gName}`;
+
+    const app = Vue.createApp({
+        computed: {
+            hasBooks: function () {
+               
+            }
+        },
+        data() {
+            return {
+                gName: 'Alice',
+                picURL: '',
+                acceptedPets: [],
+                address: '',
+                contactNo: '',
+                email: '',
+                
+
+            };
+        },
+        methods: {
+    
+            findGroomerInfo () {
+
+                const response =
+                    fetch(`${get_groomer_info_URL}/${this.gName}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(response);
+                            this. = [data.data];
+                            
+                        })
+                        .catch(error => {
+                            // Errors when calling the service; such as network error, 
+                            // service offline, etc
+                            console.log(this.message + error);
+
+                        });
+
+            },
+    
+   
+        },
+        created () {
+            // on Vue instance created, load the book list
+            this.getAllBooks();
+        }
+    });
+    const vm = app.mount('#app');
+</script> 
