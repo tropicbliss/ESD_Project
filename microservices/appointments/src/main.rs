@@ -160,17 +160,13 @@ async fn get_quantity(
         .map_err(|_| ApiError::IncorrectTimeFormat)?
         .to_chrono()
         .date_naive();
-    let days: Vec<_> = start_date_raw
+    let days = start_date_raw
         .iter_days()
         .map(|day| if day >= end_date_raw { None } else { Some(day) })
         .fuse()
         .flatten()
-        .map(|date| date.to_string())
-        .collect();
-    let number_of_days = days.len();
-    Ok(Json(CheckAddOutput {
-        day_length: number_of_days,
-    }))
+        .count();
+    Ok(Json(CheckAddOutput { day_length: days }))
 }
 
 async fn get_user(
