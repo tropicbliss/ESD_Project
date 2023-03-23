@@ -34,6 +34,7 @@
   <link href="css/groomers_display.css" rel="stylesheet" />
   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css'> 
   <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
+  <link rel="stylesheet" href="https://cdn.lineicons.com/3.0/lineicons.css">
 </head>
 
 <body>
@@ -71,8 +72,14 @@
               </ul>
             </div>
             <div class="quote_btn-container d-flex justify-content-center m">
-              <a href="login.html">
+              <a href="account/loginuser.html">
                 Log In
+              </a>
+              <a>
+                /
+              </a>
+              <a href="account/registeruser.html">
+                Register
               </a>
             </div>
           </div>
@@ -80,8 +87,7 @@
       </div>
     </header>
     <!-- end header section -->
-
-
+    
     <!-- Pet Groomer Display -->
     <section>
       <div class="container">
@@ -97,11 +103,11 @@
                         <div class="row g-3 mt-2">
 
                             <div class="col-md-6">
-                                <input type="text" class="form-control" placeholder="Enter the key word of the groomer you want to search">
+                                <input type="text" v-model="keyword" class="form-control" placeholder="Enter the key word of the groomer you want to search">
                             </div>
         
                             <div class="col-md-2">
-                                <button class="btn btn-secondary btn-block">Search</button>
+                                <button @click="keywordSearch()" class="btn btn-secondary btn-block">Search</button>
                             </div>
 
                         </div>
@@ -158,7 +164,7 @@
                     
             <div class="container mt-2 buy_section">
               <div class="row">
-                <blog-post v-for="(g,idx) in groomers" v-bind:key="idx" v-bind:grom="g" v-bind:name="g.name" v-bind:addr="g.address" v-bind:pic="g.pictureUrl" v-bind:contactNo="g.contactNo" v-bind:email="g.email" v-bind:pic="g.pictureUrl" v-bind:basic="g.basic" v-bind:premium="g.premium" v-bind:lux="g.luxury" v-on:show="onShow">
+                <blog-post v-for="g in groomers" v-bind:key="idx" v-bind:grom="g" v-bind:name="g.name" v-bind:addr="g.address" v-bind:pic="g.pictureUrl" v-bind:contact_no="g.contactNo" v-bind:email="g.email" v-bind:pic="g.pictureUrl" v-bind:basic="g.basic" v-bind:premium="g.premium" v-bind:lux="g.luxury" v-on:show="onShow">
                 </blog-post>
               </div>
             </div>
@@ -185,24 +191,30 @@
                         <div v-html="elsePart">
                         </div>
                         <h5 class="my-3">{{disName}}</h5>
-                        <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
                         <div class="d-flex justify-content-center mb-2">
-                          <button type="button" class="btn btn-primary">Follow</button>
-                          <button type="button" class="btn btn-outline-primary ms-1">Message</button>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div class="col-lg-8">
-                    <div class="card mb-4">
+                    <div class="card mb-2">
                       <div class="card-body">
                         <div class="row">
                           <div class="col-sm-3">
-                            <p class="mb-0">Full Name</p>
+                            <p class="mb-0">Address</p>
                           </div>
                           <div class="col-sm-9">
-                            <p class="text-muted mb-0">Johnatan Smith</p>
+                            <p class="text-muted mb-0">{{disAddr}}</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                          <div class="col-sm-3">
+                            <p class="mb-0">Contact Number</p>
+                          </div>
+                          <div class="col-sm-9">
+                            <p class="text-muted mb-0">{{disContactNo}}</p>
                           </div>
                         </div>
                         <hr>
@@ -211,48 +223,108 @@
                             <p class="mb-0">Email</p>
                           </div>
                           <div class="col-sm-9">
-                            <p class="text-muted mb-0">example@example.com</p>
+                            <p class="text-muted mb-0">{{disEmail}}</p>
                           </div>
                         </div>
                         <hr>
-                        <div class="row">
-                          <div class="col-sm-3">
-                            <p class="mb-0">Phone</p>
-                          </div>
-                          <div class="col-sm-9">
-                            <p class="text-muted mb-0">(097) 234-5678</p>
-                          </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                          <div class="col-sm-3">
-                            <p class="mb-0">Mobile</p>
-                          </div>
-                          <div class="col-sm-9">
-                            <p class="text-muted mb-0">(098) 765-4321</p>
-                          </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                          <div class="col-sm-3">
-                            <p class="mb-0">Address</p>
-                          </div>
-                          <div class="col-sm-9">
-                            <p class="text-muted mb-0">Bay Area, San Francisco, CA</p>
-                          </div>
-                        </div>
                       </div>
                     </div>
+
                     <div class="row">
                       <div class="col-md-12">
+                        <h6>Starting Date</h6>
+                        <div class="input-group mb-2">
+                          <i class="bi bi-calendar-date input-group-text"></i>
+                          <input ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Choosing Your Starting Date!" required aria-label="Starting Date">
+                        </div>
+                        <h6>Ending Date</h6>
                         <div class="input-group mb-4">
                           <i class="bi bi-calendar-date input-group-text"></i>
-                          <input ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Date input 3 placeholder" required aria-label="Date input 3 (using aria-label)">
+                          <input ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Choosing Your Ending Date!" required aria-label="Ending Date">
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                <div class="row">
+                  <div class="card mb-4">
+                    <div class="card-body">
+                      <section class="price_plan_area section_padding_130_80" id="pricing">
+                        <div class="container">
+      
+                          <div class="row justify-content-center">
+                            <!-- Single Price Plan Area-->
+                            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                              <div class="single_price_plan wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                                <div class="title">
+                                  <h3>Basic</h3>
+                                  <p>Try our basic option!</p>
+                                  <div class="line"></div>
+                                </div>
+                                <div class="price">
+                                  <h4>${{disBasic}}</h4>
+                                </div>
+                                <div class="description">
+                                  <p><i class="lni lni-checkmark-circle"></i>Bath</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Brushing</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Nail Trimming</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Ear Cleaning</p>
+                                </div>
+                                <div class="button"><a class="btn btn-success btn-2" href="#">Checkout</a></div>
+                              </div>
+                            </div>
+                            <!-- Single Price Plan Area-->
+                            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                              <div class="single_price_plan active wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                                <!-- Side Shape-->
+                                <div class="side-shape"><img src="https://bootdey.com/img/popular-pricing.png" alt=""></div>
+                                <div class="title"><span>Popular</span>
+                                  <h3>Premuim</h3>
+                                  <p>Try our most popular option!</p>
+                                  <div class="line"></div>
+                                </div>
+                                <div class="price">
+                                  <h4>${{disPremium}}</h4>
+                                </div>
+                                <div class="description">
+                                  <p><i class="lni lni-checkmark-circle"></i>All basic</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Teeth Cleaning</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Gland Expression</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Trimming of Paw Pads</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Sanitary Areas</p>
+                                </div>
+                                <div class="button"><a class="btn btn-warning" href="#">Checkout</a></div>
+                              </div>
+                            </div>
+                            <!-- Single Price Plan Area-->
+                            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                              <div class="single_price_plan wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                                <div class="title">
+                                  <h3>Luxury</h3>
+                                  <p>Try our luxury service!</p>
+                                  <div class="line"></div>
+                                </div>
+                                <div class="price">
+                                  <h4>${{disLux}}</h4>
+                                </div>
+                                <div class="description">
+                                  <p><i class="lni lni-checkmark-circle"></i>All basic</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>All premium</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>CUstomized Haircut</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Specialty Shampoos</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Conditioning Treatments</p>
+                                </div>
+                                <div class="button"><a class="btn btn-info" href="#">Checkout</a></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </div> 
+                </div>
+
               </div>
             </section>
           </div>
@@ -261,6 +333,7 @@
         <script>
             const get_all_URL = "http://localhost:5000/groomer/read";
             const place_order_URL = "http://localhost:5100/place_order";
+            const search_URL = "http://localhost:5000/groomer/search/keyword";     
             const app = Vue.createApp({
                 data() {
                     return {
@@ -268,7 +341,8 @@
                       message: "There is a problem retrieving groomers data, please try again later.",
                       display: 'listGroomer',
                       elsePart: '',
-                      disName: ''
+                      disName: '', disAddr:'', disContactNo:'', disEmail:'', disBasi:'', disBasic:'', disPremium:'', disLux:'',           
+                      keyword: ''
                     }
                 },
                 // created() { // created is a hook that executes as soon as Vue instance is created
@@ -280,7 +354,7 @@
                 //     })
                 //     .catch(error => {
                 //         this.posts = [{ entry: 'There was an error: ' + error.message }]
-                //     })
+                //     })p
                 methods: {
                   getAllGroomers () {
                     // on Vue instance created, load the Groomer List
@@ -314,20 +388,48 @@
                             });
 
                 },
-                  onShow: function (name, pic) {
+                  keywordSearch () {
+                    console.log(this.keyword);
+                    const response =
+                        fetch(`${search_URL}/${this.keyword}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(response);
+                                if (data.code === 404) {
+                                    // no book in db
+                                    this.message = groomers.message;
+                                } else {
+                                    this.groomers = [data.data];
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+
+                },
+                  onShow: function (name, pic, addr, contact_no, email, basic, premium, lux) {
                     this.display = 'Groomer';
                     this.elsePart = `<img class="img-fluid" src="${pic}">`;
-                    this.disName = name
+                    this.disName=name; 
+                    this.disAddr=addr; 
+                    this.disContactNo=contact_no;
+                    this.disEmail=email; 
+                    this.disBasic=basic; 
+                    this.disPremium=premium;
+                    this.disLux=lux; 
                   },
               },
-              created () {
-                // on Vue instance created, load the book list
-                this.getAllGroomers();
-              }
+                created () {
+                  // on Vue instance created, load the book list
+                  this.getAllGroomers();
+                }
             });
 
             app.component('blog-post', {
-                props: ['name', 'addr', 'contactNo', 'email', 'basic', 'premium', 'lux',  'pic'],
+                props: ['name', 'addr', 'contact_no', 'email', 'basic', 'premium', 'lux',  'pic'],
                 template: `    
                       <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                           <div class="our-team">
@@ -335,8 +437,7 @@
                                 <img class="img-fluid" v-bind:src=pic >
                               </div>
                               <div class="team-content">
-                                <h3 class="name">Groomer {{name}}</h3>
-                                <h4 class="title">Hotel {{name}}</h4>
+                                <h2 class="name">{{name}}</h2>
                               </div>
                               <a class="mt-2" style="border-radius: 8px;" href="#" v-on:click="showGroomerInfo()">Link</a>
                           </div>
@@ -344,7 +445,7 @@
                 `,
                 methods: {
                   showGroomerInfo() {
-                      this.$emit('show',this.name, this.pic);
+                      this.$emit('show',this.name, this.pic, this.addr, this.contact_no, this.email, this.basic, this.premium, this.lux);
                   }
               }
             })

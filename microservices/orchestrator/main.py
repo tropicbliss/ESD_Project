@@ -8,6 +8,9 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 import pika
 
+# Making an API gateway-like microservice is not our initial intention, but it is our goal to provide user-friendly API docs in a single place
+# Hence, the advantages of using an actual API gateway like Kong quickly becomes more murky
+
 hostname = "esd-rabbit"
 port = 5672
 
@@ -153,6 +156,15 @@ async def get_groomer_by_name(name: str):
                                 detail=json["message"])
 
 
+@app.get("/groomer/delete/{name}", status_code=200, responses={400: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
+async def delete_groomer(name: str):
+    async with HttpClient.get_client().get(f"http://groomer:5000/delete/{name}") as resp:
+        if not resp.ok:
+            json = await resp.json()
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+
+
 @app.post("/groomer/update/{name}", status_code=200, responses={400: {"model": output.Error}}, description="All of the input fields are optional. If you want to search a keyword or name with a space, replace the space with %20")
 async def update_groomer(name: str, updated: input.UpdateGroomer):
     async with HttpClient.get_client().post(f"http://groomer:5000/update/{name}", json=vars(updated)) as resp:
@@ -248,6 +260,17 @@ async def create_comment(comment: input.CreateComment):
                                 detail=json["message"])
 
 
+@app.post("/appointments/update/{groomer_name}", status_code=200, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}}, description="To send the time in Javascript, call `date.toISOString()` on a `Date` object. If you want to search a keyword or name with a space, replace the space with %20")
+async def update_appointment_date(groomer_name: str, dates: input.AppointmentUpdate):
+    async with HttpClient.get_client().post(f"http://appointments:5000/update/{groomer_name}", json=vars(dates)) as resp:
+        if resp.ok:
+            return
+        else:
+            json = await resp.json()
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+
+
 @app.post("/checkout", status_code=200, response_model=output.Checkout, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}}, description="To send the time in Javascript, call `date.toISOString()` on a `Date` object.")
 async def checkout(checkout: input.Checkout):
     # check if groomer accepts the pets specified by the customer and return pricing info of the groomer
@@ -266,14 +289,8 @@ async def checkout(checkout: input.Checkout):
         else:
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
-    # create appointment entry
-    async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": [vars(pet) for pet in checkout.pets]}) as resp:
-        if not resp.ok:
-            json = await resp.json()
-            raise HTTPException(status_code=resp.status,
-                                detail=json["message"])
     pricing = price_tiers[checkout.priceTier]
-    # get stripe payment URL
+    # get stripe payment URL (you may realise that we did not check whether the user has paid for the service, this is a limitation of our microservices being locally hosted, resulting in the Stripe servers not being able to contact this microservice)
     async with HttpClient.get_client().post("http://stripe:5000/create-checkout-session", json={"cust_checkout": [{"price_id": pricing, "quantity": number_of_days}]}) as resp:
         if resp.ok:
             json = await resp.json()
@@ -281,4 +298,10 @@ async def checkout(checkout: input.Checkout):
         else:
             raise HTTPException(status_code=resp.status,
                                 detail="internal server error")
+    # create appointment entry
+    async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": [vars(pet) for pet in checkout.pets], "priceTier": checkout.priceTier, "totalPrice": pricing * number_of_days}) as resp:
+        if not resp.ok:
+            json = await resp.json()
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
     return {"checkoutUrl": checkout_url}
