@@ -195,7 +195,7 @@
                   </div>
 
                   <div class="col-lg-8">
-                    <div class="card mb-4">
+                    <div class="card mb-2">
                       <div class="card-body">
                         <div class="row">
                           <div class="col-sm-3">
@@ -245,9 +245,15 @@
                     </div>
                     <div class="row">
                       <div class="col-md-12">
+                        <h6>Starting Date</h6>
+                        <div class="input-group mb-2">
+                          <i class="bi bi-calendar-date input-group-text"></i>
+                          <input ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Choosing Your Starting Date!" required aria-label="Starting Date">
+                        </div>
+                        <h6>Ending Date</h6>
                         <div class="input-group mb-4">
                           <i class="bi bi-calendar-date input-group-text"></i>
-                          <input ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Date input 3 placeholder" required aria-label="Date input 3 (using aria-label)">
+                          <input ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Choosing Your Ending Date!" required aria-label="Ending Date">
                         </div>
                       </div>
                     </div>
@@ -280,7 +286,7 @@
                 //     })
                 //     .catch(error => {
                 //         this.posts = [{ entry: 'There was an error: ' + error.message }]
-                //     })
+                //     })p
                 methods: {
                   getAllGroomers () {
                     // on Vue instance created, load the Groomer List
