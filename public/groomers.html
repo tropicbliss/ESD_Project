@@ -109,54 +109,32 @@
                             <div class="col-md-2">
                                 <button @click="keywordSearch()" class="btn btn-secondary btn-block">Search</button>
                             </div>
-
+                            <div class="text-success" v-if="find">
+                              Founded! Here is the list of groomers as you requested. <span><button v-on:click="closeSearch()" type="button" class="mb-1 btn btn-warning btn-sm">Clear Search</button></span> <br>
+                            </div>
+                            <div class="text-danger" v-if="searErr!=''">
+                              There is a problem searching for the groomer(s)! Here is the full list of Groomers. {{ searErr }} <span><button v-on:click="closeSearch()" type="button" class="mb-1 btn btn-warning btn-sm">Clear Search</button></span>
+                            </div>
                         </div>
-                        <div class="mt-3">   
+                        <div class="mt-2">   
                           <!-- <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" class="advanced">
                           Advance Search <i class="fa fa-angle-down"></i>
                           </a> -->
                           <p>
-                            <a class="advanced px-5" role="button" href="#multiCollapseExample1" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample1" aria-expanded="false" aria-controls="multiCollapseExample1">Advance Search <i class="fa fa-angle-down"></i></a>
-                            <a class="advanced px-5" role="button" href="#multiCollapseExample2" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample2" aria-expanded="false" aria-controls="multiCollapseExample2">Filter <i class="fa fa-angle-down"></i></a>
+                            <a class="advanced px-5" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                              Filter <i class="bi bi-funnel"></i>
+                            </a>
                           </p>
-                          <div class="row">
-                            <div class="col">
-                              <div class="collapse multi-collapse" id="multiCollapseExample1">
-                                <div class="card card-body">
-                                  <div class="row">
-                                      <div class="col-md-6">
-                                          <input type="text" placeholder="By ID" class="form-control">        
-                                      </div>
-                                      <div class="col-md-6">
-                                        <button class="btn btn-secondary btn-block">Search by ID</button>
-                                      </div>
-                                  </div>
+                          <div class="collapse" id="collapseExample">
+                              <div class="ps-5">
+                                <div class="form-check form-check-inline" v-for="petType in petTypes">
+                                  <input class="form-check-input" type="radio" name="inlineRadioOptions" v-bind:id="petType" v-bind:value="petType" v-model="selected" v-on:click="filter(petType)">
+                                  <label class="form-check-label" v-bind:for="petType">{{petType}}</label>
                                 </div>
+                                <span><button v-on:click="closeFilter()" type="button" class="mb-1 btn btn-warning btn-sm">Clear Filter</button></span>
                               </div>
-                            </div>
-                            <div class="col">
-                              <div class="collapse multi-collapse" id="multiCollapseExample2">
-                                <div class="card card-body">
-                                  <div class="row">
-                                    <div class="col-md-6">
-                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                                        <label class="form-check-label" for="inlineCheckbox1">Cat</label>
-                                      </div>
-                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-                                        <label class="form-check-label" for="inlineCheckbox2">Dog</label>
-                                      </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                      <button class="btn btn-secondary btn-block">Filter</button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
                           </div>
+
                         </div>
                     </div>
                 </div>
@@ -164,7 +142,7 @@
                     
             <div class="container mt-2 buy_section">
               <div class="row">
-                <blog-post v-for="g in groomers" v-bind:key="idx" v-bind:grom="g" v-bind:name="g.name" v-bind:addr="g.address" v-bind:pic="g.pictureUrl" v-bind:contact_no="g.contactNo" v-bind:email="g.email" v-bind:pic="g.pictureUrl" v-bind:basic="g.basic" v-bind:premium="g.premium" v-bind:lux="g.luxury" v-on:show="onShow">
+                <blog-post v-for="(g,idx) in groomers" v-bind:key="idx" v-bind:grom="g" v-bind:name="g.name" v-bind:addr="g.address" v-bind:pic="g.pictureUrl" v-bind:contact_no="g.contactNo" v-bind:email="g.email" v-bind:pic="g.pictureUrl" v-bind:basic="g.basic" v-bind:premium="g.premium" v-bind:lux="g.luxury" v-on:show="onShow">
                 </blog-post>
               </div>
             </div>
@@ -259,7 +237,7 @@
                               <div class="single_price_plan wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
                                 <div class="title">
                                   <h3>Basic</h3>
-                                  <p>Try our basic option!</p>
+                                  <p>Try the basic option!</p>
                                   <div class="line"></div>
                                 </div>
                                 <div class="price">
@@ -281,7 +259,7 @@
                                 <div class="side-shape"><img src="https://bootdey.com/img/popular-pricing.png" alt=""></div>
                                 <div class="title"><span>Popular</span>
                                   <h3>Premuim</h3>
-                                  <p>Try our most popular option!</p>
+                                  <p>Try the most popular option!</p>
                                   <div class="line"></div>
                                 </div>
                                 <div class="price">
@@ -302,7 +280,7 @@
                               <div class="single_price_plan wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
                                 <div class="title">
                                   <h3>Luxury</h3>
-                                  <p>Try our luxury service!</p>
+                                  <p>Try the luxury service!</p>
                                   <div class="line"></div>
                                 </div>
                                 <div class="price">
@@ -339,10 +317,14 @@
                     return {
                       groomers: [],
                       message: "There is a problem retrieving groomers data, please try again later.",
+                      petTypes: ['Birds', 'Hamsters', 'Cats', 'Dogs', 'Rabbits', 'GuineaPigs', 'Chinchillas', 'Mice', 'Fishes'],
+                      selected: '',
                       display: 'listGroomer',
                       elsePart: '',
                       disName: '', disAddr:'', disContactNo:'', disEmail:'', disBasi:'', disBasic:'', disPremium:'', disLux:'',           
-                      keyword: ''
+                      keyword: '',
+                      find: false,
+                      searErr: ''
                     }
                 },
                 // created() { // created is a hook that executes as soon as Vue instance is created
@@ -388,18 +370,29 @@
                             });
 
                 },
-                  keywordSearch () {
-                    console.log(this.keyword);
+                  filter(petType) {
+                    let jsonData = JSON.stringify(
+                      {
+                        petType : petType
+                      });
+                      console.log(petType)
                     const response =
-                        fetch(`${search_URL}/${this.keyword}`)
+                        fetch(get_all_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
                             .then(response => response.json())
                             .then(data => {
-                                console.log(response);
-                                if (data.code === 404) {
-                                    // no book in db
-                                    this.message = groomers.message;
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
                                 } else {
-                                    this.groomers = [data.data];
+                                    this.groomers = data.result;
                                 }
                             })
                             .catch(error => {
@@ -408,8 +401,38 @@
                                 console.log(this.message + error);
 
                             });
-
-                },
+                  },
+                  keywordSearch() {
+                    this.searErr = ''
+                    this.find = false
+                    console.log(this.keyword);
+                    fetch(`${search_URL}/${this.keyword}`)
+                      .then(response => response.json())
+                      .then(data => {
+                        console.log(data)
+                        if(Array.isArray(data) && data.length!=0){
+                          this.groomers = data
+                          this.find = true
+                        }else{
+                          this.searErr = data.detail
+                          this.groomers = this.getAllGroomers()
+                          console.log(this.errMsg)
+                        }
+                      })
+                      .catch(error => {
+                          console.log("Problem in searching for a groomer. " + error);
+                      });
+                  },
+                  closeFilter() {
+                    this.getAllGroomers()
+                    document.getElementById(this.selected).checked = false
+                  },
+                  closeSearch() {
+                    this.getAllGroomers()
+                    this.keyword = ''
+                    this.find = false
+                    this.searErr = ''
+                  },
                   onShow: function (name, pic, addr, contact_no, email, basic, premium, lux) {
                     this.display = 'Groomer';
                     this.elsePart = `<img class="img-fluid" src="${pic}">`;
