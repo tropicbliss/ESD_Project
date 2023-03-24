@@ -110,58 +110,31 @@
                                 <button @click="keywordSearch()" class="btn btn-secondary btn-block">Search</button>
                             </div>
                             <div class="text-success" v-if="find">
-                              Founded! Here is the list of groomers as you requested. <span class="text-dark"><button v-on:click="closeSearch()" type="button" class="btn-close" aria-label="Close"></button>Clear Search</span> <br>
+                              Founded! Here is the list of groomers as you requested. <span><button v-on:click="closeSearch()" type="button" class="mb-1 btn btn-warning btn-sm">Clear Search</button></span> <br>
                             </div>
                             <div class="text-danger" v-if="searErr!=''">
-                              There is a problem searching for the groomer(s)! {{ searErr }} <span class="text-dark"><button v-on:click="closeSearch()" type="button" class="btn-close" aria-label="Close"></button>Clear Search</span>
-                          </div>
+                              There is a problem searching for the groomer(s)! Here is the full list of Groomers. {{ searErr }} <span><button v-on:click="closeSearch()" type="button" class="mb-1 btn btn-warning btn-sm">Clear Search</button></span>
+                            </div>
                         </div>
                         <div class="mt-2">   
                           <!-- <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" class="advanced">
                           Advance Search <i class="fa fa-angle-down"></i>
                           </a> -->
                           <p>
-                            <a class="advanced px-5" role="button" href="#multiCollapseExample1" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample1" aria-expanded="false" aria-controls="multiCollapseExample1">Advance Search <i class="fa fa-angle-down"></i></a>
-                            <a class="advanced px-5" role="button" href="#multiCollapseExample2" data-bs-toggle="collapse" data-bs-target="#multiCollapseExample2" aria-expanded="false" aria-controls="multiCollapseExample2">Filter <i class="fa fa-angle-down"></i></a>
+                            <a class="advanced px-5" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                              Filter <i class="bi bi-funnel"></i>
+                            </a>
                           </p>
-                          <div class="row">
-                            <div class="col">
-                              <div class="collapse multi-collapse" id="multiCollapseExample1">
-                                <div class="card card-body">
-                                  <div class="row">
-                                      <div class="col-md-6">
-                                          <input type="text" placeholder="By ID" class="form-control">        
-                                      </div>
-                                      <div class="col-md-6">
-                                        <button class="btn btn-secondary btn-block">Search by ID</button>
-                                      </div>
-                                  </div>
+                          <div class="collapse" id="collapseExample">
+                              <div class="ps-5">
+                                <div class="form-check form-check-inline" v-for="petType in petTypes">
+                                  <input class="form-check-input" type="radio" name="inlineRadioOptions" v-bind:id="petType" v-bind:value="petType" v-model="selected" v-on:click="filter(petType)">
+                                  <label class="form-check-label" v-bind:for="petType">{{petType}}</label>
                                 </div>
+                                <span><button v-on:click="closeFilter()" type="button" class="mb-1 btn btn-warning btn-sm">Clear Filter</button></span>
                               </div>
-                            </div>
-                            <div class="col">
-                              <div class="collapse multi-collapse" id="multiCollapseExample2">
-                                <div class="card card-body">
-                                  <div class="row">
-                                    <div class="col-md-6">
-                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1">
-                                        <label class="form-check-label" for="inlineCheckbox1">Cat</label>
-                                      </div>
-                                      <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" id="inlineCheckbox2" value="option2">
-                                        <label class="form-check-label" for="inlineCheckbox2">Dog</label>
-                                      </div>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                      <button class="btn btn-secondary btn-block">Filter</button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
                           </div>
+
                         </div>
                     </div>
                 </div>
@@ -344,6 +317,8 @@
                     return {
                       groomers: [],
                       message: "There is a problem retrieving groomers data, please try again later.",
+                      petTypes: ['Birds', 'Hamsters', 'Cats', 'Dogs', 'Rabbits', 'GuineaPigs', 'Chinchillas', 'Mice', 'Fishes'],
+                      selected: '',
                       display: 'listGroomer',
                       elsePart: '',
                       disName: '', disAddr:'', disContactNo:'', disEmail:'', disBasi:'', disBasic:'', disPremium:'', disLux:'',           
@@ -395,6 +370,38 @@
                             });
 
                 },
+                  filter(petType) {
+                    let jsonData = JSON.stringify(
+                      {
+                        petType : petType
+                      });
+                      console.log(petType)
+                    const response =
+                        fetch(get_all_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    this.groomers = data.result;
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                  },
                   keywordSearch() {
                     this.searErr = ''
                     this.find = false
@@ -415,6 +422,10 @@
                       .catch(error => {
                           console.log("Problem in searching for a groomer. " + error);
                       });
+                  },
+                  closeFilter() {
+                    this.getAllGroomers()
+                    document.getElementById(this.selected).checked = false
                   },
                   closeSearch() {
                     this.getAllGroomers()
