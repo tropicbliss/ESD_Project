@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Current Appointments</title>
+    <title>Past Reviews</title>
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -39,7 +39,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3" id="app2">{{gName}} </div>
+                <div class="sidebar-brand-text mx-3" id="app2"> {{gName}} </div>
             </a>
 
             <!-- Divider -->
@@ -141,31 +141,24 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-1 text-gray-800"> Current appointments</h1>
+                    <h1 class="h3 mb-1 text-gray-800"> Past Reviews</h1>
                    
                     <div id="app">
                     <!-- Content Row -->
                         <div class="row">
 
                             
-                            <div class="col-lg-6" v-for="each in listOfFutureApp">
+                            <div class="col-lg-6" v-for="each in listOfReviews">
                         
-                                <div class="card position-relative" v-if="currentDate() < each.endDate && currentDate() > each.startDate">
+                                <div class="card position-relative" >
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary">Appointment with {{each.userName}} </h6>
+                                        <h6 class="m-0 font-weight-bold text-primary"> Past reviews you have gotten </h6>
                                     </div>
                                     <div class="card-body">
-                                        
-                                        <!-- display each pet of each appointment -->
-                                        <div class="mb-0 small" v-for="pet in each.pets">
-                                            {{pet.petType}}
-                                            {{pet.name}}
-                                            {{pet.gender}}
-                                            {{pet.age}}
-                                            {{pet.medicalInfo}}
-                                        </div>
-                                        <p>{{each.priceTier}}</p>
-                                        <p>{{each.totalPrice}}</p>
+                                        <p>{{each.title}}</p>
+                                        <p>{{each.userName}}</p>
+                                        <p>{{each.message}}</p>
+                                        <p>{{each.rating}}</p>
                                     
                                     </div>
 
@@ -217,25 +210,25 @@
     <script src="js/sb-admin-2.min.js"></script>
 
 <script>
-    const get_groomer_app_URL = "http://localhost:5000/appointments/signin/Alice";
+    const get_reviews_URL = "http://localhost:5000/comments/read/Alice";
 
     const app = Vue.createApp({
         data() {
             return {
-                listOfFutureApp: []
+                listOfReviews: []
 
             };
         },
         methods: {
     
-            findGroomerApp () {
+            getAllReviews () {
                 const response =
-                    fetch(get_groomer_app_URL)
+                    fetch(get_reviews_URL)
                         .then(response => response.json())
                         .then(data => {
                             console.log(response)
-                            this.listOfFutureApp = data
-                            console.log(this.listOfFutureApp)
+                            this.listOfReviews = data
+                            console.log(this.listOfReviews)
                             
                         })
                         .catch(error => {
@@ -246,15 +239,10 @@
                         });
 
             },
-            currentDate() {
-                const current = new Date();
-                const date = `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
-                return date;
-            }
     
     
         }, created(){
-            this.findGroomerApp()
+            this.listOfReviews()
         }
     });
     const vm = app.mount('#app');
