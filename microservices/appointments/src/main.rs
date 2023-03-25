@@ -53,6 +53,7 @@ async fn main() -> Result<()> {
         .route("/create", post(create_appointment))
         .route("/stayed", post(stayed_customers))
         .route("/quantity", post(get_quantity))
+        .route("/get/:id", post(get_appointments_in_month))
         .route("/update/:id", post(update_appointment_date))
         .with_state(shared_state);
     let addr = std::env::var("ADDR").unwrap_or_else(|_| "127.0.0.1:3000".into());
@@ -273,6 +274,92 @@ enum PetGender {
     Male,
     Female,
     Unspecified,
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct MonthYearInput {
+    month: u32,
+    year: u32,
+}
+
+async fn get_appointments_in_month(
+    Path(groomer_name): Path<String>,
+    state: State<SharedState>,
+    Json(payload): Json<MonthYearInput>,
+) -> Result<Json<Vec<SignInOutput>>, ApiError> {
+    #[derive(Deserialize)]
+    struct UserReadEndpointOutput {
+        name: String,
+    }
+
+    if !does_groomer_exist(&state.http, &groomer_name).await? {
+        return Err(ApiError::GroomerDoesNotExist);
+    }
+    let filter = doc! {
+        "$expr": {
+            "$and": [
+                {
+                    "$eq": [
+                        {
+                            "$month": "$date"
+                        },
+                        payload.month
+                    ]
+                },
+                {
+                    "$eq": [
+                        {
+                            "$year": "$date"
+                        },
+                        payload.year
+                    ]
+                }
+            ]
+        }
+    };
+    let res = state
+        .appointments
+        .find(filter, None)
+        .await
+        .map_err(|_| ApiError::InternalError)?;
+    let res: Vec<_> = res
+        .try_collect()
+        .await
+        .map_err(|_| ApiError::InternalError)?;
+    let res = stream::iter(res)
+        .map(|app| {
+            let client = &state.http;
+            async move {
+                let res: UserReadEndpointOutput = client
+                    .get(format!("http://user:5000/read/{}", app.user_name))
+                    .send()
+                    .await
+                    .unwrap()
+                    .json()
+                    .await
+                    .unwrap();
+                let pets = app
+                    .pets
+                    .into_iter()
+                    .map(|e| e.try_into())
+                    .collect::<Result<Vec<_>, _>>()
+                    .unwrap();
+                SignInOutput {
+                    end_date: app.end_date.try_to_rfc3339_string().unwrap(),
+                    id: app.id,
+                    pets,
+                    start_date: app.start_date.try_to_rfc3339_string().unwrap(),
+                    user_name: res.name,
+                    total_price: app.total_price,
+                    price_tier: app.price_tier,
+                }
+            }
+        })
+        .buffer_unordered(3)
+        .collect()
+        .await;
+    Ok(Json(res))
 }
 
 async fn get_arriving_customers(

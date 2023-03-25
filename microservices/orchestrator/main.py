@@ -231,6 +231,17 @@ async def get_staying_customers(groomer_name: str):
                                 detail=json["message"])
 
 
+@app.post("/appointments/get/{groomer_name}", status_code=200, response_model=list[output.CustomerAppointments], responses={500: {"model": output.Error}, 404: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
+async def get_appointments_by_month(groomer_name: str, time: input.MonthYear):
+    async with HttpClient.get_client().post(f"http://appointments:5000/get/{groomer_name}", json=vars(time)) as resp:
+        json = await resp.json()
+        if resp.ok:
+            return json
+        else:
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+
+
 @app.post("/appointments/status/{appointment_id}", status_code=200, responses={400: {"model": output.Error}, 500: {"model": output.Error}, 404: {"model": output.Error}})
 async def change_appointment_status(appointment_id: str, status: input.Status):
     async with HttpClient.get_client().post(f"http://appointments:5000/status/{appointment_id}", json=vars(status)) as resp:

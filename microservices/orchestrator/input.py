@@ -111,3 +111,8 @@ class Checkout(BaseModel):
 class AppointmentUpdate(BaseModel):
     startDate: str
     endDate: str
+
+
+class MonthYear(BaseModel):
+    month: int
+    year: int
