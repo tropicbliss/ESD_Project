@@ -142,7 +142,7 @@
                     
             <div class="container mt-2 buy_section">
               <div class="row">
-                <blog-post v-for="(g,idx) in groomers" v-bind:key="idx" v-bind:grom="g" v-bind:name="g.name" v-bind:addr="g.address" v-bind:pic="g.pictureUrl" v-bind:contact_no="g.contactNo" v-bind:email="g.email" v-bind:pic="g.pictureUrl" v-bind:basic="g.basic" v-bind:premium="g.premium" v-bind:lux="g.luxury" v-on:show="onShow">
+                <blog-post v-for="(g,idx) in groomers" v-bind:key="idx" v-bind:grom="g" v-bind:pets_accept="g.acceptedPets" v-bind:name="g.name" v-bind:addr="g.address" v-bind:pic="g.pictureUrl" v-bind:contact_no="g.contactNo" v-bind:email="g.email" v-bind:pic="g.pictureUrl" v-bind:basic="g.basic" v-bind:premium="g.premium" v-bind:lux="g.luxury" v-on:show="onShow">
                 </blog-post>
               </div>
             </div>
@@ -179,32 +179,40 @@
                     <div class="card mb-2">
                       <div class="card-body">
                         <div class="row">
-                          <div class="col-sm-3">
+                          <div class="col-sm-4">
                             <p class="mb-0">Address</p>
                           </div>
-                          <div class="col-sm-9">
+                          <div class="col-sm-8">
                             <p class="text-muted mb-0">{{disAddr}}</p>
                           </div>
                         </div>
                         <hr>
                         <div class="row">
-                          <div class="col-sm-3">
+                          <div class="col-sm-4">
                             <p class="mb-0">Contact Number</p>
                           </div>
-                          <div class="col-sm-9">
+                          <div class="col-sm-8">
                             <p class="text-muted mb-0">{{disContactNo}}</p>
                           </div>
                         </div>
                         <hr>
                         <div class="row">
-                          <div class="col-sm-3">
+                          <div class="col-sm-4">
                             <p class="mb-0">Email</p>
                           </div>
-                          <div class="col-sm-9">
+                          <div class="col-sm-8">
                             <p class="text-muted mb-0">{{disEmail}}</p>
                           </div>
                         </div>
                         <hr>
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <p class="mb-0">Accepted Pet Type(s)</p>
+                          </div>
+                          <div class="col-sm-8">
+                            <p class="text-muted mb-0">{{disPetsAccpt}}</p>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -289,7 +297,7 @@
                                 <div class="description">
                                   <p><i class="lni lni-checkmark-circle"></i>All basic</p>
                                   <p><i class="lni lni-checkmark-circle"></i>All premium</p>
-                                  <p><i class="lni lni-checkmark-circle"></i>CUstomized Haircut</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Customized Haircut</p>
                                   <p><i class="lni lni-checkmark-circle"></i>Specialty Shampoos</p>
                                   <p><i class="lni lni-checkmark-circle"></i>Conditioning Treatments</p>
                                 </div>
@@ -321,7 +329,7 @@
                       selected: '',
                       display: 'listGroomer',
                       elsePart: '',
-                      disName: '', disAddr:'', disContactNo:'', disEmail:'', disBasi:'', disBasic:'', disPremium:'', disLux:'',           
+                      disName: '', disAddr:'', disContactNo:'', disEmail:'', disBasi:'', disBasic:'', disPremium:'', disLux:'', disPetsAccpt:'',           
                       keyword: '',
                       find: false,
                       searErr: ''
@@ -433,7 +441,7 @@
                     this.find = false
                     this.searErr = ''
                   },
-                  onShow: function (name, pic, addr, contact_no, email, basic, premium, lux) {
+                  onShow: function (pets_accept, name, pic, addr, contact_no, email, basic, premium, lux) {
                     this.display = 'Groomer';
                     this.elsePart = `<img class="img-fluid" src="${pic}">`;
                     this.disName=name; 
@@ -442,7 +450,14 @@
                     this.disEmail=email; 
                     this.disBasic=basic; 
                     this.disPremium=premium;
-                    this.disLux=lux; 
+                    this.disLux=lux;
+                    const numbers = [45, 4, 9, 16, 25];
+                    let accept = "";
+                    pets_accept.forEach(myFunction);
+                    function myFunction(value, index, array) {
+                      accept += value + " ";
+                    }
+                    this.disPetsAccpt = accept
                   },
               },
                 created () {
@@ -452,7 +467,7 @@
             });
 
             app.component('blog-post', {
-                props: ['name', 'addr', 'contact_no', 'email', 'basic', 'premium', 'lux',  'pic'],
+                props: ['pets_accept', 'name', 'addr', 'contact_no', 'email', 'basic', 'premium', 'lux',  'pic'],
                 template: `    
                       <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                           <div class="our-team">
@@ -460,7 +475,7 @@
                                 <img class="img-fluid" v-bind:src=pic >
                               </div>
                               <div class="team-content">
-                                <h2 class="name">{{name}}</h2>
+                                <h3 style="color: #003366"><i class="bi bi-stars"></i>{{name}}<i class="bi bi-stars"></i></h3>
                               </div>
                               <a class="mt-2" style="border-radius: 8px;" href="#" v-on:click="showGroomerInfo()">Link</a>
                           </div>
@@ -468,7 +483,7 @@
                 `,
                 methods: {
                   showGroomerInfo() {
-                      this.$emit('show',this.name, this.pic, this.addr, this.contact_no, this.email, this.basic, this.premium, this.lux);
+                      this.$emit('show',this.pets_accept, this.name, this.pic, this.addr, this.contact_no, this.email, this.basic, this.premium, this.lux);
                   }
               }
             })
