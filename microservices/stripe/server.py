@@ -114,7 +114,7 @@ def create_checkout_session():
             # Extract line items from form data
             print(request.form.get('price_id'))
             line_items = [{
-                'price': request.form.get('price_id'),
+                'price': category[request.form.get('price_id')],
                 'quantity': request.form.get('quantity')
             }]
 
