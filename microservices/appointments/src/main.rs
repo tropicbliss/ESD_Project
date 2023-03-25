@@ -302,7 +302,7 @@ async fn get_appointments_in_month(
                 {
                     "$eq": [
                         {
-                            "$month": "$date"
+                            "$month": "$end_date"
                         },
                         payload.month
                     ]
@@ -310,7 +310,7 @@ async fn get_appointments_in_month(
                 {
                     "$eq": [
                         {
-                            "$year": "$date"
+                            "$year": "$end_date"
                         },
                         payload.year
                     ]
