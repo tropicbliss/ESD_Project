@@ -40,7 +40,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">Purrfect Grooming</div>
+                <div class="sidebar-brand-text mx-3" id="app3">{{gName}} </div>
             </a>
 
             <!-- Divider -->
@@ -72,7 +72,7 @@
                         
                         <a class="collapse-item" href="currentAppointments.html">Current Appointments</a>
                         <a class="collapse-item" href="futureAppointments.html">Future Appointments</a>
-                        <a class="collapse-item" href="tables.html">Past Reviews</a>
+                        <a class="collapse-item" href="pastReviews.html">Past Reviews</a>
                     </div>
                 </div>
             </li>
@@ -166,7 +166,6 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Purrfect Grooming</span>
                                 <img class="img-profile rounded-circle"
                                     src="img/undraw_profile.svg">
                             </a>
@@ -594,6 +593,42 @@
             }
         });
         const vm2 = app2.mount('#app2');
+
+        const get_groomer_name_URL = "http://localhost:5000/groomer/search/name/Alice";
+
+    const app3 = Vue.createApp({
+        data() {
+            return {
+                gName: '',
+                
+            };
+        },
+        methods: {
+    
+            findGroomerName () {
+                const response =
+                    fetch(get_groomer_name_URL)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log(response)
+                            this.gName = data.name
+                            
+                        })
+                        .catch(error => {
+                            // Errors when calling the service; such as network error, 
+                            // service offline, etc
+                            console.log(this.message + error);
+
+                        });
+
+            },
+    
+   
+        }, created(){
+            this.findGroomerName()
+        }
+    });
+    const vm3 = app3.mount('#app3');
 </script>
 </body>
 
