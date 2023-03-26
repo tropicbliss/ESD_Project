@@ -47,6 +47,7 @@ var myLineChart = new Chart(ctx, {
       pointHitRadius: 10,
       pointBorderWidth: 2,
       data: [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000],
+      //maybe we copy paste this entire thing under script tag in the index, create one function for each month (vue there) then input here in data 
     }],
   },
   options: {
