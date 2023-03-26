@@ -374,7 +374,7 @@ async fn get_arriving_customers(
     if !does_groomer_exist(&state.http, &groomer_name).await? {
         return Err(ApiError::GroomerDoesNotExist);
     }
-    let filter = doc! {"groomer_id": groomer_name, "status": "awaiting"};
+    let filter = doc! {"groomer_name": groomer_name, "status": "awaiting"};
     let res = state
         .appointments
         .find(filter, None)
@@ -437,7 +437,7 @@ async fn update_appointment_date(
     if !does_groomer_exist(&state.http, &groomer_name).await? {
         return Err(ApiError::GroomerDoesNotExist);
     }
-    let filter = doc! {"groomer_id": groomer_name, "status": "awaiting"};
+    let filter = doc! {"groomer_name": groomer_name, "status": "awaiting"};
     let res = state
         .appointments
         .find_one_and_update(
@@ -466,7 +466,7 @@ async fn get_staying_customers(
     if !does_groomer_exist(&state.http, &groomer_name).await? {
         return Err(ApiError::GroomerDoesNotExist);
     }
-    let filter = doc! {"groomer_id": groomer_name, "status": "staying"};
+    let filter = doc! {"groomer_name": groomer_name, "status": "staying"};
     let res = state
         .appointments
         .find(filter, None)
