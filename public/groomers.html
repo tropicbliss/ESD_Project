@@ -227,12 +227,11 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="petType">Pet Type</label>
-                                <input v-model="cpetType" type="text" class="form-control" id="petType" placeholder="" value="" required="">
-                                <div class="invalid-feedback"> Valid first name is required. </div>
+                                <input v-model="cpetType" type="text" class="form-control" id="petType" placeholder="" required="">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="name">Pet Name</label>
-                                <input v-model="cname" type="text" class="form-control" id="name" placeholder="" value="" required="">
+                                <input v-model="cname" type="text" class="form-control" id="name" placeholder="" required="">
                                 <div class="invalid-feedback"> Valid last name is required. </div>
                             </div>
                         </div>
@@ -240,14 +239,13 @@
                             <div class="col-md-6 mb-3">
                                 <label for="gender">Gender</label>
                                 <select v-model="cgender" class="form-select" aria-label="Default select example" id="gender">
-                                    <option selected>Gender</option>
-                                    <option value="male">male</option>
+                                    <option selected value="male">male</option>
                                     <option value="female">female</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="age">Age</label>
-                                <input v-model="cage" type="text" class="form-control" id="age" placeholder="" value="" required="">
+                                <input v-model="cage" type="text" class="form-control" id="age" placeholder="" required="">
                             </div>
                         </div>
                         <div class="mb-3">
@@ -263,12 +261,12 @@
                               <h6>Starting Date</h6>
                               <div class="input-group mb-2">
                                 <i class="bi bi-calendar-date input-group-text"></i>
-                                <input v-model="cStart" ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Choosing Your Starting Date!" required aria-label="Starting Date">
+                                <input v-model="cStart" ref="datepicker" @blur="updateCStart" type="text" class="datepicker_input form-control" placeholder="Choosing Your Starting Date!" required aria-label="Starting Date">
                               </div>
                               <h6>Ending Date</h6>
                               <div class="input-group mb-1">
                                 <i class="bi bi-calendar-date input-group-text"></i>
-                                <input v-model="cEnd" ref="datepicker" type="text" class="datepicker_input form-control" placeholder="Choosing Your Ending Date!" required aria-label="Ending Date">
+                                <input v-model="cEnd" ref="datepicker" @blur="updateCEnd" type="text" class="datepicker_input form-control" placeholder="Choosing Your Ending Date!" required aria-label="Ending Date">
                               </div>
                             </div>
                         </div>
@@ -295,7 +293,7 @@
                                   <p><i class="lni lni-checkmark-circle"></i>Nail Trimming</p>
                                   <p><i class="lni lni-checkmark-circle"></i>Ear Cleaning</p>
                                 </div>
-                                <div class="button"><a class="btn btn-success btn-2" href="#">Checkout</a></div>
+                                <div class="button"><a class="btn btn-success btn-2" v-on:click="sendBasic()">Checkout</a></div>
                               </div>
                             </div>
                             <!-- Single Price Plan Area-->
@@ -318,7 +316,7 @@
                                   <p><i class="lni lni-checkmark-circle"></i>Trimming of Paw Pads</p>
                                   <p><i class="lni lni-checkmark-circle"></i>Sanitary Areas</p>
                                 </div>
-                                <div class="button"><a class="btn btn-warning" href="#">Checkout</a></div>
+                                <div class="button"><a class="btn btn-warning" v-on:click="sendPremium()">Checkout</a></div>
                               </div>
                             </div>
                             <!-- Single Price Plan Area-->
@@ -339,7 +337,7 @@
                                   <p><i class="lni lni-checkmark-circle"></i>Specialty Shampoos</p>
                                   <p><i class="lni lni-checkmark-circle"></i>Conditioning Treatments</p>
                                 </div>
-                                <div class="button"><a class="btn btn-info" href="#">Checkout</a></div>
+                                <div class="button"><a class="btn btn-info" v-on:click="sendLuxury()">Checkout</a></div>
                               </div>
                             </div>
                           </div>
@@ -356,8 +354,8 @@
 
         <script>
             const get_all_URL = "http://localhost:5000/groomer/read";
-            const place_order_URL = "http://localhost:5100/place_order";
-            const search_URL = "http://localhost:5000/groomer/search/keyword";     
+            const search_URL = "http://localhost:5000/groomer/search/keyword";  
+            const checkout_URL = "http://localhost:5000/checkout"   
             const app = Vue.createApp({
                 data() {
                     return {
@@ -385,6 +383,12 @@
                 //         this.posts = [{ entry: 'There was an error: ' + error.message }]
                 //     })p
                 methods: {
+                  updateCStart(event) {
+                    this.cStart = event.target.value;
+                  },
+                  updateCEnd(event) {
+                    this.cEnd = event.target.value;
+                  },
                   getAllGroomers () {
                     // on Vue instance created, load the Groomer List
                     let jsonData = JSON.stringify({
@@ -480,6 +484,171 @@
                     this.find = false
                     this.searErr = ''
                   },
+                  sendBasic() {
+                    var start = this.cStart;
+                    console.log(start)
+                    const [day, month, year] = start.split("/");
+                    const isoStart = new Date(`${year}-${month}-${day}`).toISOString();
+                    console.log(isoStart);
+
+                    var end = this.cEnd;
+                    console.log(end)
+                    const [endday, endmonth, endyear] = end.split("/");
+                    const isoEnd = new Date(`${endyear}-${endmonth}-${endday}`).toISOString();
+                    console.log(isoEnd);
+
+                    let jsonData = JSON.stringify(
+                      {
+                        groomerName: this.disName,
+                        pets: [
+                          {
+                            petType: this.cpetType,
+                            name: this.cname,
+                            gender: this.cgender,
+                            age: this.cage,
+                            medicalInfo: this.cmediInfo
+                          }
+                        ],
+                        startTime: isoStart,
+                        endTime: isoEnd,
+                        userName: "Hi",
+                        priceTier: "basic"
+                      }
+                      );
+
+                    const response =
+                        fetch(checkout_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    window.location.replace(data.checkoutUrl);
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                  },          
+                  sendPremium() {
+                    var start = this.cStart;
+                    const [day, month, year] = start.split("/");
+                    const isoStart = new Date(`${year}-${month}-${day}`).toISOString();
+
+                    var end = this.cEnd;
+                    const [endday, endmonth, endyear] = end.split("/");
+                    const isoEnd = new Date(`${endyear}-${endmonth}-${endday}`).toISOString();
+
+                    let jsonData = JSON.stringify(
+                      {
+                        groomerName: this.disName,
+                        pets: [
+                          {
+                            petType: this.cpetType,
+                            name: this.cname,
+                            gender: this.cgender,
+                            age: this.cage,
+                            medicalInfo: this.cmediInfo
+                          }
+                        ],
+                        startTime: isoStart,
+                        endTime: isoEnd,
+                        userName: "Hi",
+                        priceTier: "premium"
+                      }
+                      );
+
+                    const response =
+                        fetch(checkout_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    window.location.replace(data.checkoutUrl);
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+                            });
+                  },  
+                  sendLuxury() {
+                    var start = this.cStart;
+                    const [day, month, year] = start.split("/");
+                    const isoStart = new Date(`${year}-${month}-${day}`).toISOString();
+
+                    var end = this.cEnd;
+                    const [endday, endmonth, endyear] = end.split("/");
+                    const isoEnd = new Date(`${endyear}-${endmonth}-${endday}`).toISOString();
+
+                    let jsonData = JSON.stringify(
+                      {
+                        groomerName: this.disName,
+                        pets: [
+                          {
+                            petType: this.cpetType,
+                            name: this.cname,
+                            gender: this.cgender,
+                            age: this.cage,
+                            medicalInfo: this.cmediInfo
+                          }
+                        ],
+                        startTime: isoStart,
+                        endTime: isoEnd,
+                        userName: "Hi",
+                        priceTier: "luxury"
+                      }
+                      );
+
+                    const response =
+                        fetch(checkout_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    window.location.replace(data.checkoutUrl);
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+                            });
+                  },  
+                          
                   onShow: function (pets_accept, name, pic, addr, contact_no, email, basic, premium, lux) {
                     this.display = 'Groomer';
                     this.elsePart = `<img class="img-fluid" src="${pic}">`;
