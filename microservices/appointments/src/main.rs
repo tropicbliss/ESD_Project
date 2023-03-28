@@ -288,11 +288,6 @@ async fn get_appointments_in_month(
     state: State<SharedState>,
     Json(payload): Json<MonthYearInput>,
 ) -> Result<Json<Vec<SignInOutput>>, ApiError> {
-    #[derive(Deserialize)]
-    struct UserReadEndpointOutput {
-        name: String,
-    }
-
     if !does_groomer_exist(&state.http, &groomer_name).await? {
         return Err(ApiError::GroomerDoesNotExist);
     }
@@ -318,47 +313,28 @@ async fn get_appointments_in_month(
             ]
         }
     };
-    let res = state
-        .appointments
-        .find(filter, None)
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    let res: Vec<_> = res
-        .try_collect()
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    let res = stream::iter(res)
+    let res = state.appointments.find(filter, None).await.unwrap();
+    let res: Vec<_> = res.try_collect().await.unwrap();
+    let res = res
+        .into_iter()
         .map(|app| {
-            let client = &state.http;
-            async move {
-                let res: UserReadEndpointOutput = client
-                    .get(format!("http://user:5000/read/{}", app.user_name))
-                    .send()
-                    .await
-                    .unwrap()
-                    .json()
-                    .await
-                    .unwrap();
-                let pets = app
-                    .pets
-                    .into_iter()
-                    .map(|e| e.try_into())
-                    .collect::<Result<Vec<_>, _>>()
-                    .unwrap();
-                SignInOutput {
-                    end_date: app.end_date.try_to_rfc3339_string().unwrap(),
-                    id: app.id,
-                    pets,
-                    start_date: app.start_date.try_to_rfc3339_string().unwrap(),
-                    user_name: res.name,
-                    total_price: app.total_price,
-                    price_tier: app.price_tier,
-                }
+            let pets = app
+                .pets
+                .into_iter()
+                .map(|e| e.try_into())
+                .collect::<Result<Vec<_>, _>>()
+                .unwrap();
+            SignInOutput {
+                end_date: app.end_date.try_to_rfc3339_string().unwrap(),
+                id: app.id,
+                pets,
+                start_date: app.start_date.try_to_rfc3339_string().unwrap(),
+                user_name: app.user_name,
+                total_price: app.total_price,
+                price_tier: app.price_tier,
             }
         })
-        .buffer_unordered(3)
-        .collect()
-        .await;
+        .collect();
     Ok(Json(res))
 }
 
@@ -366,56 +342,32 @@ async fn get_arriving_customers(
     Path(groomer_name): Path<String>,
     state: State<SharedState>,
 ) -> Result<Json<Vec<SignInOutput>>, ApiError> {
-    #[derive(Deserialize)]
-    struct UserReadEndpointOutput {
-        name: String,
-    }
-
     if !does_groomer_exist(&state.http, &groomer_name).await? {
         return Err(ApiError::GroomerDoesNotExist);
     }
     let filter = doc! {"groomer_name": groomer_name, "status": "awaiting"};
-    let res = state
-        .appointments
-        .find(filter, None)
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    let res: Vec<_> = res
-        .try_collect()
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    let res = stream::iter(res)
+    let res = state.appointments.find(filter, None).await.unwrap();
+    let res: Vec<_> = res.try_collect().await.unwrap();
+    let res = res
+        .into_iter()
         .map(|app| {
-            let client = &state.http;
-            async move {
-                let res: UserReadEndpointOutput = client
-                    .get(format!("http://user:5000/read/{}", app.user_name))
-                    .send()
-                    .await
-                    .unwrap()
-                    .json()
-                    .await
-                    .unwrap();
-                let pets = app
-                    .pets
-                    .into_iter()
-                    .map(|e| e.try_into())
-                    .collect::<Result<Vec<_>, _>>()
-                    .unwrap();
-                SignInOutput {
-                    end_date: app.end_date.try_to_rfc3339_string().unwrap(),
-                    id: app.id,
-                    pets,
-                    start_date: app.start_date.try_to_rfc3339_string().unwrap(),
-                    user_name: res.name,
-                    total_price: app.total_price,
-                    price_tier: app.price_tier,
-                }
+            let pets = app
+                .pets
+                .into_iter()
+                .map(|e| e.try_into())
+                .collect::<Result<Vec<_>, _>>()
+                .unwrap();
+            SignInOutput {
+                end_date: app.end_date.try_to_rfc3339_string().unwrap(),
+                id: app.id,
+                pets,
+                start_date: app.start_date.try_to_rfc3339_string().unwrap(),
+                user_name: app.user_name,
+                total_price: app.total_price,
+                price_tier: app.price_tier,
             }
         })
-        .buffer_unordered(3)
-        .collect()
-        .await;
+        .collect();
     Ok(Json(res))
 }
 
@@ -458,11 +410,6 @@ async fn get_staying_customers(
     Path(groomer_name): Path<String>,
     state: State<SharedState>,
 ) -> Result<Json<Vec<SignInOutput>>, ApiError> {
-    #[derive(Deserialize)]
-    struct UserReadEndpointOutput {
-        name: String,
-    }
-
     if !does_groomer_exist(&state.http, &groomer_name).await? {
         return Err(ApiError::GroomerDoesNotExist);
     }
@@ -476,38 +423,26 @@ async fn get_staying_customers(
         .try_collect()
         .await
         .map_err(|_| ApiError::InternalError)?;
-    let res = stream::iter(res)
+    let res = res
+        .into_iter()
         .map(|app| {
-            let client = &state.http;
-            async move {
-                let res: UserReadEndpointOutput = client
-                    .get(format!("http://user:5000/read/{}", app.user_name))
-                    .send()
-                    .await
-                    .unwrap()
-                    .json()
-                    .await
-                    .unwrap();
-                let pets = app
-                    .pets
-                    .into_iter()
-                    .map(|e| e.try_into())
-                    .collect::<Result<Vec<_>, _>>()
-                    .unwrap();
-                SignInOutput {
-                    end_date: app.end_date.try_to_rfc3339_string().unwrap(),
-                    id: app.id,
-                    pets,
-                    start_date: app.start_date.try_to_rfc3339_string().unwrap(),
-                    user_name: res.name,
-                    total_price: app.total_price,
-                    price_tier: app.price_tier,
-                }
+            let pets = app
+                .pets
+                .into_iter()
+                .map(|e| e.try_into())
+                .collect::<Result<Vec<_>, _>>()
+                .unwrap();
+            SignInOutput {
+                end_date: app.end_date.try_to_rfc3339_string().unwrap(),
+                id: app.id,
+                pets,
+                start_date: app.start_date.try_to_rfc3339_string().unwrap(),
+                user_name: app.user_name,
+                total_price: app.total_price,
+                price_tier: app.price_tier,
             }
         })
-        .buffer_unordered(3)
-        .collect()
-        .await;
+        .collect();
     Ok(Json(res))
 }
 
@@ -611,6 +546,8 @@ struct CreateInput {
     pet_info: Vec<PetInputOutput>,
     price_tier: String,
     total_price: f64,
+    start_time: String,
+    end_time: String,
 }
 
 #[derive(Serialize)]
@@ -623,7 +560,7 @@ impl TryFrom<Pet> for PetInputOutput {
     type Error = &'static str;
 
     fn try_from(value: Pet) -> std::result::Result<Self, Self::Error> {
-        let gender = match value.pet_type.as_str() {
+        let gender = match value.gender.as_str() {
             "male" => PetGender::Male,
             "female" => PetGender::Female,
             "unspecified" => PetGender::Unspecified,
@@ -685,6 +622,13 @@ async fn create_appointment(
     state: State<SharedState>,
     Json(payload): Json<CreateInput>,
 ) -> Result<Json<CreateOutput>, ApiError> {
+    let start_time = DateTime::parse_rfc3339_str(payload.start_time)
+        .map_err(|_| ApiError::IncorrectTimeFormat)?;
+    let end_time =
+        DateTime::parse_rfc3339_str(payload.end_time).map_err(|_| ApiError::IncorrectTimeFormat)?;
+    if start_time > end_time {
+        return Err(ApiError::StartEndDateMismatch);
+    }
     let (user_exists, groomer_exists) = tokio::join!(
         does_user_exist(&state.http, &payload.user_name),
         does_groomer_exist(&state.http, &payload.groomer_name)
@@ -696,11 +640,11 @@ async fn create_appointment(
         return Err(ApiError::GroomerDoesNotExist);
     }
     let payload = Appointment {
-        end_date: DateTime::now(),
+        end_date: end_time,
         groomer_name: payload.groomer_name,
         id: cuid::cuid2(),
         pets: payload.pet_info.into_iter().map(|e| e.into()).collect(),
-        start_date: DateTime::now(),
+        start_date: start_time,
         status: Status::Awaiting,
         user_name: payload.user_name,
         total_price: payload.total_price,

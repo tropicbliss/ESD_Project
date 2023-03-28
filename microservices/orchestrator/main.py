@@ -310,7 +310,7 @@ async def checkout(checkout: input.Checkout):
             raise HTTPException(status_code=resp.status,
                                 detail="internal server error")
     # create appointment entry
-    async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": [vars(pet) for pet in checkout.pets], "priceTier": checkout.priceTier, "totalPrice": pricing * number_of_days}) as resp:
+    async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": [vars(pet) for pet in checkout.pets], "priceTier": checkout.priceTier, "totalPrice": pricing * number_of_days, "startTime": checkout.startTime, "endTime": checkout.endTime}) as resp:
         if not resp.ok:
             json = await resp.json()
             raise HTTPException(status_code=resp.status,
