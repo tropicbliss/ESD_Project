@@ -161,7 +161,7 @@ async fn create_comment(
         groomer_name: payload.groomer_name,
         id: cuid::cuid2(),
         message: message?,
-        rating: 5,
+        rating: payload.rating,
         title: title?,
         user_name: payload.user_name,
     };
