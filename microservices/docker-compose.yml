@@ -61,11 +61,9 @@ services:
     build:
       context: stripe
     restart: always
-    ports:
-      - 5001:5000
     environment:
       STRIPE_API_KEY: sk_test_51MjbeMLUyNHnHR56ghODyP72NgDWRampHyhFefBv9tP6xCc9ySabM2BipAaCnl6vfjDY6o97LWgeztMcyxy19SBF00yJjf0L6H
-      YOUR_DOMAIN: http://localhost:5000
+      YOUR_DOMAIN: http://localhost:5002
       PORT: 5000
   orchestrator:
     build:

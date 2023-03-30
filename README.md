@@ -11,8 +11,6 @@
 
 ## Exposed ports
 
-- `5000`: Main orchestrator
-- `5001`: Stripe microservice
 - `15672`: RabbitMQ admin panel
 - `1337`: Konga
-- `8000`: Kong
+- `8000`: Kong/everything that is not an admin panel
