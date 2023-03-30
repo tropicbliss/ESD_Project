@@ -96,7 +96,6 @@ rel='stylesheet'integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3y
 	  },
 	  methods: {
 		createUser() {
-			console.log('function called');
 		  fetch("http://localhost:5000/user/create", {
 			method: 'POST',
 			headers: {
@@ -105,6 +104,10 @@ rel='stylesheet'integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3y
 			body: JSON.stringify(this.user)
 		  })
 		  .then(response => {
+			if(response.ok){
+				console.log('function called');
+				window.location.href = '../index.html'
+			}
 			if (!response.ok) {
 				console.log('Failed');
 			  throw new Error('Failed to create user');
