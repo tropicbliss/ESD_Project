@@ -1,9 +1,9 @@
 const express = require("express");
-const PORT = 5000;
+const PORT = parseInt(process.env.PORT);
 
 const app = express();
 app.use(express.static("public"));
 
-app.listen(Number(PORT), "127.0.0.1", () => {
+app.listen(Number(PORT), "0.0.0.0", () => {
   console.log(`Censorer listening on port ${PORT}`);
 });
