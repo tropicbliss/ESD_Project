@@ -381,7 +381,7 @@
         const app2 = Vue.createApp({
             data() {
                 return {
-                    listOfFutureApp: [],
+                    listOfCurrentApp: [],
     
                 };
             },
@@ -389,12 +389,12 @@
         
                 findGroomerApp () {
                     const response =
-                        fetch(future_rev_URL)
+                        fetch(current_rev_URL)
                             .then(response => response.json())
                             .then(data => {
                                 console.log(response)
-                                this.listOfFutureApp = data
-                                console.log(this.listOfFutureApp)
+                                this.listOfCurrentApp = data
+                                console.log(this.listOfCurrentApp)
                                 
                             })
                             .catch(error => {
@@ -406,7 +406,7 @@
     
                 }, totalCurrentRev(){
                     currentRev =0 
-                    for(each of this.listOfFutureApp){
+                    for(each of this.listOfCurrentApp){
                         console.log(each)
                         currentRev += each['totalPrice']
                     }

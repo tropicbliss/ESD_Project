@@ -360,7 +360,9 @@
           <!-- Show Groomer's Review after click See the Review  -->
           <div v-show="display=='Review'">
             <section style="background-color: #ffffff;">
+
               <div class="container py-3">
+                <!-- Nav Bar -->
                 <div class="row">
                   <div class="col">
                     <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
@@ -373,6 +375,7 @@
                   </div>
                 </div>
 
+                <!-- Send Review -->
                 <div>
                   <div v-show="reviewSend == true" class="alert alert-success" role="alert">
                     Review added! Please refresh the page to check your review!
@@ -403,8 +406,6 @@
                         </select>
                       </div>
 
-                      <div>{{reviewRating}}</div>
-
                       <div class="input-group mb-3">
                         <span class="input-group-text">Add your message here</span>
                         <textarea v-model="reviewMsg" class="form-control" aria-label="Message"></textarea>
@@ -414,6 +415,7 @@
                     </div>
                   </div>
                 </div>
+
                 <!-- Reviews Cards -->
                 <div v-for="review in reviews" class="card mt-3">
                   <div class="card-header">
@@ -428,6 +430,7 @@
                   </div>
                 </div> 
               </div>
+              
             </section>
           </div>
         </div>
