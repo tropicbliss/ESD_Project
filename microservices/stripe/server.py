@@ -93,7 +93,7 @@ def cpf():
 def finish_liao():
     global id
     payment_intent = stripe.checkout.Session.retrieve(id).payment_intent
-    return jsonify(payment_intent=payment_intent)
+    return redirect(YOUR_DOMAIN + '/index.html')
 
 
 @app.route('/create-checkout-session', methods=['POST'])
@@ -122,8 +122,8 @@ def create_checkout_session():
         checkout_session = stripe.checkout.Session.create(
             line_items=line_items,
             mode='payment',
-            success_url=YOUR_DOMAIN + '/stripe_success/success.html',
-            cancel_url=YOUR_DOMAIN + '/stripe_success/cancel.html',
+            success_url=YOUR_DOMAIN + '/index.html',
+            cancel_url=YOUR_DOMAIN + '/stripe_success/success.html',
             discounts=[{"coupon": "d1LybAG0"}],
         )
         # Return session ID to client
@@ -138,35 +138,35 @@ def create_checkout_session():
         return redirect(checkout_session.url, code=303)
 
 
-@app.route('/stripe_webhooks', methods=['POST'])
-def webhook():
-    event = None
-    try:
-        # Verify the signature of the incoming webhook request
-        payload = request.data
-        sig_header = request.headers.get('Stripe-Signature', None)
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, stripe.api_key
-        )
-    except ValueError as e:
-        # Invalid payload or signature
-        return jsonify(error=str(e)), 400
-    except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
-        return jsonify(error=str(e)), 400
+# @app.route('/stripe_webhooks', methods=['POST'])
+# def webhook():
+#     event = None
+#     try:
+#         # Verify the signature of the incoming webhook request
+#         payload = request.data
+#         sig_header = request.headers.get('Stripe-Signature', None)
+#         event = stripe.Webhook.construct_event(
+#             payload, sig_header, stripe.api_key
+#         )
+#     except ValueError as e:
+#         # Invalid payload or signature
+#         return jsonify(error=str(e)), 400
+#     except stripe.error.SignatureVerificationError as e:
+#         # Invalid signature
+#         return jsonify(error=str(e)), 400
 
-    # Handle the event
-    if event.type == 'payment_intent.succeeded':
-        print(f"Payment succeeded: {event['data']['object']['id']}")
-        return render_template('success_webhook.html', event_json=json.dumps(event))
-    elif event.type == 'charge.failed':
-        # Do something when a charge fails
-        print(f"Charge failed for charge id: {event.data.object.id}")
-        return render_template('success_webhook.html', event_json=json.dumps(event))
-    else:
-        print('Unhandled event type {}'.format(event['type']))
+#     # Handle the event
+#     if event.type == 'payment_intent.succeeded':
+#         print(f"Payment succeeded: {event['data']['object']['id']}")
+#         return render_template('success_webhook.html', event_json=json.dumps(event))
+#     elif event.type == 'charge.failed':
+#         # Do something when a charge fails
+#         print(f"Charge failed for charge id: {event.data.object.id}")
+#         return render_template('success_webhook.html', event_json=json.dumps(event))
+#     else:
+#         print('Unhandled event type {}'.format(event['type']))
 
-    return jsonify(success=True), 200
+#     return jsonify(success=True), 200
 
 
 @app.route('/create-product', methods=['POST'])
@@ -201,7 +201,7 @@ def make_refund():
         print(payment_intent)
         stripe.Refund.create(payment_intent=payment_intent)
     except Exception as e:
-        return str(e)
+        return jsonify(error=str(e)), 500
     return "success"
 
 # @app.route('/edit-product', methods=['POST'])
