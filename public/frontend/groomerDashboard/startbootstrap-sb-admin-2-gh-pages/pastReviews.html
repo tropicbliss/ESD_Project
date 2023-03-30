@@ -160,20 +160,25 @@
                    
                     <div id="app">
                     <!-- Content Row -->
+                    <div> 
+                        <h4>Past reviews you have gotten </h4>
+                    </div>
                         <div class="row">
 
                             
-                            <div class="col-lg-6" v-for="each in listOfReviews">
+                            <div class="col-lg-6 mb-2" v-for="each in listOfReviews">
                         
                                 <div class="card position-relative" >
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"> Past reviews you have gotten </h6>
+                                        <h6 class="m-0 font-weight-bold text-primary"> {{each.title}}</h6>
                                     </div>
                                     <div class="card-body">
-                                        <p>{{each.title}}</p>
-                                        <p>{{each.userName}}</p>
+            
+                                        <p><span class="font-weight-bold">Reviewer: </span> {{each.userName}}</p>
+                                        <p><span class="font-weight-bold">Rating: </span>{{each.rating}}</p>
+                                        <hr>
                                         <p>{{each.message}}</p>
-                                        <p>{{each.rating}}</p>
+
                                     
                                     </div>
 
@@ -257,7 +262,7 @@
     
     
         }, created(){
-            this.listOfReviews()
+            this.getAllReviews()
         }
     });
     const vm = app.mount('#app');

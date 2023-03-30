@@ -157,29 +157,32 @@
                     <!-- Page Heading -->
                     <h1 class="h3 mb-1 text-gray-800"> Current appointments</h1>
                    
-                    <div id="app">
+                    <div id="app" v-if="{{listof
+                    }} != []">
                     <!-- Content Row -->
                         <div class="row">
 
                             
                             <div class="col-lg-6" v-for="each in listOfFutureApp">
                         
-                                <div class="card position-relative" v-if="currentDate() < each.endDate && currentDate() > each.startDate">
+                                <div class="card position-relative mb-2">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Appointment with {{each.userName}} </h6>
                                     </div>
                                     <div class="card-body">
                                         
                                         <!-- display each pet of each appointment -->
-                                        <div class="mb-0 small" v-for="pet in each.pets">
-                                            {{pet.petType}}
-                                            {{pet.name}}
-                                            {{pet.gender}}
-                                            {{pet.age}}
-                                            {{pet.medicalInfo}}
+                                        <div class="mb-1" v-for="pet in each.pets">
+                                            <p>Pet Type: {{pet.petType}}</p>
+                                            <p>Pet Name: {{pet.name}}</p>
+                                            <p>Pet Gender: {{pet.gender}}</p>
+                                            <p>Pet Age: {{pet.age}}</p>
+                                            <p>Pet Medical Info: {{pet.medicalInfo}}</p>
+                                            
                                         </div>
-                                        <p>{{each.priceTier}}</p>
-                                        <p>{{each.totalPrice}}</p>
+
+                                        <p>Price Tier: {{each.priceTier}}</p>
+                                        <p>Total Price Paid: {{each.totalPrice}}</p>
                                     
                                     </div>
 
@@ -189,6 +192,10 @@
                             </div>
 
                         </div>
+                    </div>
+
+                    <div v-else class="m-3">
+                        <h4>No current appointments</h4>
                     </div>
 
                 </div>
@@ -231,7 +238,7 @@
     <script src="js/sb-admin-2.min.js"></script>
 
 <script>
-    const get_groomer_app_URL = "http://localhost:5000/appointments/signin/Alice";
+    const get_groomer_app_URL = "http://localhost:5000/appointments/staying/Alice";
 
     const app = Vue.createApp({
         data() {
@@ -260,11 +267,6 @@
                         });
 
             },
-            currentDate() {
-                const current = new Date();
-                const date = `${current.getDate()}/${current.getMonth()+1}/${current.getFullYear()}`;
-                return date;
-            }
     
     
         }, created(){

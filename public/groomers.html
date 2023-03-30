@@ -1,13 +1,13 @@
+<!-- Currently hard coded thing: User Data coded as Alice(might need to get from login page)-->
+
 <!DOCTYPE html>
 <html>
 
 <head>
-  <!-- Basic -->
+  <!-- Site Configure -->
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <!-- Mobile Metas -->
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Site Metas -->
   <meta name="keywords" content="" />
   <meta name="description" content="" />
   <meta name="author" content="" />
@@ -39,7 +39,8 @@
 
 <body>
   <div class="hero_area">
-    <!-- header section strats -->
+
+    <!-- start header section -->
     <header class="header_section">
       <div class="container-fluid">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
@@ -92,6 +93,7 @@
     <section>
       <div class="container">
         <div id="app">
+          <!-- Groomer List Page -->
           <div v-if="display=='listGroomer'">
             <h2 class="mt-5">
               Discover Our <span style="color:rgb(0, 201, 241)">Groomers</span>
@@ -147,6 +149,7 @@
               </div>
             </div>
           </div>
+          <!-- Show Specific Groomer after click View Groomer -->
           <div v-show="display=='Groomer'">
             <section style="background-color: #ffffff;">
               <div class="container py-3">
@@ -212,10 +215,14 @@
                           <div class="col-sm-8">
                             <p class="text-muted mb-0">{{disPetsAccpt}}</p>
                           </div>
-                        </div>
+                        </div>             
                       </div>
                     </div>
-      
+                    <div class="row">
+                      <div class="col-lg-6">
+                        <button type="button" class="btn btn-success" v-on:click="goReview()">See the reviews</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
       
@@ -350,16 +357,100 @@
               </div>
             </section>
           </div>
+          <!-- Show Groomer's Review after click See the Review  -->
+          <div v-show="display=='Review'">
+            <section style="background-color: #ffffff;">
+
+              <div class="container py-3">
+                <!-- Nav Bar -->
+                <div class="row">
+                  <div class="col">
+                    <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
+                      <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="groomers.html">Groomers</a></li>
+                        <li class="breadcrumb-item"><a href="#" v-on:click="goGroomer()">Groomer Profile</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Review</li>
+                      </ol>
+                    </nav>
+                  </div>
+                </div>
+
+                <!-- Send Review -->
+                <div>
+                  <div v-show="reviewSend == true" class="alert alert-success" role="alert">
+                    Review added! Please refresh the page to check your review!
+                  </div>
+                  <div v-show="reviewSend == false" class="alert alert-danger" role="alert">
+                    Sorry! You can only make reviews after the groomer service...
+                  </div>
+                  <p>
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                      Send Your Review
+                    </button>
+                  </p>
+                  <div class="collapse" id="collapseExample">
+                    <div class="card card-body">
+                      <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Title</span>
+                        <input v-model="reviewTitle" type="text" class="form-control" placeholder="Add your title here" aria-label="Title" aria-describedby="basic-addon1">
+                      </div>
+
+                      <div class="input-group mb-3">
+                        <label class="input-group-text" for="inputGroupSelect01">Ratings</label>
+                        <select v-model="reviewRating" class="form-select" id="inputGroupSelect01">
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                        </select>
+                      </div>
+
+                      <div class="input-group mb-3">
+                        <span class="input-group-text">Add your message here</span>
+                        <textarea v-model="reviewMsg" class="form-control" aria-label="Message"></textarea>
+                      </div>
+
+                      <button type="button" class="btn btn-outline-dark" v-on:click="sendReview()">Send</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Reviews Cards -->
+                <div v-for="review in reviews" class="card mt-3">
+                  <div class="card-header">
+                    {{review.title}}
+                    <span class="ms-5 checked">Rating: </span><span v-for="n in review.rating" class="fa fa-star checked"></span>
+                  </div>
+                  <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                      <p>{{review.message}}</p>
+                      <footer class="blockquote-footer">From <cite title="Source Title">{{review.userName}}</cite></footer>
+                    </blockquote>
+                  </div>
+                </div> 
+              </div>
+              
+            </section>
+          </div>
         </div>
 
+        <!-- START Vue APP JS Part -->
         <script>
-            const get_all_URL = "http://localhost:5000/groomer/read";
-            const search_URL = "http://localhost:5000/groomer/search/keyword";  
+
+            const get_all_URL = "http://localhost:5000/groomer/read"
+            const search_URL = "http://localhost:5000/groomer/search/keyword"
             const checkout_URL = "http://localhost:5000/checkout"   
+            const review_URL = "http://localhost:5000/comments/read"
+            const create_review_URL = "http://localhost:5000/comments/create"
+            
             const app = Vue.createApp({
                 data() {
                     return {
                       groomers: [],
+                      reviews: [],
+                      reviewSend: 'nothing',
+                      reviewTitle: '', reviewMsg: '', reviewRating: '',
                       message: "There is a problem retrieving groomers data, please try again later.",
                       petTypes: ['Birds', 'Hamsters', 'Cats', 'Dogs', 'Rabbits', 'GuineaPigs', 'Chinchillas', 'Mice', 'Fishes'],
                       selected: '',
@@ -372,17 +463,76 @@
                       cpetType: '', cname:'', cgender:'', cage:'', cmediInfo:'', cStart:'', cEnd:''
                     }
                 },
-                // created() { // created is a hook that executes as soon as Vue instance is created
-                //     axios.get('#') 
-                //     .then(response => {
-                //         // this gets the all groomers
-                //         console.log(response.data)
-                //         this.posts = response.data
-                //     })
-                //     .catch(error => {
-                //         this.posts = [{ entry: 'There was an error: ' + error.message }]
-                //     })p
+
                 methods: {
+                  goReview(){
+                    this.display = "Review"
+                    this.getReviews()
+                  },
+                  goGroomer(){
+                    this.display = "Groomer"
+                  },
+                  getReviews(){
+                    const response =
+                        fetch(`${review_URL}/${this.disName}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    this.reviews = data;
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                  },
+                  sendReview(){
+                    console.log(this.reviewRating)
+                    let jsonData = JSON.stringify(
+                      {
+                        groomerName: this.disName,
+                        userName: "Hi",
+                        title: this.reviewTitle,
+                        message: this.reviewMsg,
+                        rating: this.reviewRating
+                      }
+                      );
+
+                    const response =
+                        fetch(create_review_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    this.reviewSend = true;
+                                    this.reviewTitle = '';
+                                    this.reviewMsg = '';
+                                    this.reviewRating = '';
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+                                this.reviewSend = false;
+
+                            });
+                  },
                   updateCStart(event) {
                     this.cStart = event.target.value;
                   },
@@ -668,6 +818,7 @@
                     this.disPetsAccpt = accept
                   },
               },
+              
                 created () {
                   // on Vue instance created, load the book list
                   this.getAllGroomers();
@@ -695,9 +846,11 @@
                   }
               }
             })
-
             app.mount('#app')
+
         </script> 
+        <!-- END Vue APP JS Part -->
+
       </div>
     </section>
     <!-- end Pet Groomer Display -->
@@ -756,10 +909,11 @@
     <!-- footer section -->
   </div>
 
+  <!-- JS Lib Used -->
   <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-  <!-- Vanilla Datepicker JS -->
   <script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
   <script src="./js/groomer.js"></script>
+  
 </body>
 </html>
