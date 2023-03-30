@@ -8,8 +8,8 @@
 4. This step will take a while (up to 10 minutes).
 5. Run `docker compose up -d`.
 6. Navigate to `http://localhost:1337` and sign up for an account.
-7. Click "Snapshots" on the left panel.
-8. Click on "Import from file", and import `snapshot.json` from the respository's root directory.
+7. Click on "snapshots" in the left panel.
+8. Click on "import from file", and import `snapshot.json` from the respository's root directory.
 9. Click on "details", and click "restore".
 10. Go to `http://localhost:8000/backend/docs` for documentation, and `http://localhost:8000` for the frontend homepage.
 
