@@ -21,9 +21,7 @@ import stripe
 
 stripe.api_key = os.getenv('STRIPE_API_KEY')
 
-app = Flask(__name__,
-            static_url_path='',
-            # static_folder='../../public')
+app = Flask(__name__)
 app.config['SECRET_KEY'] = 'very_secret_deh'
 CORS(app)
 # app.debug = True
