@@ -69,8 +69,6 @@ services:
     build:
       context: orchestrator
     restart: always
-    ports:
-      - 5000:5000
     depends_on:
       - user
       - comments
@@ -144,3 +142,9 @@ services:
       - "1337:1337"
     volumes:
       - kongadata:/app/kongadata
+  frontend:
+    build:
+      context: ../frontend
+    restart: always
+    environment:
+      PORT: 5000
