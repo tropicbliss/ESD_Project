@@ -116,3 +116,7 @@ class AppointmentUpdate(BaseModel):
 class MonthYear(BaseModel):
     month: int
     year: int
+
+
+class Refund(BaseModel):
+    appointmentId: str

@@ -3,7 +3,7 @@ use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post},
+    routing::{delete, get, post},
     Json, Router,
 };
 use futures::{stream, StreamExt, TryStreamExt};
@@ -55,6 +55,9 @@ async fn main() -> Result<()> {
         .route("/quantity", post(get_quantity))
         .route("/get/:id", post(get_appointments_in_month))
         .route("/update/:id", post(update_appointment_date))
+        .route("/transaction/:id", post(get_appointment))
+        .route("/delete/:id", delete(delete_appointment))
+        .route("/groomer/:id", get(get_all_groomer_appointments))
         .with_state(shared_state);
     let addr = std::env::var("ADDR").unwrap_or_else(|_| "127.0.0.1:3000".into());
     let addr: SocketAddr = addr.parse()?;
@@ -116,6 +119,7 @@ struct Appointment {
     pets: Vec<Pet>,
     total_price: f64,
     price_tier: String,
+    transaction_id: String,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -171,6 +175,82 @@ async fn get_quantity(
         .flatten()
         .count();
     Ok(Json(CheckAddOutput { day_length: days }))
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RefundOutput {
+    transaction_id: String,
+}
+
+async fn get_appointment(
+    Path(appointment_id): Path<String>,
+    state: State<SharedState>,
+) -> Result<Json<RefundOutput>, ApiError> {
+    let user = state
+        .appointments
+        .find_one(doc! {"id": appointment_id}, None)
+        .await
+        .map_err(|_| ApiError::InternalError)?;
+    if let Some(user) = user {
+        Ok(Json(RefundOutput {
+            transaction_id: user.transaction_id,
+        }))
+    } else {
+        Err(ApiError::AppointmentDoesNotExist)
+    }
+}
+
+async fn delete_appointment(
+    Path(appointment_id): Path<String>,
+    state: State<SharedState>,
+) -> Result<StatusCode, ApiError> {
+    let user = state
+        .appointments
+        .delete_one(doc! {"id": appointment_id}, None)
+        .await
+        .map_err(|e| e.kind)
+        .map_err(|_| ApiError::InternalError)?;
+    if user.deleted_count == 0 {
+        Err(ApiError::AppointmentDoesNotExist)
+    } else {
+        Ok(StatusCode::OK)
+    }
+}
+
+async fn get_all_groomer_appointments(
+    Path(groomer_name): Path<String>,
+    state: State<SharedState>,
+) -> Result<Json<Vec<SignInOutput>>, ApiError> {
+    if !does_groomer_exist(&state.http, &groomer_name).await? {
+        return Err(ApiError::GroomerDoesNotExist);
+    }
+    let filter = doc! {
+        "groomer_name": groomer_name
+    };
+    let res = state.appointments.find(filter, None).await.unwrap();
+    let res: Vec<_> = res.try_collect().await.unwrap();
+    let res = res
+        .into_iter()
+        .map(|app| {
+            let pets = app
+                .pets
+                .into_iter()
+                .map(|e| e.try_into())
+                .collect::<Result<Vec<_>, _>>()
+                .unwrap();
+            SignInOutput {
+                end_date: app.end_date.try_to_rfc3339_string().unwrap(),
+                id: app.id,
+                pets,
+                start_date: app.start_date.try_to_rfc3339_string().unwrap(),
+                user_name: app.user_name,
+                total_price: app.total_price,
+                price_tier: app.price_tier,
+            }
+        })
+        .collect();
+    Ok(Json(res))
 }
 
 async fn get_user(
@@ -309,6 +389,9 @@ async fn get_appointments_in_month(
                         },
                         payload.year
                     ]
+                },
+                {
+                    "groomer_name": groomer_name
                 }
             ]
         }
@@ -548,6 +631,7 @@ struct CreateInput {
     total_price: f64,
     start_time: String,
     end_time: String,
+    transaction_id: String,
 }
 
 #[derive(Serialize)]
@@ -649,6 +733,7 @@ async fn create_appointment(
         user_name: payload.user_name,
         total_price: payload.total_price,
         price_tier: payload.price_tier,
+        transaction_id: payload.transaction_id,
     };
     state
         .appointments

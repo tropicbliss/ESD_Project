@@ -231,6 +231,17 @@ async def get_staying_customers(groomer_name: str):
                                 detail=json["message"])
 
 
+@app.get("/appointments/groomer/{groomer_name}", status_code=200, response_model=list[output.CustomerAppointments], responses={500: {"model": output.Error}, 404: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
+async def get_all_groomer_appointments(groomer_name: str):
+    async with HttpClient.get_client().get(f"http://appointments:5000/groomer/{groomer_name}") as resp:
+        json = await resp.json()
+        if resp.ok:
+            return json
+        else:
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+
+
 @app.post("/appointments/get/{groomer_name}", status_code=200, response_model=list[output.CustomerAppointments], responses={500: {"model": output.Error}, 404: {"model": output.Error}}, description="If you want to search a keyword or name with a space, replace the space with %20")
 async def get_appointments_by_month(groomer_name: str, time: input.MonthYear):
     async with HttpClient.get_client().post(f"http://appointments:5000/get/{groomer_name}", json=vars(time)) as resp:
@@ -306,13 +317,36 @@ async def checkout(checkout: input.Checkout):
         if resp.ok:
             json = await resp.json()
             checkout_url = json["checkout_url"]
+            transaction_id = json["id"]
         else:
             raise HTTPException(status_code=resp.status,
                                 detail="internal server error")
     # create appointment entry
-    async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": [vars(pet) for pet in checkout.pets], "priceTier": checkout.priceTier, "totalPrice": pricing * number_of_days, "startTime": checkout.startTime, "endTime": checkout.endTime}) as resp:
+    async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": [vars(pet) for pet in checkout.pets], "priceTier": checkout.priceTier, "totalPrice": pricing * number_of_days, "startTime": checkout.startTime, "endTime": checkout.endTime, "transactionId": transaction_id}) as resp:
         if not resp.ok:
             json = await resp.json()
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
     return {"checkoutUrl": checkout_url}
+
+
+@app.post("/refund", status_code=200, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
+async def refund(refund: input.Refund):
+    # get the transaction id from the appointment id
+    async with HttpClient.get_client().post(f"http://appointments:5000/transaction/{refund.appointmentId}") as resp:
+        json = await resp.json()
+        if resp.ok:
+            transaction_id = json["transactionId"]
+        else:
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
+    # refund the customer
+    async with HttpClient.get_client().post("http://stripe:5000/make-refund", json={"id": transaction_id}) as resp:
+        if not resp.ok:
+            raise HTTPException(status_code=resp.status,
+                                detail="internal server error")
+    # delete the appointment
+    async with HttpClient.get_client().delete(f"http://appointments:5000/delete/{refund.appointmentId}") as resp:
+        if not resp.ok:
+            raise HTTPException(status_code=resp.status,
+                                detail=json["message"])
