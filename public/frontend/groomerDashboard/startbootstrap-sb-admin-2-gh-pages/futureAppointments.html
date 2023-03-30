@@ -165,22 +165,24 @@
                             
                             <div class="col-lg-6" v-for="each in listOfFutureApp">
                         
-                                <div class="card position-relative">
+                                <div class="card position-relative mb-2" >
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Appointment with {{each.userName}} </h6>
                                     </div>
                                     <div class="card-body">
                                         
                                         <!-- display each pet of each appointment -->
-                                        <div class="mb-0 small" v-for="pet in each.pets">
-                                            {{pet.petType}}
-                                            {{pet.name}}
-                                            {{pet.gender}}
-                                            {{pet.age}}
-                                            {{pet.medicalInfo}}
+                                        <div class="mb-1" v-for="pet in each.pets">
+                                            <p>Pet Type: {{pet.petType}}</p>
+                                            <p>Pet Name: {{pet.name}}</p>
+                                            <p>Pet Gender: {{pet.gender}}</p>
+                                            <p>Pet Age: {{pet.age}}</p>
+                                            <p>Pet Medical Info: {{pet.medicalInfo}}</p>
+                                            
                                         </div>
-                                        <p>{{each.priceTier}}</p>
-                                        <p>{{each.totalPrice}}</p>
+
+                                        <p>Price Tier: {{each.priceTier}}</p>
+                                        <p>Total Price Paid: {{each.totalPrice}}</p>
                                     
                                     </div>
 

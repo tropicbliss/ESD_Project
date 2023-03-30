@@ -157,7 +157,8 @@
                     <!-- Page Heading -->
                     <h1 class="h3 mb-1 text-gray-800"> Current appointments</h1>
                    
-                    <div id="app">
+                    <div id="app" v-if="{{listof
+                    }} != []">
                     <!-- Content Row -->
                         <div class="row">
 
@@ -191,6 +192,10 @@
                             </div>
 
                         </div>
+                    </div>
+
+                    <div v-else class="m-3">
+                        <h4>No current appointments</h4>
                     </div>
 
                 </div>
@@ -233,7 +238,7 @@
     <script src="js/sb-admin-2.min.js"></script>
 
 <script>
-    const get_groomer_app_URL = "http://localhost:5000/appointments/signin/Alice";
+    const get_groomer_app_URL = "http://localhost:5000/appointments/staying/Alice";
 
     const app = Vue.createApp({
         data() {
