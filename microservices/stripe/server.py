@@ -122,7 +122,7 @@ def create_checkout_session():
         checkout_session = stripe.checkout.Session.create(
             line_items=line_items,
             mode='payment',
-            success_url=YOUR_DOMAIN + '/index.html',
+            success_url=YOUR_DOMAIN + '/stripe_success/success.html',
             cancel_url=YOUR_DOMAIN + '/stripe_success/success.html',
             discounts=[{"coupon": "d1LybAG0"}],
         )
