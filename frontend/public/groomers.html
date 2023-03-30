@@ -94,10 +94,14 @@
       <div class="container">
         <div id="app">
           <!-- Groomer List Page -->
+          <div v-show="message!=''" class="alert alert-danger mt-3" role="alert">
+            {{message}}
+          </div>   
+
           <div v-if="display=='listGroomer'">
             <h2 class="mt-5">
               Discover Our <span style="color:rgb(0, 201, 241)">Groomers</span>
-            </h2>
+            </h2>         
 
             <div class="row d-flex justify-content-center">
                 <div class="col-md-12">
@@ -119,9 +123,6 @@
                             </div>
                         </div>
                         <div class="mt-2">   
-                          <!-- <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" class="advanced">
-                          Advance Search <i class="fa fa-angle-down"></i>
-                          </a> -->
                           <p>
                             <a class="advanced px-5" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
                               Filter <i class="bi bi-funnel"></i>
@@ -451,7 +452,7 @@
                       reviews: [],
                       reviewSend: 'nothing',
                       reviewTitle: '', reviewMsg: '', reviewRating: '',
-                      message: "There is a problem retrieving groomers data, please try again later.",
+                      message: '',
                       petTypes: ['Birds', 'Hamsters', 'Cats', 'Dogs', 'Rabbits', 'GuineaPigs', 'Chinchillas', 'Mice', 'Fishes'],
                       selected: '',
                       display: 'listGroomer',
@@ -556,8 +557,7 @@
                             .then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                                if (data.code === 400) {
-                                    // no book in db
+                                if (data.hasOwnProperty('detail')) { //return data as an error
                                     this.message = data.detail;
                                 } else {
                                     this.groomers = data.result;
