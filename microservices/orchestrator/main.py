@@ -331,9 +331,9 @@ async def checkout(checkout: input.Checkout):
 
 
 @app.post("/refund", status_code=200, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
-async def refund(refund: input.Refund):
+async def refund(appointment_id: str):
     # get the transaction id from the appointment id
-    async with HttpClient.get_client().post(f"http://appointments:5000/transaction/{refund.appointmentId}") as resp:
+    async with HttpClient.get_client().get(f"http://appointments:5000/transaction/{appointment_id}") as resp:
         json = await resp.json()
         if resp.ok:
             transaction_id = json["transactionId"]
@@ -346,7 +346,7 @@ async def refund(refund: input.Refund):
             raise HTTPException(status_code=resp.status,
                                 detail="internal server error")
     # delete the appointment
-    async with HttpClient.get_client().delete(f"http://appointments:5000/delete/{refund.appointmentId}") as resp:
+    async with HttpClient.get_client().delete(f"http://appointments:5000/delete/{appointment_id}") as resp:
         if not resp.ok:
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])

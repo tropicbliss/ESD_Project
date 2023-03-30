@@ -55,7 +55,7 @@ async fn main() -> Result<()> {
         .route("/quantity", post(get_quantity))
         .route("/get/:id", post(get_appointments_in_month))
         .route("/update/:id", post(update_appointment_date))
-        .route("/transaction/:id", post(get_appointment))
+        .route("/transaction/:id", get(get_appointment))
         .route("/delete/:id", delete(delete_appointment))
         .route("/groomer/:id", get(get_all_groomer_appointments))
         .with_state(shared_state);
