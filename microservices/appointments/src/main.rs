@@ -228,8 +228,15 @@ async fn get_all_groomer_appointments(
     let filter = doc! {
         "groomer_name": groomer_name
     };
-    let res = state.appointments.find(filter, None).await.unwrap();
-    let res: Vec<_> = res.try_collect().await.unwrap();
+    let res = state
+        .appointments
+        .find(filter, None)
+        .await
+        .map_err(|_| ApiError::InternalError)?;
+    let res: Vec<_> = res
+        .try_collect()
+        .await
+        .map_err(|_| ApiError::InternalError)?;
     let res = res
         .into_iter()
         .map(|app| {
@@ -396,8 +403,15 @@ async fn get_appointments_in_month(
             ]
         }
     };
-    let res = state.appointments.find(filter, None).await.unwrap();
-    let res: Vec<_> = res.try_collect().await.unwrap();
+    let res = state
+        .appointments
+        .find(filter, None)
+        .await
+        .map_err(|_| ApiError::InternalError)?;
+    let res: Vec<_> = res
+        .try_collect()
+        .await
+        .map_err(|_| ApiError::InternalError)?;
     let res = res
         .into_iter()
         .map(|app| {
@@ -429,8 +443,15 @@ async fn get_arriving_customers(
         return Err(ApiError::GroomerDoesNotExist);
     }
     let filter = doc! {"groomer_name": groomer_name, "status": "awaiting"};
-    let res = state.appointments.find(filter, None).await.unwrap();
-    let res: Vec<_> = res.try_collect().await.unwrap();
+    let res = state
+        .appointments
+        .find(filter, None)
+        .await
+        .map_err(|_| ApiError::InternalError)?;
+    let res: Vec<_> = res
+        .try_collect()
+        .await
+        .map_err(|_| ApiError::InternalError)?;
     let res = res
         .into_iter()
         .map(|app| {
