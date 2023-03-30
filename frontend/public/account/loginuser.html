@@ -95,7 +95,7 @@ rel='stylesheet'integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3y
 			  },
 			  methods: {
 				login() {
-				  fetch(`http://localhost:5000/user/read/${this.name}`)
+				  fetch(`http://localhost:8000/backend/user/read/${this.name}`)
 					.then((response) => response.json())
 					.then((data) => {
 					  if (data.email === this.email) {
