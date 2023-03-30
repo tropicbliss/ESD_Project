@@ -11,7 +11,6 @@ import json
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, RadioField, SelectField, IntegerField
 from wtforms.validators import InputRequired, NumberRange, ValidationError
-from flask_cors import CORS
 
 import stripe
 # This is a public sample test API key.
@@ -23,7 +22,6 @@ stripe.api_key = os.getenv('STRIPE_API_KEY')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'very_secret_deh'
-CORS(app)
 # app.debug = True
 # YOUR_DOMAIN = "http://localhost:4242"
 YOUR_DOMAIN = os.getenv("YOUR_DOMAIN")

@@ -7,7 +7,7 @@
 3. Run `docker compose build`.
 4. This step will take a while (up to 10 minutes).
 5. Run `docker compose up -d`.
-6. Go to `http://localhost:5000/docs` for documentation.
+6. Go to `http://localhost:8000/backend/docs` for documentation.
 
 ## Exposed ports
 

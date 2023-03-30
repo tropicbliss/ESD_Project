@@ -57,10 +57,7 @@ async def lifespan(_: FastAPI):
     yield
     await HttpClient.close()
 
-app = FastAPI(lifespan=lifespan, openapi_url="/backend/openapi.json")
-
-app.add_middleware(CORSMiddleware, allow_origins=[
-                   "*"], allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
+app = FastAPI(lifespan=lifespan, root_path="/backend")
 
 
 @app.post("/user/create", status_code=201, responses={400: {"model": output.Error}})
