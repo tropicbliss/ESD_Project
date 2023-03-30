@@ -1,0 +1,919 @@
+<!-- Currently hard coded thing: User Data coded as Alice(might need to get from login page)-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Site Configure -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="keywords" content="" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+
+  <title>Pawsitively Pampered | Groomers</title>
+
+  <!-- slider stylesheet / groomer display stylesheet-->
+  <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.1.3/assets/owl.carousel.min.css" />
+  <link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+  <!-- Vue & axios & bootstrap -->
+  <script src="https://unpkg.com/vue@next"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
+  <!-- CSS style -->
+  <link href="https://fonts.googleapis.com/css?family=Dosis:400,500|Poppins:400,700&display=swap" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet" />
+  <link href="css/responsive.css" rel="stylesheet" />
+  <link href="css/groomers_display.css" rel="stylesheet" />
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css'> 
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/css/datepicker.min.css'>
+  <link rel="stylesheet" href="https://cdn.lineicons.com/3.0/lineicons.css">
+</head>
+
+<body>
+  <div class="hero_area">
+
+    <!-- start header section -->
+    <header class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg custom_nav-container ">
+          <a class="navbar-brand" href="index.html">
+            <img src="images/logo.png" style="width: 70px; height: 70px;">
+            <span style="font-size: medium; margin-top: 0px;">
+              Pawsitively Pampered
+            </span>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="d-flex mx-auto flex-column flex-lg-row align-items-center">
+              <ul class="navbar-nav">
+                <li class="nav-item active">
+                  <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="groomers.html">Groomers </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="aboutus.html">About Us </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+              </ul>
+            </div>
+            <div class="quote_btn-container d-flex justify-content-center m">
+              <a href="account/loginuser.html">
+                Log In
+              </a>
+              <a>
+                /
+              </a>
+              <a href="account/registeruser.html">
+                Register
+              </a>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <!-- end header section -->
+    
+    <!-- Pet Groomer Display -->
+    <section>
+      <div class="container">
+        <div id="app">
+          <!-- Groomer List Page -->
+          <div v-if="display=='listGroomer'">
+            <h2 class="mt-5">
+              Discover Our <span style="color:rgb(0, 201, 241)">Groomers</span>
+            </h2>
+
+            <div class="row d-flex justify-content-center">
+                <div class="col-md-12">
+                    <div class="pb-1">
+                        <div class="row g-3 mt-2">
+
+                            <div class="col-md-6">
+                                <input type="text" v-model="keyword" class="form-control" placeholder="Enter the key word of the groomer you want to search">
+                            </div>
+        
+                            <div class="col-md-2">
+                                <button @click="keywordSearch()" class="btn btn-secondary btn-block">Search</button>
+                            </div>
+                            <div class="text-success" v-if="find">
+                              Founded! Here is the list of groomers as you requested. <span><button v-on:click="closeSearch()" type="button" class="mb-1 btn btn-warning btn-sm">Clear Search</button></span> <br>
+                            </div>
+                            <div class="text-danger" v-if="searErr!=''">
+                              There is a problem searching for the groomer(s)! Here is the full list of Groomers. {{ searErr }} <span><button v-on:click="closeSearch()" type="button" class="mb-1 btn btn-warning btn-sm">Clear Search</button></span>
+                            </div>
+                        </div>
+                        <div class="mt-2">   
+                          <!-- <a data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" class="advanced">
+                          Advance Search <i class="fa fa-angle-down"></i>
+                          </a> -->
+                          <p>
+                            <a class="advanced px-5" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                              Filter <i class="bi bi-funnel"></i>
+                            </a>
+                          </p>
+                          <div class="collapse" id="collapseExample">
+                              <div class="ps-5">
+                                <div class="form-check form-check-inline" v-for="petType in petTypes">
+                                  <input class="form-check-input" type="radio" name="inlineRadioOptions" v-bind:id="petType" v-bind:value="petType" v-model="selected" v-on:click="filter(petType)">
+                                  <label class="form-check-label" v-bind:for="petType">{{petType}}</label>
+                                </div>
+                                <span><button v-on:click="closeFilter()" type="button" class="mb-1 btn btn-warning btn-sm">Clear Filter</button></span>
+                              </div>
+                          </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+                    
+            <div class="container mt-2 buy_section">
+              <div class="row">
+                <blog-post v-for="(g,idx) in groomers" v-bind:key="idx" v-bind:grom="g" v-bind:pets_accept="g.acceptedPets" v-bind:name="g.name" v-bind:addr="g.address" v-bind:pic="g.pictureUrl" v-bind:contact_no="g.contactNo" v-bind:email="g.email" v-bind:pic="g.pictureUrl" v-bind:basic="g.basic" v-bind:premium="g.premium" v-bind:lux="g.luxury" v-on:show="onShow">
+                </blog-post>
+              </div>
+            </div>
+          </div>
+          <!-- Show Specific Groomer after click View Groomer -->
+          <div v-show="display=='Groomer'">
+            <section style="background-color: #ffffff;">
+              <div class="container py-3">
+                <div class="row">
+                  <div class="col">
+                    <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
+                      <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="groomers.html">Groomers</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">User Profile</li>
+                      </ol>
+                    </nav>
+                  </div>
+                </div>
+            
+                <div class="row">
+                  <div class="col-lg-4">
+                    <div class="card mb-4">
+                      <div class="card-body text-center">
+      
+                        <div v-html="elsePart">
+                        </div>
+                        <h5 class="my-3">{{disName}}</h5>
+                        <div class="d-flex justify-content-center mb-2">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+      
+                  <div class="col-lg-8">
+                    <div class="card mb-2">
+                      <div class="card-body">
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <p class="mb-0">Address</p>
+                          </div>
+                          <div class="col-sm-8">
+                            <p class="text-muted mb-0">{{disAddr}}</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <p class="mb-0">Contact Number</p>
+                          </div>
+                          <div class="col-sm-8">
+                            <p class="text-muted mb-0">{{disContactNo}}</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <p class="mb-0">Email</p>
+                          </div>
+                          <div class="col-sm-8">
+                            <p class="text-muted mb-0">{{disEmail}}</p>
+                          </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                          <div class="col-sm-4">
+                            <p class="mb-0">Accepted Pet Type(s)</p>
+                          </div>
+                          <div class="col-sm-8">
+                            <p class="text-muted mb-0">{{disPetsAccpt}}</p>
+                          </div>
+                        </div>             
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-6">
+                        <button type="button" class="btn btn-success" v-on:click="goReview()">See the reviews</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+      
+                <div class="row">
+                  <div class="card mb-4">
+                    <div class="card-body">
+
+                        <h4 class="mb-2">Now, tell us something about your pet!</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="petType">Pet Type</label>
+                                <input v-model="cpetType" type="text" class="form-control" id="petType" placeholder="" required="">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="name">Pet Name</label>
+                                <input v-model="cname" type="text" class="form-control" id="name" placeholder="" required="">
+                                <div class="invalid-feedback"> Valid last name is required. </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="gender">Gender</label>
+                                <select v-model="cgender" class="form-select" aria-label="Default select example" id="gender">
+                                    <option selected value="male">male</option>
+                                    <option value="female">female</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="age">Age</label>
+                                <input v-model="cage" type="text" class="form-control" id="age" placeholder="" required="">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="medicalInfo">Medical Information</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Any Medical Details</span>
+                                <textarea v-model="cmediInfo" id="medicalInfo" class="form-control" aria-label="With textarea"></textarea>
+                              </div>
+                        </div>
+                        <h4 class="mb-2">What is your expected start and end time?</h4>
+                        <div class="row">
+                            <div class="col-md-12">
+                              <h6>Starting Date</h6>
+                              <div class="input-group mb-2">
+                                <i class="bi bi-calendar-date input-group-text"></i>
+                                <input v-model="cStart" ref="datepicker" @blur="updateCStart" type="text" class="datepicker_input form-control" placeholder="Choosing Your Starting Date!" required aria-label="Starting Date">
+                              </div>
+                              <h6>Ending Date</h6>
+                              <div class="input-group mb-1">
+                                <i class="bi bi-calendar-date input-group-text"></i>
+                                <input v-model="cEnd" ref="datepicker" @blur="updateCEnd" type="text" class="datepicker_input form-control" placeholder="Choosing Your Ending Date!" required aria-label="Ending Date">
+                              </div>
+                            </div>
+                        </div>
+                        <hr class="mb-3">
+
+                      <h4 class="mb-3">Choose your perfered price tier and ready to checkout!</h4>
+                      <section class="price_plan_area section_padding_130_80" id="pricing">
+                        <div class="container">
+                          <div class="row justify-content-center">
+                            <!-- Single Price Plan Area-->
+                            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                              <div class="single_price_plan wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                                <div class="title">
+                                  <h3>Basic</h3>
+                                  <p>Try the basic option!</p>
+                                  <div class="line"></div>
+                                </div>
+                                <div class="price">
+                                  <h4>${{disBasic}}</h4>
+                                </div>
+                                <div class="description">
+                                  <p><i class="lni lni-checkmark-circle"></i>Bath</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Brushing</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Nail Trimming</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Ear Cleaning</p>
+                                </div>
+                                <div class="button"><a class="btn btn-success btn-2" v-on:click="sendBasic()">Checkout</a></div>
+                              </div>
+                            </div>
+                            <!-- Single Price Plan Area-->
+                            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                              <div class="single_price_plan active wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                                <!-- Side Shape-->
+                                <div class="side-shape"><img src="https://bootdey.com/img/popular-pricing.png" alt=""></div>
+                                <div class="title"><span>Popular</span>
+                                  <h3>Premuim</h3>
+                                  <p>Try the most popular option!</p>
+                                  <div class="line"></div>
+                                </div>
+                                <div class="price">
+                                  <h4>${{disPremium}}</h4>
+                                </div>
+                                <div class="description">
+                                  <p><i class="lni lni-checkmark-circle"></i>All basic</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Teeth Cleaning</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Gland Expression</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Trimming of Paw Pads</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Sanitary Areas</p>
+                                </div>
+                                <div class="button"><a class="btn btn-warning" v-on:click="sendPremium()">Checkout</a></div>
+                              </div>
+                            </div>
+                            <!-- Single Price Plan Area-->
+                            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                              <div class="single_price_plan wow fadeInUp" data-wow-delay="0.2s" style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                                <div class="title">
+                                  <h3>Luxury</h3>
+                                  <p>Try the luxury service!</p>
+                                  <div class="line"></div>
+                                </div>
+                                <div class="price">
+                                  <h4>${{disLux}}</h4>
+                                </div>
+                                <div class="description">
+                                  <p><i class="lni lni-checkmark-circle"></i>All basic</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>All premium</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Customized Haircut</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Specialty Shampoos</p>
+                                  <p><i class="lni lni-checkmark-circle"></i>Conditioning Treatments</p>
+                                </div>
+                                <div class="button"><a class="btn btn-info" v-on:click="sendLuxury()">Checkout</a></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </div> 
+                </div>
+      
+              </div>
+            </section>
+          </div>
+          <!-- Show Groomer's Review after click See the Review  -->
+          <div v-show="display=='Review'">
+            <section style="background-color: #ffffff;">
+
+              <div class="container py-3">
+                <!-- Nav Bar -->
+                <div class="row">
+                  <div class="col">
+                    <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
+                      <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="groomers.html">Groomers</a></li>
+                        <li class="breadcrumb-item"><a href="#" v-on:click="goGroomer()">Groomer Profile</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Review</li>
+                      </ol>
+                    </nav>
+                  </div>
+                </div>
+
+                <!-- Send Review -->
+                <div>
+                  <div v-show="reviewSend == true" class="alert alert-success" role="alert">
+                    Review added! Please refresh the page to check your review!
+                  </div>
+                  <div v-show="reviewSend == false" class="alert alert-danger" role="alert">
+                    Sorry! You can only make reviews after the groomer service...
+                  </div>
+                  <p>
+                    <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                      Send Your Review
+                    </button>
+                  </p>
+                  <div class="collapse" id="collapseExample">
+                    <div class="card card-body">
+                      <div class="input-group mb-3">
+                        <span class="input-group-text" id="basic-addon1">Title</span>
+                        <input v-model="reviewTitle" type="text" class="form-control" placeholder="Add your title here" aria-label="Title" aria-describedby="basic-addon1">
+                      </div>
+
+                      <div class="input-group mb-3">
+                        <label class="input-group-text" for="inputGroupSelect01">Ratings</label>
+                        <select v-model="reviewRating" class="form-select" id="inputGroupSelect01">
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                        </select>
+                      </div>
+
+                      <div class="input-group mb-3">
+                        <span class="input-group-text">Add your message here</span>
+                        <textarea v-model="reviewMsg" class="form-control" aria-label="Message"></textarea>
+                      </div>
+
+                      <button type="button" class="btn btn-outline-dark" v-on:click="sendReview()">Send</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Reviews Cards -->
+                <div v-for="review in reviews" class="card mt-3">
+                  <div class="card-header">
+                    {{review.title}}
+                    <span class="ms-5 checked">Rating: </span><span v-for="n in review.rating" class="fa fa-star checked"></span>
+                  </div>
+                  <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                      <p>{{review.message}}</p>
+                      <footer class="blockquote-footer">From <cite title="Source Title">{{review.userName}}</cite></footer>
+                    </blockquote>
+                  </div>
+                </div> 
+              </div>
+              
+            </section>
+          </div>
+        </div>
+
+        <!-- START Vue APP JS Part -->
+        <script>
+
+            const get_all_URL = "http://localhost:5000/groomer/read"
+            const search_URL = "http://localhost:5000/groomer/search/keyword"
+            const checkout_URL = "http://localhost:5000/checkout"   
+            const review_URL = "http://localhost:5000/comments/read"
+            const create_review_URL = "http://localhost:5000/comments/create"
+            
+            const app = Vue.createApp({
+                data() {
+                    return {
+                      groomers: [],
+                      reviews: [],
+                      reviewSend: 'nothing',
+                      reviewTitle: '', reviewMsg: '', reviewRating: '',
+                      message: "There is a problem retrieving groomers data, please try again later.",
+                      petTypes: ['Birds', 'Hamsters', 'Cats', 'Dogs', 'Rabbits', 'GuineaPigs', 'Chinchillas', 'Mice', 'Fishes'],
+                      selected: '',
+                      display: 'listGroomer',
+                      elsePart: '',
+                      disName: '', disAddr:'', disContactNo:'', disEmail:'', disBasi:'', disBasic:'', disPremium:'', disLux:'', disPetsAccpt:'',           
+                      keyword: '',
+                      find: false,
+                      searErr: '',
+                      cpetType: '', cname:'', cgender:'', cage:'', cmediInfo:'', cStart:'', cEnd:''
+                    }
+                },
+
+                methods: {
+                  goReview(){
+                    this.display = "Review"
+                    this.getReviews()
+                  },
+                  goGroomer(){
+                    this.display = "Groomer"
+                  },
+                  getReviews(){
+                    const response =
+                        fetch(`${review_URL}/${this.disName}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    this.reviews = data;
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                  },
+                  sendReview(){
+                    console.log(this.reviewRating)
+                    let jsonData = JSON.stringify(
+                      {
+                        groomerName: this.disName,
+                        userName: "Hi",
+                        title: this.reviewTitle,
+                        message: this.reviewMsg,
+                        rating: this.reviewRating
+                      }
+                      );
+
+                    const response =
+                        fetch(create_review_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    this.reviewSend = true;
+                                    this.reviewTitle = '';
+                                    this.reviewMsg = '';
+                                    this.reviewRating = '';
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+                                this.reviewSend = false;
+
+                            });
+                  },
+                  updateCStart(event) {
+                    this.cStart = event.target.value;
+                  },
+                  updateCEnd(event) {
+                    this.cEnd = event.target.value;
+                  },
+                  getAllGroomers () {
+                    // on Vue instance created, load the Groomer List
+                    let jsonData = JSON.stringify({
+                    });
+                    const response =
+                        fetch(get_all_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    // no book in db
+                                    this.message = data.detail;
+                                } else {
+                                    this.groomers = data.result;
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+
+                },
+                  filter(petType) {
+                    let jsonData = JSON.stringify(
+                      {
+                        petType : petType
+                      });
+                      console.log(petType)
+                    const response =
+                        fetch(get_all_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    this.groomers = data.result;
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                  },
+                  keywordSearch() {
+                    this.searErr = ''
+                    this.find = false
+                    console.log(this.keyword);
+                    fetch(`${search_URL}/${this.keyword}`)
+                      .then(response => response.json())
+                      .then(data => {
+                        console.log(data)
+                        if(Array.isArray(data) && data.length!=0){
+                          this.groomers = data
+                          this.find = true
+                        }else{
+                          this.searErr = data.detail
+                          this.groomers = this.getAllGroomers()
+                          console.log(this.errMsg)
+                        }
+                      })
+                      .catch(error => {
+                          console.log("Problem in searching for a groomer. " + error);
+                      });
+                  },
+                  closeFilter() {
+                    this.getAllGroomers()
+                    document.getElementById(this.selected).checked = false
+                  },
+                  closeSearch() {
+                    this.getAllGroomers()
+                    this.keyword = ''
+                    this.find = false
+                    this.searErr = ''
+                  },
+                  sendBasic() {
+                    var start = this.cStart;
+                    console.log(start)
+                    const [day, month, year] = start.split("/");
+                    const isoStart = new Date(`${year}-${month}-${day}`).toISOString();
+                    console.log(isoStart);
+
+                    var end = this.cEnd;
+                    console.log(end)
+                    const [endday, endmonth, endyear] = end.split("/");
+                    const isoEnd = new Date(`${endyear}-${endmonth}-${endday}`).toISOString();
+                    console.log(isoEnd);
+
+                    let jsonData = JSON.stringify(
+                      {
+                        groomerName: this.disName,
+                        pets: [
+                          {
+                            petType: this.cpetType,
+                            name: this.cname,
+                            gender: this.cgender,
+                            age: this.cage,
+                            medicalInfo: this.cmediInfo
+                          }
+                        ],
+                        startTime: isoStart,
+                        endTime: isoEnd,
+                        userName: "Hi",
+                        priceTier: "basic"
+                      }
+                      );
+
+                    const response =
+                        fetch(checkout_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    window.location.replace(data.checkoutUrl);
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                  },          
+                  sendPremium() {
+                    var start = this.cStart;
+                    const [day, month, year] = start.split("/");
+                    const isoStart = new Date(`${year}-${month}-${day}`).toISOString();
+
+                    var end = this.cEnd;
+                    const [endday, endmonth, endyear] = end.split("/");
+                    const isoEnd = new Date(`${endyear}-${endmonth}-${endday}`).toISOString();
+
+                    let jsonData = JSON.stringify(
+                      {
+                        groomerName: this.disName,
+                        pets: [
+                          {
+                            petType: this.cpetType,
+                            name: this.cname,
+                            gender: this.cgender,
+                            age: this.cage,
+                            medicalInfo: this.cmediInfo
+                          }
+                        ],
+                        startTime: isoStart,
+                        endTime: isoEnd,
+                        userName: "Hi",
+                        priceTier: "premium"
+                      }
+                      );
+
+                    const response =
+                        fetch(checkout_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    window.location.replace(data.checkoutUrl);
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+                            });
+                  },  
+                  sendLuxury() {
+                    var start = this.cStart;
+                    const [day, month, year] = start.split("/");
+                    const isoStart = new Date(`${year}-${month}-${day}`).toISOString();
+
+                    var end = this.cEnd;
+                    const [endday, endmonth, endyear] = end.split("/");
+                    const isoEnd = new Date(`${endyear}-${endmonth}-${endday}`).toISOString();
+
+                    let jsonData = JSON.stringify(
+                      {
+                        groomerName: this.disName,
+                        pets: [
+                          {
+                            petType: this.cpetType,
+                            name: this.cname,
+                            gender: this.cgender,
+                            age: this.cage,
+                            medicalInfo: this.cmediInfo
+                          }
+                        ],
+                        startTime: isoStart,
+                        endTime: isoEnd,
+                        userName: "Hi",
+                        priceTier: "luxury"
+                      }
+                      );
+
+                    const response =
+                        fetch(checkout_URL,
+                            {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.code === 400) {
+                                    this.message = data.detail;
+                                } else {
+                                    window.location.replace(data.checkoutUrl);
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+                            });
+                  },  
+                          
+                  onShow: function (pets_accept, name, pic, addr, contact_no, email, basic, premium, lux) {
+                    this.display = 'Groomer';
+                    this.elsePart = `<img class="img-fluid" src="${pic}">`;
+                    this.disName=name; 
+                    this.disAddr=addr; 
+                    this.disContactNo=contact_no;
+                    this.disEmail=email; 
+                    this.disBasic=basic; 
+                    this.disPremium=premium;
+                    this.disLux=lux;
+                    const numbers = [45, 4, 9, 16, 25];
+                    let accept = "";
+                    pets_accept.forEach(myFunction);
+                    function myFunction(value, index, array) {
+                      accept += value + " ";
+                    }
+                    this.disPetsAccpt = accept
+                  },
+              },
+              
+                created () {
+                  // on Vue instance created, load the book list
+                  this.getAllGroomers();
+                }
+            });
+
+            app.component('blog-post', {
+                props: ['pets_accept', 'name', 'addr', 'contact_no', 'email', 'basic', 'premium', 'lux',  'pic'],
+                template: `    
+                      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                          <div class="our-team">
+                              <div class="picture">
+                                <img class="img-fluid" v-bind:src=pic >
+                              </div>
+                              <div class="team-content">
+                                <h3 style="color: #003366"><i class="bi bi-stars"></i>{{name}}<i class="bi bi-stars"></i></h3>
+                              </div>
+                              <a class="mt-2" style="border-radius: 8px;" href="#" v-on:click="showGroomerInfo()">Link</a>
+                          </div>
+                      </div>
+                `,
+                methods: {
+                  showGroomerInfo() {
+                      this.$emit('show',this.pets_accept, this.name, this.pic, this.addr, this.contact_no, this.email, this.basic, this.premium, this.lux);
+                  }
+              }
+            })
+            app.mount('#app')
+
+        </script> 
+        <!-- END Vue APP JS Part -->
+
+      </div>
+    </section>
+    <!-- end Pet Groomer Display -->
+
+    <!-- info section -->
+    <section class="info_section layout_padding2">
+      <div class="container">
+        <div class="info_items">
+          <a href="">
+            <div class="item ">
+              <div class="img-box box-1">
+                <img src="" alt="">
+              </div>
+              <div class="detail-box">
+                <p>
+                  Location: Singapore
+                </p>
+              </div>
+            </div>
+          </a>
+          <a href="">
+            <div class="item ">
+              <div class="img-box box-2">
+                <img src="" alt="">
+              </div>
+              <div class="detail-box">
+                <p>
+                  +65 1234567890
+                </p>
+              </div>
+            </div>
+          </a>
+          <a href="">
+            <div class="item ">
+              <div class="img-box box-3">
+                <img src="" alt="">
+              </div>
+              <div class="detail-box">
+                <p>
+                  pawstivelypampered@gmail.com
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+    <!-- end info_section -->
+
+    <!-- footer section -->
+    <section class="container-fluid footer_section">
+      <p>
+        &copy; ESD G5 T2-Barley
+      </p>
+    </section>
+    <!-- footer section -->
+  </div>
+
+  <!-- JS Lib Used -->
+  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+  <script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
+  <script src="./js/groomer.js"></script>
+  
+</body>
+</html>
