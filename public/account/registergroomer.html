@@ -209,6 +209,10 @@
 							body: JSON.stringify(this.groomer)
 						})
 						.then(response => {
+							if(response.ok){
+								console.log('function called');
+								window.location.href = '../index.html'
+							}
 							if (!response.ok) {
 								console.log('Failed');
 								throw new Error('Failed to create groomer');
