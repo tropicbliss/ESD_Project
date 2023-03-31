@@ -157,40 +157,38 @@
 
                     <!-- Page Heading -->
                     <h1 class="h3 mb-1 text-gray-800"> Past Reviews</h1>
-                   
+
+                 
                     <div id="app">
                     <!-- Content Row -->
-                    <div> 
-                        <h4>Past reviews you have gotten </h4>
-                    </div>
-                        <div class="row">
+                        <div v-if="listOfReviews == []" class="m-3"> You have no reviews currently </div>
+                        <div class="m-3" v-else > 
+                            <div>Past reviews you have gotten </div>
 
-                            
-                            <div class="col-lg-6 mb-2" v-for="each in listOfReviews">
-                        
-                                <div class="card position-relative" >
-                                    <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary"> {{each.title}}</h6>
+                            <div class="row">
+                                <div class="col-lg-6 mb-2" v-for="each in listOfReviews">
+                                    <div class="card position-relative" >
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary"> {{each.title}}</h6>
+                                        </div>
+                                        <div class="card-body">
+                
+                                            <p><span class="font-weight-bold">Reviewer: </span> {{each.userName}}</p>
+                                            <p><span class="font-weight-bold">Rating: </span>
+                                                <span v-for="x in each.rating" class="fa fa-star checked" style="color:orange"></span>
+                                            </p>
+                                            <hr>
+                                            <p>{{each.message}}</p>
+                                        </div>
+
                                     </div>
-                                    <div class="card-body">
-            
-                                        <p><span class="font-weight-bold">Reviewer: </span> {{each.userName}}</p>
-                                        <p><span class="font-weight-bold">Rating: </span>
-                                            <span v-for="x in each.rating" class="fa fa-star checked" style="color:orange"></span>
-                                        </p>
-                                        <hr>
-                                        <p>{{each.message}}</p>
-
-                                    
-                                    </div>
-
                                 </div>
-
-
                             </div>
-
+                            
                         </div>
                     </div>
+
+                    
 
                 </div>
                 <!-- /.container-fluid -->
@@ -232,7 +230,7 @@
     <script src="js/sb-admin-2.min.js"></script>
 
 <script>
-    const get_reviews_URL = "http://localhost:5000/comments/read/Alice";
+    const get_reviews_URL = "http://localhost:8000/backend/comments/read/Alice";
 
     const app = Vue.createApp({
         data() {
@@ -269,7 +267,7 @@
     });
     const vm = app.mount('#app');
 
-const get_groomer_name_URL = "http://localhost:5000/groomer/search/name/Alice";
+const get_groomer_name_URL = "http://localhost:8000/backend/groomer/search/name/Alice";
 
     const app2 = Vue.createApp({
         data() {
