@@ -481,7 +481,7 @@
                             .then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                                if (data.hasOwnProperty('detail')) { //return data as an error
+                                if (data.code === 400) {
                                     this.message = data.detail;
                                 } else {
                                     this.reviews = data;
@@ -495,7 +495,6 @@
                             });
                   },
                   sendReview(){
-                    this.message = ""
                     console.log(this.reviewRating)
                     let jsonData = JSON.stringify(
                       {
@@ -520,9 +519,8 @@
                             .then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                                if (data.hasOwnProperty('detail')) { //return data as an error
+                                if (data.code === 400) {
                                     this.message = data.detail;
-                                    this.reviewSend = false
                                 } else {
                                     this.reviewSend = true;
                                     this.reviewTitle = '';
@@ -594,7 +592,7 @@
                             .then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                                if (data.hasOwnProperty('detail')) { //return data as an error
+                                if (data.code === 400) {
                                     this.message = data.detail;
                                 } else {
                                     this.groomers = data.result;
@@ -683,7 +681,7 @@
                             .then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                                if (data.hasOwnProperty('detail')) { //return data as an error
+                                if (data.code === 400) {
                                     this.message = data.detail;
                                 } else {
                                     window.location.replace(data.checkoutUrl);
@@ -737,7 +735,7 @@
                             .then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                                if (data.hasOwnProperty('detail')) { //return data as an error
+                                if (data.code === 400) {
                                     this.message = data.detail;
                                 } else {
                                     window.location.replace(data.checkoutUrl);
@@ -790,7 +788,7 @@
                             .then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                                if (data.hasOwnProperty('detail')) { //return data as an error
+                                if (data.code === 400) {
                                     this.message = data.detail;
                                 } else {
                                     window.location.replace(data.checkoutUrl);

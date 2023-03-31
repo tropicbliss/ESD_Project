@@ -9,14 +9,14 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Current Appointments</title>
+    <title>Past Reviews</title>
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
-
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
     <!-- Vue 3 -->
@@ -39,7 +39,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3" id="app2">{{gName}} </div>
+                <div class="sidebar-brand-text mx-3" id="app2"> {{gName}} </div>
             </a>
 
             <!-- Divider -->
@@ -70,6 +70,7 @@
                         
                         <a class="collapse-item" href="currentAppointments.html">Current Appointments</a>
                         <a class="collapse-item" href="futureAppointments.html">Future Appointments</a>
+
                     </div>
                 </div>
             </li>
@@ -155,48 +156,39 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-1 text-gray-800"> Current appointments</h1>
-                   
-                    <div id="app" v-if="{{listof
-                    }} != []">
-                    <!-- Content Row -->
-                        <div class="row">
+                    <h1 class="h3 mb-1 text-gray-800"> Past Reviews</h1>
 
-                            
-                            <div class="col-lg-6" v-for="each in listOfFutureApp">
-                        
-                                <div class="card position-relative mb-2">
-                                    <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary">Appointment with {{each.userName}} </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        
-                                        <!-- display each pet of each appointment -->
-                                        <div class="mb-1" v-for="pet in each.pets">
-                                            <p>Pet Type: {{pet.petType}}</p>
-                                            <p>Pet Name: {{pet.name}}</p>
-                                            <p>Pet Gender: {{pet.gender}}</p>
-                                            <p>Pet Age: {{pet.age}}</p>
-                                            <p>Pet Medical Info: {{pet.medicalInfo}}</p>
-                                            
+                 
+                    <div id="app">
+                    <!-- Content Row -->
+                        <div v-if="listOfReviews == []" class="m-3"> You have no reviews currently </div>
+                        <div class="m-3" v-else > 
+                            <div>Past reviews you have gotten </div>
+
+                            <div class="row">
+                                <div class="col-lg-6 mb-2" v-for="each in listOfReviews">
+                                    <div class="card position-relative" >
+                                        <div class="card-header py-3">
+                                            <h6 class="m-0 font-weight-bold text-primary"> {{each.title}}</h6>
+                                        </div>
+                                        <div class="card-body">
+                
+                                            <p><span class="font-weight-bold">Reviewer: </span> {{each.userName}}</p>
+                                            <p><span class="font-weight-bold">Rating: </span>
+                                                <span v-for="x in each.rating" class="fa fa-star checked" style="color:orange"></span>
+                                            </p>
+                                            <hr>
+                                            <p>{{each.message}}</p>
                                         </div>
 
-                                        <p>Price Tier: {{each.priceTier}}</p>
-                                        <p>Total Price Paid: {{each.totalPrice}}</p>
-                                    
                                     </div>
-
                                 </div>
-
-
                             </div>
-
+                            
                         </div>
                     </div>
 
-                    <div v-else class="m-3">
-                        <h4>No current appointments</h4>
-                    </div>
+                    
 
                 </div>
                 <!-- /.container-fluid -->
@@ -238,25 +230,25 @@
     <script src="js/sb-admin-2.min.js"></script>
 
 <script>
-    const get_groomer_app_URL = "http://localhost:8000/backend/appointments/staying/Alice";
+    const get_reviews_URL = "http://localhost:8000/backend/comments/read/Alice";
 
     const app = Vue.createApp({
         data() {
             return {
-                listOfFutureApp: []
+                listOfReviews: []
 
             };
         },
         methods: {
     
-            findGroomerApp () {
+            getAllReviews () {
                 const response =
-                    fetch(get_groomer_app_URL)
+                    fetch(get_reviews_URL)
                         .then(response => response.json())
                         .then(data => {
                             console.log(response)
-                            this.listOfFutureApp = data
-                            console.log(this.listOfFutureApp)
+                            this.listOfReviews = data
+                            console.log(this.listOfReviews)
                             
                         })
                         .catch(error => {
@@ -270,7 +262,7 @@
     
     
         }, created(){
-            this.findGroomerApp()
+            this.getAllReviews()
         }
     });
     const vm = app.mount('#app');
