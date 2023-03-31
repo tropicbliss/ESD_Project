@@ -119,20 +119,6 @@
                         <i class="fa fa-bars"></i>
                     </button>
 
-                    <!-- Topbar Search -->
-                    <form
-                        class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
-                                aria-label="Search" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="button">
-                                    <i class="fas fa-search fa-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
                     <!-- Topbar Navbar -->
                     <ul class="navbar-nav ml-auto">
 
@@ -266,7 +252,7 @@
 
 
     <script>
-        const future_rev_URL = "http://localhost:5000/appointments/signin/Alice";
+        const future_rev_URL = "http://localhost:8000/backend/appointments/signin/Alice";
     
         const app = Vue.createApp({
             data() {
@@ -315,7 +301,7 @@
 
 
 
-        const current_rev_URL = "http://localhost:5000/appointments/staying/Alice";
+        const current_rev_URL = "http://localhost:8000/backend/appointments/staying/Alice";
     
         const app2 = Vue.createApp({
             data() {
@@ -360,7 +346,7 @@
         });
         const vm2 = app2.mount('#app2');
 
-        const get_groomer_name_URL = "http://localhost:5000/groomer/search/name/Alice";
+        const get_groomer_name_URL = "http://localhost:8000/backend/groomer/search/name/Alice";
 
     const app3 = Vue.createApp({
         data() {
@@ -396,7 +382,7 @@
     });
     const vm3 = app3.mount('#app3');
 
-    const get_appt_by_month_URL = "http://localhost:5000/appointments/get/Alice";
+    const get_appt_by_month_URL = "http://localhost:8000/backend/appointments/groomer/Alice";
     const app4 = Vue.createApp({
         data() {
             return {
