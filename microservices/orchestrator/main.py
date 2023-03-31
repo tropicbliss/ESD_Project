@@ -5,8 +5,11 @@ from aiographql.client import GraphQLClient
 from aiohttp import ClientSession, ClientTimeout
 from typing import Optional
 from contextlib import asynccontextmanager
-from fastapi.middleware.cors import CORSMiddleware
 import pika
+import time
+
+# too lazy to make a docker healthcheck
+time.sleep(5)
 
 # Making an API gateway-like microservice is not our initial intention, but it is our goal to provide user-friendly API docs in a single place
 # Hence, the advantages of using an actual API gateway like Kong quickly becomes more murky

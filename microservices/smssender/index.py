@@ -1,6 +1,9 @@
 import pika
 from twilio.rest import Client
 import os
+import time
+
+time.sleep(10)
 
 ACCOUNT_SID = os.getenv("ACCOUNT_SID")
 AUTH_TOKEN = os.getenv("AUTH_TOKEN")
