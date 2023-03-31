@@ -96,9 +96,10 @@
       <div class="container">
         <div id="app">
           <!-- Groomer List Page -->
-          <div v-show="message!=''" class="alert alert-danger mt-3" role="alert">
-            {{message}}
-          </div>   
+          <div v-show="message!=''" class="alert alert-danger alert-dismissible mt-3" role="alert">
+            <strong>{{message}}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
 
           <div v-if="display=='listGroomer'">
             <h2 class="mt-5">
@@ -380,11 +381,13 @@
 
                 <!-- Send Review -->
                 <div>
-                  <div v-show="reviewSend == true" class="alert alert-success" role="alert">
-                    Review added! Please refresh the page to check your review!
+                  <div v-show="reviewSend == true" class="alert alert-success alert-dismissible" role="alert">
+                    <strong>Review added! Please refresh the page to check your review!</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                   </div>
-                  <div v-show="reviewSend == false" class="alert alert-danger" role="alert">
-                    Sorry! You can only make reviews after the groomer service...
+                  <div v-show="reviewSend == false" class="alert alert-danger alert-dismissible" role="alert">
+                    <strong>Sorry! You can only make reviews after the groomer service...</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                   </div>
                   <p>
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
@@ -496,7 +499,7 @@
                             });
                   },
                   sendReview(){
-                    this.message = ""
+                    this.reviewSend = "nothing"
                     console.log(this.reviewRating)
                     let jsonData = JSON.stringify(
                       {
