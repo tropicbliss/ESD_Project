@@ -471,6 +471,7 @@
                   goReview(){
                     this.display = "Review"
                     this.getReviews()
+                    this.reviewSend = 'nothing'
                   },
                   goGroomer(){
                     this.display = "Groomer"
@@ -521,7 +522,6 @@
                             .then(data => {
                                 console.log(data);
                                 if (data.hasOwnProperty('detail')) { //return data as an error
-                                    this.message = data.detail;
                                     this.reviewSend = false
                                 } else {
                                     this.reviewSend = true;
