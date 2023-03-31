@@ -1,3 +1,4 @@
 node_modules/
 microservices/mysql*/
 target/
+.DS_Store
