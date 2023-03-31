@@ -160,7 +160,8 @@
                    
                     <div>
                     <!-- Content Row -->
-                        <div class="row" id="app" v-if="listOfFutureApp !=[]">
+                        <div v-if="listOfFutureApp ==[]" class="m-3">No upcoming appointments</div>
+                        <div v-else class="row" id="app" >
 
                             
                             <div class="col-lg-6" v-for="each in listOfFutureApp">
@@ -193,7 +194,7 @@
                             </div>
 
                         </div>
-                        <div v-else class="m-3">No upcoming appointments</div>
+                        
                     </div>
 
                 </div>
