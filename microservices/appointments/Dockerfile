@@ -14,7 +14,7 @@ COPY . .
 RUN cargo build --release --bin appointments
 
 # We do not need the Rust toolchain to run the binary!
-FROM debian:buster-slim AS runtime
+FROM debian:bullseye-slim AS runtime
 WORKDIR app
 COPY --from=builder /app/target/release/appointments /usr/local/bin
 RUN apt-get update && apt install -y openssl
