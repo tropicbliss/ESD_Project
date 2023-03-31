@@ -157,13 +157,12 @@
                     <!-- Page Heading -->
                     <h1 class="h3 mb-1 text-gray-800"> Current appointments</h1>
                    
-                    <div id="app" v-if="{{listof
-                    }} != []">
+                    <div id="app" v-if="listOfCurrentApp != []">
                     <!-- Content Row -->
                         <div class="row">
 
                             
-                            <div class="col-lg-6" v-for="each in listOfFutureApp">
+                            <div class="col-lg-6" v-for="each in listOfCurrentApp">
                         
                                 <div class="card position-relative mb-2">
                                     <div class="card-header py-3">
@@ -243,7 +242,7 @@
     const app = Vue.createApp({
         data() {
             return {
-                listOfFutureApp: []
+                listOfCurrentApp: []
 
             };
         },
@@ -255,8 +254,8 @@
                         .then(response => response.json())
                         .then(data => {
                             console.log(response)
-                            this.listOfFutureApp = data
-                            console.log(this.listOfFutureApp)
+                            this.listOfCurrentApp = data
+                            console.log(this.listOfCurrentApp)
                             
                         })
                         .catch(error => {

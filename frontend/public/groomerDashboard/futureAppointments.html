@@ -162,17 +162,13 @@
                     <!-- Content Row -->
                         <div v-if="listOfFutureApp ==[]" class="m-3">No upcoming appointments</div>
                         <div v-else class="row" id="app" >
-
-                            
-                            <div class="col-lg-6" v-for="each in listOfFutureApp">
-                        
+                            <div class="col-lg-6" v-for="each in listOfFutureApp">                       
                                 <div class="card position-relative mb-2" >
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Appointment with {{each.userName}} </h6>
                                         <!-- <button>Change Status</button> -->
                                     </div>
-                                    <div class="card-body">
-                                        
+                                    <div class="card-body">                                       
                                         <!-- display each pet of each appointment -->
                                         <div class="mb-1" v-for="pet in each.pets">
                                             <p>Pet Type: {{pet.petType}}</p>
