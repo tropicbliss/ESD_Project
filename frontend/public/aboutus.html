@@ -27,9 +27,44 @@
   <link href="css/style.css" rel="stylesheet" />
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
+
+    <!-- Vue -->
+    <script src="https://unpkg.com/vue@next"></script>
 </head>
 
 <body>
+  <script>
+    function getCookie(cname) {
+        let name = cname + "=";
+        let ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+      }
+
+    function delete_cookie(name) {
+      document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+
+    function checkCookie() {
+        let user = getCookie("username");
+        if (user != "") {
+            alert("Welcome again " + user);
+        } else {
+            user = prompt("Please enter your name:", "");
+            if (user != "" && user != null) {
+            setCookie("username", user, 365);
+            }
+        }
+      }
+  </script>
   <div class="hero_area">
     <!-- header section strats -->
     <header class="header_section">
@@ -63,23 +98,60 @@
                 </li>
               </ul>
             </div>
-            <div class="quote_btn-container d-flex justify-content-center m">
-              <a href="account/loginuser.html" onMouseOver="this.style.color='blue'"
-              onMouseOut="this.style.color='black'">
-                Log In&nbsp
-              </a>
-              <a>
-                /
-              </a>
-              <a href="account/registeruser.html" onMouseOver="this.style.color='blue'"
-              onMouseOut="this.style.color='black'">
-              &nbspRegister
-              </a>
+            <div id="app2">
+              <div v-if="login=='failure'" class="quote_btn-container d-flex justify-content-center m">
+                <a href="account/loginuser.html" onMouseOver="this.style.color='blue'"
+                onMouseOut="this.style.color='black'">
+                  Log In&nbsp
+                </a>
+                <a>
+                  /
+                </a>
+                <a href="account/registeruser.html" onMouseOver="this.style.color='blue'"
+                onMouseOut="this.style.color='black'">
+                &nbspRegister
+                </a>
+              </div>
+              <div v-if="login=='success'" class="quote_btn-container d-flex justify-content-center m">
+                <a v-on:click="logout()" onMouseOver="this.style.color='blue'"
+                onMouseOut="this.style.color='black'">
+                  Log Out
+                </a>
+              </div>
             </div>
           </div>
         </nav>
       </div>
     </header>
+    <script>
+      const app2 = Vue.createApp({ 
+          data() { 
+              return { 
+                  login: 'failure',
+              };
+          }, // data
+          // computed: { 
+          //     derivedProperty() {
+          //         return false;
+          //     }  
+          // }, // computed
+          created() { 
+            console.log(getCookie('logname')!='')
+            if(getCookie('logname')!= ''){
+              this.login = 'success'
+            }
+          },
+          // mounted() { 
+          // },
+          methods: {
+            logout() {
+              delete_cookie('logname')
+              this.login = 'failure'
+            }
+          } // methods
+      });
+      const vm = app2.mount('#app2'); 
+    </script> 
     <!-- end header section -->
 
   <!-- service section -->
