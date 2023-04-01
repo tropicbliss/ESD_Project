@@ -38,6 +38,11 @@ services:
     restart: always
     ports:
       - 15672:15672
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
   appointments:
     build:
       context: appointments
@@ -68,7 +73,7 @@ services:
   orchestrator:
     build:
       context: orchestrator
-    restart: always
+    restart: on-failure
     depends_on:
       - user
       - comments
@@ -79,7 +84,7 @@ services:
   smssender:
     build:
       context: smssender
-    restart: always
+    restart: on-failure
     depends_on:
       - esd-rabbit
     environment:

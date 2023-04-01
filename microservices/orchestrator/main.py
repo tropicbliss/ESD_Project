@@ -8,8 +8,7 @@ from contextlib import asynccontextmanager
 import pika
 import time
 
-# too lazy to make a docker healthcheck
-time.sleep(5)
+time.sleep(9)
 
 # Making an API gateway-like microservice is not our initial intention, but it is our goal to provide user-friendly API docs in a single place
 # Hence, the advantages of using an actual API gateway like Kong quickly becomes more murky
@@ -33,6 +32,9 @@ channel.queue_declare(queue=queue_name, durable=True)
 
 channel.queue_bind(exchange=exchange_name,
                    queue=queue_name, routing_key="sms.*")
+
+channel.basic_publish(exchange=exchange_name, routing_key="sms.user",
+                      body="+6581650034", properties=pika.BasicProperties(delivery_mode=2))
 
 
 graphql_client = GraphQLClient(
