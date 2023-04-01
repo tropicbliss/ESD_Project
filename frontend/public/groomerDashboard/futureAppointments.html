@@ -39,7 +39,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3" id="app2"> {{gName}} </div>
+                <div class="sidebar-brand-text mx-3" id="app2">{{gName}} </div>
             </a>
 
             <!-- Divider -->
@@ -70,7 +70,6 @@
                         
                         <a class="collapse-item" href="currentAppointments.html">Current Appointments</a>
                         <a class="collapse-item" href="futureAppointments.html">Future Appointments</a>
-                     
                     </div>
                 </div>
             </li>
@@ -156,19 +155,21 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-1 text-gray-800">Upcoming appointments</h1>
+                    <h1 class="h3 mb-1 text-gray-800"> Future appointments</h1>
                    
-                    <div>
+                    <div id="app" v-if="listOfFutureApp != []">
                     <!-- Content Row -->
-                        <div v-if="listOfFutureApp ==[]" class="m-3">No upcoming appointments</div>
-                        <div v-else class="row" id="app" >
-                            <div class="col-lg-6" v-for="each in listOfFutureApp">                       
-                                <div class="card position-relative mb-2" >
+                        <div class="row">
+
+                            
+                            <div class="col-lg-6" v-for="each in listOfFutureApp">
+                        
+                                <div class="card position-relative mb-2">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Appointment with {{each.userName}} </h6>
-                                        <!-- <button>Change Status</button> -->
                                     </div>
-                                    <div class="card-body">                                       
+                                    <div class="card-body">
+                                        
                                         <!-- display each pet of each appointment -->
                                         <div class="mb-1" v-for="pet in each.pets">
                                             <p>Pet Type: {{pet.petType}}</p>
@@ -190,7 +191,10 @@
                             </div>
 
                         </div>
-                        
+                    </div>
+
+                    <div v-else class="m-3">
+                        No upcoming appointments
                     </div>
 
                 </div>
@@ -262,6 +266,7 @@
                         });
 
             },
+    
     
         }, created(){
             this.findGroomerApp()
