@@ -38,6 +38,35 @@
 </head>
 
 <body>
+  <script>
+    function getCookie(cname) {
+        let name = cname + "=";
+        let ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+      }
+
+      function checkCookie() {
+        let user = getCookie("username");
+        if (user != "") {
+            alert("Welcome again " + user);
+        } else {
+            user = prompt("Please enter your name:", "");
+            if (user != "" && user != null) {
+            setCookie("username", user, 365);
+            }
+        }
+      }
+  </script>
+  
   <div class="hero_area">
 
     <!-- start header section -->
@@ -381,13 +410,11 @@
 
                 <!-- Send Review -->
                 <div>
-                  <div v-show="reviewSend == true" class="alert alert-success alert-dismissible" role="alert">
+                  <div v-show="reviewSend == true" class="alert alert-success" role="alert">
                     <strong>Review added! Please refresh the page to check your review!</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                   </div>
-                  <div v-show="reviewSend == false" class="alert alert-danger alert-dismissible" role="alert">
+                  <div v-show="reviewSend == false" class="alert alert-danger" role="alert">
                     <strong>Sorry! You can only make reviews after the groomer service...</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                   </div>
                   <p>
                     <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
@@ -453,6 +480,7 @@
             const app = Vue.createApp({
                 data() {
                     return {
+                      loginName: '',
                       groomers: [],
                       reviews: [],
                       reviewSend: 'nothing',
@@ -500,11 +528,10 @@
                   },
                   sendReview(){
                     this.reviewSend = "nothing"
-                    console.log(this.reviewRating)
                     let jsonData = JSON.stringify(
                       {
                         groomerName: this.disName,
-                        userName: "Hi",
+                        userName: this.loginName,
                         title: this.reviewTitle,
                         message: this.reviewMsg,
                         rating: this.reviewRating
@@ -526,6 +553,9 @@
                                 console.log(data);
                                 if (data.hasOwnProperty('detail')) { //return data as an error
                                     this.reviewSend = false
+                                    this.reviewTitle = '';
+                                    this.reviewMsg = '';
+                                    this.reviewRating = '';
                                 } else {
                                     this.reviewSend = true;
                                     this.reviewTitle = '';
@@ -613,7 +643,6 @@
                   keywordSearch() {
                     this.searErr = ''
                     this.find = false
-                    console.log(this.keyword);
                     fetch(`${search_URL}/${this.keyword}`)
                       .then(response => response.json())
                       .then(data => {
@@ -642,6 +671,7 @@
                     this.searErr = ''
                   },
                   sendBasic() {
+                    console.log(this.loginName)
                     var start = this.cStart;
                     console.log(start)
                     const [day, month, year] = start.split("/");
@@ -668,7 +698,7 @@
                         ],
                         startTime: isoStart,
                         endTime: isoEnd,
-                        userName: "Hi",
+                        userName: this.loginName,
                         priceTier: "basic"
                       }
                       );
@@ -722,7 +752,7 @@
                         ],
                         startTime: isoStart,
                         endTime: isoEnd,
-                        userName: "Hi",
+                        userName: this.loginName,
                         priceTier: "premium"
                       }
                       );
@@ -775,7 +805,7 @@
                         ],
                         startTime: isoStart,
                         endTime: isoEnd,
-                        userName: "Hi",
+                        userName: this.loginName,
                         priceTier: "luxury"
                       }
                       );
@@ -829,6 +859,8 @@
                 created () {
                   // on Vue instance created, load the book list
                   this.getAllGroomers();
+                  this.loginName = getCookie('logname')
+                  console.log(getCookie('logname'))
                 }
             });
 
@@ -921,6 +953,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
   <script src='https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.1.4/dist/js/datepicker-full.min.js'></script>
   <script src="./js/groomer.js"></script>
-  
+  <script src="./js/cookies.js"></script>
+
 </body>
 </html>
