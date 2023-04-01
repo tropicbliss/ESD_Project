@@ -39,7 +39,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3" id="app2"> {{gName}} </div>
+                <div class="sidebar-brand-text mx-3" id="app2">{{gName}} </div>
             </a>
 
             <!-- Divider -->
@@ -70,7 +70,6 @@
                         
                         <a class="collapse-item" href="currentAppointments.html">Current Appointments</a>
                         <a class="collapse-item" href="futureAppointments.html">Future Appointments</a>
-                     
                     </div>
                 </div>
             </li>
@@ -156,19 +155,22 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <h1 class="h3 mb-1 text-gray-800">Upcoming appointments</h1>
+                    <h1 class="h3 mb-1 text-gray-800"> Future appointments</h1>
                    
-                    <div>
+                    <div id="app" v-if="listOfFutureApp != []">
                     <!-- Content Row -->
-                        <div class="row" id="app" v-if="listOfFutureApp !=[]">
+                        <div class="row">
 
                             
                             <div class="col-lg-6" v-for="each in listOfFutureApp">
                         
-                                <div class="card position-relative mb-2" >
+                                <div class="card position-relative mb-2">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Appointment with {{each.userName}} </h6>
-                                        <!-- <button>Change Status</button> -->
+                                        
+                                            <changestatusbutton v-bind:appid="each.id" style="float:right"></changestatusbutton>
+                                       
+                                       
                                     </div>
                                     <div class="card-body">
                                         
@@ -193,7 +195,10 @@
                             </div>
 
                         </div>
-                        <div v-else class="m-3">No upcoming appointments</div>
+                    </div>
+
+                    <div v-else class="m-3">
+                        No upcoming appointments
                     </div>
 
                 </div>
@@ -236,7 +241,7 @@
     <script src="js/sb-admin-2.min.js"></script>
 
 <script>
-    const get_groomer_app_URL = "http://localhost:5000/appointments/signin/Alice";
+    const get_groomer_app_URL = "http://localhost:8000/backend/appointments/signin/Alice";
 
     const app = Vue.createApp({
         data() {
@@ -264,15 +269,48 @@
 
                         });
 
-            },
+            }  
     
         }, created(){
             this.findGroomerApp()
         }
     });
+
+    app.component('changestatusbutton', { 
+        props: ['appid'],
+        template:
+            `<button v-on:click="this.changeStatus()" type="button" class="btn btn-primary">Change Status</button>`
+        ,
+        methods: {
+            changeStatus() {
+                changeStatusURL = 'http://localhost:8000/backend/appointments/status/' + this.appid
+                let jsonData = JSON.stringify(
+                      {
+                      status : 'staying'  
+                      }
+                      );
+                const response =
+                        fetch(changeStatusURL,
+                            {
+                                method: "POST",
+                                
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                            
+                    }) 
+                }
+        }});
     const vm = app.mount('#app');
 
-const get_groomer_name_URL = "http://localhost:5000/groomer/search/name/Alice";
+
+const get_groomer_name_URL = "http://localhost:8000/backend/groomer/search/name/Alice";
 
     const app2 = Vue.createApp({
         data() {

@@ -44,6 +44,7 @@ rel='stylesheet'integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3y
 		<div class="container-login100" style="background-image: url('images/background_dogs.jpg')">
 			<div class="wrap-login100">
 				<form class="login100-form validate-form" v-on:submit.prevent="login">	
+					<a href="../index.html" role="button" type="button" class="btn-close" aria-label="Close"></a>
 					<span class="login100-form-logo">
 						<img src="images/icons8-5-star-hotel-50.png">
 					</span>
@@ -75,6 +76,8 @@ rel='stylesheet'integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3y
 						</button>
 					</div>
 
+					<div v-show="loginSuccess==false" style="color:rgb(255, 78, 54)">{{errMsg}}</div>
+
 					<div class="text-center p-t-90">
 						<a class="txt1" href="logingroomer.html">
 							I am a Groomer!
@@ -91,6 +94,8 @@ rel='stylesheet'integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3y
 				return {
 				  name: '',
 				  email: '',
+				  loginSuccess: 'unknown',
+				  errMsg: '',
 				};
 			  },
 			  methods: {
@@ -100,9 +105,14 @@ rel='stylesheet'integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3y
 					.then((data) => {
 					  if (data.email === this.email) {
 						console.log('User found!');
-						window.location.href = '../index.html'
+						this.loginSucess = true
+						console.log(setCookie('logname', this.name, 1))
+						window.location.href = `../index.html`
+
 						// redirect to the user dashboard
 					  } else {
+						this.loginSuccess = false
+						this.errMsg = 'Invalid login credentials! Please try again!'
 						console.log('Invalid login credentials');
 					  }
 					})
@@ -129,6 +139,7 @@ rel='stylesheet'integrity='sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3y
 	<script src="vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
 	<script src="js/main.js"></script>
+	<script src="../js/cookies.js"></script>
 
 </body>
 </html>
