@@ -27,7 +27,38 @@
 </head>
 
 <body id="page-top">
-
+    <script>
+        function getCookie(cname) {
+            let name = cname + "=";
+            let ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+          }
+    
+        function delete_cookie(name) {
+          document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        }
+    
+        function checkCookie() {
+            let user = getCookie("username");
+            if (user != "") {
+                alert("Welcome again " + user);
+            } else {
+                user = prompt("Please enter your name:", "");
+                if (user != "" && user != null) {
+                setCookie("username", user, 365);
+                }
+            }
+          }
+      </script>
     <!-- Page Wrapper -->
     <div id="wrapper">
 
@@ -234,18 +265,21 @@
     <script src="js/sb-admin-2.min.js"></script>
 
 <script>
-    const get_groomer_app_URL = "http://localhost:8000/backend/appointments/staying/Alice";
+
 
     const app = Vue.createApp({
         data() {
             return {
-                listOfCurrentApp: []
+                listOfCurrentApp: [],
+                
 
             };
         },
         methods: {
     
             findGroomerApp () {
+                console.log(this.loginName)
+                const get_groomer_app_URL = "http://localhost:8000/backend/appointments/staying/" + getCookie('groomername');
                 const response =
                     fetch(get_groomer_app_URL)
                         .then(response => response.json())
@@ -267,11 +301,12 @@
     
         }, created(){
             this.findGroomerApp()
+
         }
     });
     const vm = app.mount('#app');
 
-const get_groomer_name_URL = "http://localhost:8000/backend/groomer/search/name/Alice";
+
 
     const app2 = Vue.createApp({
         data() {
@@ -283,6 +318,7 @@ const get_groomer_name_URL = "http://localhost:8000/backend/groomer/search/name/
         methods: {
     
             findGroomerName () {
+                const get_groomer_name_URL = "http://localhost:8000/backend/groomer/search/name/" + getCookie('groomername');
                 const response =
                     fetch(get_groomer_name_URL)
                         .then(response => response.json())
@@ -307,7 +343,7 @@ const get_groomer_name_URL = "http://localhost:8000/backend/groomer/search/name/
     });
     const vm2 = app2.mount('#app2');
 </script>  
-
+<script src="../js/cookies.js"></script>
 </body>
 
 </html>
