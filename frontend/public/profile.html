@@ -27,9 +27,11 @@
   <link href="css/style.css" rel="stylesheet" />
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
+  <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css'> 
 
   <!-- Vue -->
   <script src="https://unpkg.com/vue@next"></script>
+</head>
 
   <body>
     <script>
@@ -146,66 +148,115 @@
               logout() {
                 delete_cookie('logname')
                 this.login = 'failure'
+                location.reload()
               }
             } // methods
         });
         const vm = app2.mount('#app2'); 
       </script> 
     <!-- end header section -->
-
-      <div class="row">
-        <div class="col-lg-4">
-          <div class="card mb-4">
-            <div class="card-body text-center">
-              <img src="images/profile.png"
-                class="rounded-circle img-fluid" style="width: 150px;">
-              <h5 class="my-3">Jack</h5>
+      <div id="app">
+        <div class="row mt-3" v-if="log==true">
+          <div class="col-lg-4">
+            <div class="card ml-2 mb-4">
+              <div class="card-body text-center">
+                <img src="images/profile.png"
+                  class="rounded-circle img-fluid" style="width: 150px;">
+                <h5 class="my-3">{{loginname}}</h5>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="card mr-2 mb-4">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-sm-3">
+                    <p class="mb-0">Full Name</p>
+                  </div>
+                  <div class="col-sm-9">
+                    <p class="text-muted mb-0">{{loginname}}</p>
+                  </div>
+                </div>
+                <hr>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <p class="mb-0">Email</p>
+                  </div>
+                  <div class="col-sm-9">
+                    <p class="text-muted mb-0">{{email}}</p>
+                  </div>
+                </div>
+                <hr>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <p class="mb-0">Phone</p>
+                  </div>
+                  <div class="col-sm-9">
+                    <p class="text-muted mb-0">{{phone}}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-lg-8">
-          <div class="card mb-4">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Full Name</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">Jack</p>
-                </div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Email</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">jack@gmail.com.sg</p>
-                </div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Phone</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">67891234</p>
-                </div>
-              </div>
-            
-              <hr>
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Pet Owned</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">Dog</p>
-                </div>
-              </div>
-            </div>
+        <div v-else>
+          <div class="alert alert-danger text-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> You need to login to see your profile!
           </div>
         </div>
       </div>
+
+      <script>
+        const user_URL = "http://localhost:8000/backend/user/read"
+
+        const app = Vue.createApp({ 
+            data() { 
+                return { 
+                    loginname: '',
+                    email: '',
+                    phone: '',
+                    log: false
+                };
+            }, // data
+            // computed: { 
+            //     derivedProperty() {
+            //         return false;
+            //     }  
+            // }, // computed
+            created() { 
+              this.loginname = getCookie('logname')
+              this.readuser()
+            },
+            // mounted() { 
+            // },
+            methods: {
+              readuser(){
+                    this.loginname = getCookie('logname')
+                    const response =
+                        fetch(`${user_URL}/${this.loginname}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                                if (data.hasOwnProperty('detail')) { //return data as an error
+                                    this.log = false
+                                } else {
+                                    this.email = data.email;
+                                    this.phone = data.contactNo
+                                    this.log = true
+                                }
+                            })
+                            .catch(error => {
+                                // Errors when calling the service; such as network error, 
+                                // service offline, etc
+                                console.log(this.message + error);
+
+                            });
+                },
+            } // methods
+        });
+        const vm2 = app.mount('#app'); 
+      </script> 
+
     </div>
   <!-- footer section -->
   <section class="container-fluid footer_section">

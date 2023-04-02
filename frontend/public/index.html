@@ -147,6 +147,7 @@
             logout() {
               delete_cookie('logname')
               this.login = 'failure'
+              location.reload()
             }
           } // methods
       });
