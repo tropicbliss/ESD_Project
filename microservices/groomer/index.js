@@ -172,7 +172,7 @@ app.post("/update/:name", async (req, res) => {
   try {
     const parsed = schema.parse(json);
     const query = Object.fromEntries(
-      Object.entries(parsed).filter(([_, v]) => v != undefined)
+      Object.entries(parsed).filter(([_, v]) => v !== undefined)
     );
     await Groomer.updateOne(
       { name },
