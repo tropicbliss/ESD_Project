@@ -734,8 +734,13 @@
                                 console.log(data);
                                 if (data.hasOwnProperty('detail')) { //return data as an error
                                     this.checkoutErr = data.detail;
+                                    if(data.detail[0].hasOwnProperty('msg')){
+                                      alert(data.detail[0].msg)
+                                    }else{
+                                      alert(data.detail)
+                                    }
                                 } else {
-                                    window.location.replace(data.checkoutUrl);
+                                    window.location.href = data.redirectUrl;
                                 }
                             })
                             .catch(error => {
@@ -788,8 +793,13 @@
                                 console.log(data);
                                 if (data.hasOwnProperty('detail')) { //return data as an error
                                     this.checkoutErr = data.detail;
+                                    if(data.detail[0].hasOwnProperty('msg')){
+                                      alert(data.detail[0].msg)
+                                    }else{
+                                      alert(data.detail)
+                                    }
                                 } else {
-                                    window.location.replace(data.checkoutUrl);
+                                    window.location.href = data.redirectUrl;
                                 }
                             })
                             .catch(error => {
@@ -841,8 +851,13 @@
                                 console.log(data);
                                 if (data.hasOwnProperty('detail')) { //return data as an error
                                     this.checkoutErr = data.detail;
+                                    if(data.detail[0].hasOwnProperty('msg')){
+                                      alert(data.detail[0].msg)
+                                    }else{
+                                      alert(data.detail)
+                                    }
                                 } else {
-                                    window.location.replace(data.checkoutUrl);
+                                    window.location.href = data.redirectUrl;
                                 }
                             })
                             .catch(error => {
