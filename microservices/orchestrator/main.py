@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 import pika
 import time
 from starlette.responses import RedirectResponse
+import asyncio
 
 time.sleep(9)
 
@@ -64,6 +65,53 @@ async def lifespan(_: FastAPI):
     await HttpClient.close()
 
 app = FastAPI(lifespan=lifespan, root_path="/backend")
+
+
+async def does_groomer_exist(name: str) -> bool:
+    async with HttpClient.get_client().get(f"http://groomer:5000/search/name/{name}") as resp:
+        if resp.ok:
+            return True
+        else:
+            return False
+
+
+async def does_user_exist(name: str) -> bool:
+    query = """
+    query {{
+        getUser(name: "{name}") {{
+            name,
+            contactNo,
+            email
+        }}
+    }}
+    """.format(name=name)
+    res = await graphql_client.query(query)
+    res = res.json["data"]["getUser"]
+    if res == None:
+        return False
+    return True
+
+
+class UtilError(Exception):
+    pass
+
+
+async def censor(text: str) -> str:
+    async with HttpClient.get_client().post(f"http://censorer:5000", json={"message": text}) as resp:
+        json = await resp.json()
+        if resp.ok:
+            return json["sanitised"]
+        else:
+            raise UtilError
+
+
+async def get_groomer_picture_url(name: str) -> str:
+    async with HttpClient.get_client().get(f"http://groomer:5000/search/name/{name}") as resp:
+        json = await resp.json()
+        if resp.ok:
+            return json["pictureUrl"]
+        else:
+            raise UtilError
 
 
 @app.post("/user/create", status_code=201, responses={400: {"model": output.Error}})
@@ -206,7 +254,10 @@ async def get_appointments_of_user(user_name: str):
     async with HttpClient.get_client().get(f"http://appointments:5000/user/{user_name}") as resp:
         json = await resp.json()
         if resp.ok:
-            return json
+            urls = await asyncio.gather(*[get_groomer_picture_url(app["groomerName"]) for app in json])
+            res = [{"id": app["id"], "groomerName": app["groomerName"], "startDate": app["startDate"], "endDate": app["endDate"],
+                    "groomerPictureUrl": urls[idx], "petNames": app["petNames"]} for idx, app in enumerate(json)]
+            return res
         else:
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
@@ -269,14 +320,26 @@ async def change_appointment_status(appointment_id: str, status: input.Status):
 
 @app.post("/comments/create", status_code=201, response_model=output.CensoredComment, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
 async def create_comment(comment: input.CreateComment):
+    # check if groomer or user is valid
+    res = await asyncio.gather(does_groomer_exist(comment.groomerName),
+                               does_user_exist(comment.userName))
+    if False in res:
+        raise HTTPException(status_code=404,
+                            detail="groomer or user does not exist")
     # check if customer has stayed (only customers that stayed are allowed to comment)
     async with HttpClient.get_client().post("http://appointments:5000/stayed", json={"groomerName": comment.groomerName, "userName": comment.userName}) as resp:
         if not resp.ok:
             json = await resp.json()
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
-    # censor and post the comment
-    async with HttpClient.get_client().post("http://comments:5000/", json=vars(comment)) as resp:
+    # censor the comment
+    try:
+        message, title = await asyncio.gather(censor(comment.message), censor(comment.title))
+    except UtilError:
+        raise HTTPException(status_code=400,
+                            detail="unable to censor message")
+    # post the comment
+    async with HttpClient.get_client().post("http://comments:5000/", json={"userName": comment.userName, "groomerName": comment.groomerName, "title": title, "message": message, "rating": comment.rating}) as resp:
         json = await resp.json()
         if resp.ok:
             return json
@@ -324,6 +387,12 @@ async def checkout(checkout: input.Checkout):
         else:
             raise HTTPException(status_code=resp.status,
                                 detail="internal server error")
+    # check if groomer and user exists
+    res = await asyncio.gather(does_groomer_exist(checkout.groomerName),
+                               does_user_exist(checkout.userName))
+    if False in res:
+        raise HTTPException(status_code=404,
+                            detail="groomer or user does not exist")
     # create appointment entry
     async with HttpClient.get_client().post("http://appointments:5000/create", json={"groomerName": checkout.groomerName, "userName": checkout.userName, "petInfo": [vars(pet) for pet in checkout.pets], "priceTier": checkout.priceTier, "totalPrice": pricing * number_of_days, "startTime": checkout.startTime, "endTime": checkout.endTime, "transactionId": transaction_id}) as resp:
         if not resp.ok:

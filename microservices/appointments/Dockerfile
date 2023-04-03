@@ -17,5 +17,4 @@ RUN cargo build --release --bin appointments
 FROM debian:bullseye-slim AS runtime
 WORKDIR app
 COPY --from=builder /app/target/release/appointments /usr/local/bin
-RUN apt-get update && apt install -y openssl
 ENTRYPOINT ["/usr/local/bin/appointments"]

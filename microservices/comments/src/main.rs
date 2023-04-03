@@ -7,12 +7,10 @@ use axum::{
     Json, Router,
 };
 use futures::TryStreamExt;
-use graphql_client::{GraphQLQuery, Response};
 use mongodb::{bson::doc, options::ClientOptions, Client, Collection};
-use reqwest::Client as HttpClient;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use std::{net::SocketAddr, time::Duration};
+use std::net::SocketAddr;
 use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt};
 use validator::Validate;
 
@@ -31,12 +29,7 @@ async fn main() -> Result<()> {
         client.database(&std::env::var("DATABASE").unwrap_or_else(|_| "esdproject".into()));
     let collection = database
         .collection::<Comment>(&std::env::var("COLLECTION").unwrap_or_else(|_| "comments".into()));
-    let shared_state = SharedState {
-        db: collection,
-        http: HttpClient::builder()
-            .timeout(Duration::from_secs(9))
-            .build()?,
-    };
+    let shared_state = SharedState { db: collection };
     let app = Router::new()
         .route("/", post(create_comment))
         .route("/:id", get(get_comment))
@@ -50,14 +43,9 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-#[derive(GraphQLQuery)]
-#[graphql(schema_path = "src/schema.json", query_path = "src/query.graphql")]
-struct GetUser;
-
 #[derive(Clone)]
 struct SharedState {
     db: Collection<Comment>,
-    http: HttpClient,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -89,80 +77,17 @@ struct CreateOutput {
     message: String,
 }
 
-async fn does_groomer_exist(client: &HttpClient, id: &str) -> Result<bool, ApiError> {
-    Ok(client
-        .get(format!("http://groomer:5000/search/name/{id}"))
-        .send()
-        .await
-        .map_err(|_| ApiError::InternalError)?
-        .status()
-        .is_success())
-}
-
-async fn does_user_exist(client: &HttpClient, name: &str) -> Result<bool, ApiError> {
-    let variables = get_user::Variables {
-        name: name.to_string(),
-    };
-    let request_body = GetUser::build_query(variables);
-    let res = client
-        .post(format!("http://user:5000/"))
-        .json(&request_body)
-        .send()
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    let response_body: Response<get_user::ResponseData> =
-        res.json().await.map_err(|_| ApiError::InternalError)?;
-    Ok(response_body
-        .data
-        .ok_or(ApiError::InternalError)?
-        .get_user
-        .is_some())
-}
-
-async fn censor_comment(client: &HttpClient, comment: &str) -> Result<String, ApiError> {
-    #[derive(Deserialize)]
-    struct CensorerOutput {
-        sanitised: String,
-    }
-
-    let json = json!({ "message": comment });
-    let res: CensorerOutput = client
-        .post("http://censorer:5000/")
-        .json(&json)
-        .send()
-        .await
-        .map_err(|_| ApiError::InternalError)?
-        .json()
-        .await
-        .map_err(|_| ApiError::InternalError)?;
-    Ok(res.sanitised)
-}
-
 async fn create_comment(
     state: State<SharedState>,
     Json(payload): Json<CreateInput>,
 ) -> Result<Json<CreateOutput>, ApiError> {
     payload.validate().map_err(|_| ApiError::InvalidData)?;
-    let (user_exists, groomer_exists) = tokio::join!(
-        does_user_exist(&state.http, &payload.user_name),
-        does_groomer_exist(&state.http, &payload.groomer_name)
-    );
-    if !user_exists? {
-        return Err(ApiError::UserDoesNotExist);
-    }
-    if !groomer_exists? {
-        return Err(ApiError::GroomerDoesNotExist);
-    }
-    let (title, message) = tokio::join!(
-        censor_comment(&state.http, &payload.title),
-        censor_comment(&state.http, &payload.message)
-    );
     let payload = Comment {
         groomer_name: payload.groomer_name,
         id: cuid::cuid2(),
-        message: message?,
+        message: payload.message,
         rating: payload.rating,
-        title: title?,
+        title: payload.title,
         user_name: payload.user_name,
     };
     state
@@ -191,10 +116,6 @@ async fn get_comment(
     Path(groomer_name): Path<String>,
     state: State<SharedState>,
 ) -> Result<Json<Vec<GetOutput>>, ApiError> {
-    let groomer_exist = does_groomer_exist(&state.http, &groomer_name).await?;
-    if !groomer_exist {
-        return Err(ApiError::GroomerDoesNotExist);
-    }
     let filter = doc! {"groomer_name": groomer_name};
     let res = state
         .db
@@ -222,8 +143,6 @@ async fn get_comment(
 enum ApiError {
     InternalError,
     InvalidData,
-    UserDoesNotExist,
-    GroomerDoesNotExist,
 }
 
 impl IntoResponse for ApiError {
@@ -231,8 +150,6 @@ impl IntoResponse for ApiError {
         let (status, error_message) = match self {
             ApiError::InternalError => (StatusCode::INTERNAL_SERVER_ERROR, "internal server error"),
             ApiError::InvalidData => (StatusCode::BAD_REQUEST, "invalid input data"),
-            ApiError::UserDoesNotExist => (StatusCode::NOT_FOUND, "user cannot be found"),
-            ApiError::GroomerDoesNotExist => (StatusCode::NOT_FOUND, "groomer cannot be found"),
         };
         let body = Json(json!({ "message": error_message }));
         (status, body).into_response()
