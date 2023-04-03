@@ -198,6 +198,7 @@
                                 <div class="card position-relative mb-2">
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Appointment with {{each.userName}} </h6>
+                                        <changestatusbutton v-bind:appid="each.id" style="float:right"></changestatusbutton>
                                     </div>
                                     <div class="card-body">
                                         
@@ -304,6 +305,37 @@
 
         }
     });
+    app.component('changestatusbutton', { 
+        props: ['appid'],
+        template:
+            `<button v-on:click="this.changeStatus()" type="button" class="btn btn-primary">Change Status</button>`
+        ,
+        methods: {
+            changeStatus() {
+                changeStatusURL = 'http://localhost:8000/backend/appointments/status/' + this.appid
+                let jsonData = JSON.stringify(
+                      {
+                      status : 'left'  
+                      }
+                      );
+                const response =
+                        fetch(changeStatusURL,
+                            {
+                                method: "POST",
+                                
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "accept": "application/json"
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                            
+                    }) 
+                }
+        }});
     const vm = app.mount('#app');
 
 

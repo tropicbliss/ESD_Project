@@ -90,7 +90,3 @@ class CustomerAppointments(BaseModel):
 
 class Error(BaseModel):
     detail: str
-
-
-class Checkout(BaseModel):
-    checkoutUrl: str
