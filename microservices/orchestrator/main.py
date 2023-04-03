@@ -403,7 +403,7 @@ async def checkout(checkout: input.Checkout):
     return {"redirectUrl": checkout_url}
 
 
-@app.post("/refund/{appointment_id}", status_code=200, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
+@app.get("/refund/{appointment_id}", status_code=200, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
 async def refund(appointment_id: str):
     # get the transaction id from the appointment id
     async with HttpClient.get_client().get(f"http://appointments:5000/transaction/{appointment_id}") as resp:
