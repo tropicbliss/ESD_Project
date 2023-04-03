@@ -9,6 +9,7 @@ import pika
 import time
 from starlette.responses import RedirectResponse
 import asyncio
+from async_lru import alru_cache
 
 time.sleep(9)
 
@@ -105,6 +106,7 @@ async def censor(text: str) -> str:
             raise UtilError
 
 
+@alru_cache(ttl=5)
 async def get_groomer_picture_url(name: str) -> str:
     async with HttpClient.get_client().get(f"http://groomer:5000/search/name/{name}") as resp:
         json = await resp.json()
@@ -403,7 +405,7 @@ async def checkout(checkout: input.Checkout):
     return response
 
 
-@app.post("/refund", status_code=200, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
+@app.post("/refund/{appointment_id}", status_code=200, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
 async def refund(appointment_id: str):
     # get the transaction id from the appointment id
     async with HttpClient.get_client().get(f"http://appointments:5000/transaction/{appointment_id}") as resp:
