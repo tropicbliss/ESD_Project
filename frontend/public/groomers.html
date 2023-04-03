@@ -508,7 +508,9 @@
                       keyword: '',
                       find: false,
                       searErr: '',
-                      cpetType: '', cname:'', cgender:'', cage:'', cmediInfo:'', cStart:'', cEnd:''
+                      cpetType: '', cname:'', cgender:'', cage:'', cmediInfo:'', cStart:'', cEnd:'',
+                      reviewErr: '',
+                      checkoutErr: '',
                     }
                 },
 
@@ -528,7 +530,7 @@
                             .then(data => {
                                 console.log(data);
                                 if (data.hasOwnProperty('detail')) { //return data as an error
-                                    this.message = data.detail;
+                                    this.reviewErr = data.detail;
                                 } else {
                                     this.reviews = data;
                                 }
@@ -580,7 +582,7 @@
                             .catch(error => {
                                 // Errors when calling the service; such as network error, 
                                 // service offline, etc
-                                console.log(this.message + error);
+                                console.log(this.reviewErr + error);
                                 this.reviewSend = false;
 
                             });
@@ -731,7 +733,7 @@
                             .then(data => {
                                 console.log(data);
                                 if (data.hasOwnProperty('detail')) { //return data as an error
-                                    this.message = data.detail;
+                                    this.checkoutErr = data.detail;
                                 } else {
                                     window.location.replace(data.checkoutUrl);
                                 }
@@ -785,7 +787,7 @@
                             .then(data => {
                                 console.log(data);
                                 if (data.hasOwnProperty('detail')) { //return data as an error
-                                    this.message = data.detail;
+                                    this.checkoutErr = data.detail;
                                 } else {
                                     window.location.replace(data.checkoutUrl);
                                 }
@@ -838,7 +840,7 @@
                             .then(data => {
                                 console.log(data);
                                 if (data.hasOwnProperty('detail')) { //return data as an error
-                                    this.message = data.detail;
+                                    this.checkoutErr = data.detail;
                                 } else {
                                     window.location.replace(data.checkoutUrl);
                                 }
