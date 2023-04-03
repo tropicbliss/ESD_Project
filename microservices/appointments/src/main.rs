@@ -134,6 +134,7 @@ struct Pet {
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 struct UserEndpointOutput {
+    id: String,
     groomer_name: String,
     start_date: String,
     end_date: String,
@@ -315,6 +316,7 @@ async fn get_user(
                 .clone(),
             pet_names: app.pets.into_iter().map(|pet| pet.name).collect(),
             start_date: app.start_date.try_to_rfc3339_string().unwrap(),
+            id: app.id,
         })
         .collect();
     Ok(Json(res))

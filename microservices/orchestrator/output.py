@@ -51,6 +51,7 @@ class CensoredComment(BaseModel):
 
 
 class Appointment(BaseModel):
+    id: str
     groomerName: str
     startDate: str
     endDate: str
