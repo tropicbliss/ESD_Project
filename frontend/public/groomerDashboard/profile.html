@@ -32,7 +32,38 @@
     <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js'></script>
     <!-- Vue 3: production version, optimized for size and speed -->
     <!-- <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.prod.js'></script> -->
-
+    <script>
+      function getCookie(cname) {
+          let name = cname + "=";
+          let ca = document.cookie.split(';');
+          for(let i = 0; i < ca.length; i++) {
+              let c = ca[i];
+              while (c.charAt(0) == ' ') {
+              c = c.substring(1);
+              }
+              if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+              }
+          }
+          return "";
+        }
+  
+      function delete_cookie(name) {
+        document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      }
+  
+      function checkCookie() {
+          let user = getCookie("username");
+          if (user != "") {
+              alert("Welcome again " + user);
+          } else {
+              user = prompt("Please enter your name:", "");
+              if (user != "" && user != null) {
+              setCookie("username", user, 365);
+              }
+          }
+        }
+    </script>
 
   <body>
     <div id="app">
@@ -132,7 +163,7 @@
 </html>
 
 <script>
-    const get_groomer_info_URL = "http://localhost:5000/groomer/search/name/Alice";
+    const get_groomer_info_URL = "http://localhost:5000/groomer/search/name/"+ getCookie('groomername');
 
     const app = Vue.createApp({
         data() {
@@ -183,4 +214,4 @@
         }
     });
     const vm = app.mount('#app');
-</script> 
+</script>
