@@ -151,28 +151,28 @@ app.post("/update/:name", async (req, res) => {
   const { name } = req.params;
   const json = req.body;
   const schema = z.object({
-    pictureUrl: z.string().url().optional(),
-    address: z.string().optional(),
-    contactNo: z.string().optional(),
-    email: z.string().email().optional(),
-    acceptedPets: z.array(PetType).min(1).optional(),
+    pictureUrl: z.string().url().nullable(),
+    address: z.string().nullable(),
+    contactNo: z.string().nullable(),
+    email: z.string().email().nullable(),
+    acceptedPets: z.array(PetType).min(1).nullable(),
     basic: z
       .number()
       .refine((num) => priceList.includes(num))
-      .optional(),
+      .nullable(),
     premium: z
       .number()
       .refine((num) => priceList.includes(num))
-      .optional(),
+      .nullable(),
     luxury: z
       .number()
       .refine((num) => priceList.includes(num))
-      .optional(),
+      .nullable(),
   });
   try {
     const parsed = schema.parse(json);
     const query = Object.fromEntries(
-      Object.entries(parsed).filter(([_, v]) => v !== undefined)
+      Object.entries(parsed).filter(([_, v]) => v !== null)
     );
     await Groomer.updateOne(
       { name },
@@ -191,7 +191,7 @@ app.post("/update/:name", async (req, res) => {
 app.post("/read", async (req, res) => {
   const json = req.body;
   const schema = z.object({
-    petType: PetType.optional(),
+    petType: PetType.nullable(),
   });
   try {
     const parsed = schema.parse(json);
@@ -208,6 +208,7 @@ app.post("/read", async (req, res) => {
       res.send({ result });
     }
   } catch (err) {
+    console.error(err);
     res.status(400);
     res.send({ message: "an error has occurred" });
   }
