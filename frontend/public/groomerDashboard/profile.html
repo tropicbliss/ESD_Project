@@ -32,6 +32,9 @@
     <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.js'></script>
     <!-- Vue 3: production version, optimized for size and speed -->
     <!-- <script src='https://cdn.jsdelivr.net/npm/vue@3.0.2/dist/vue.global.prod.js'></script> -->
+
+
+  <body>
     <script>
       function getCookie(cname) {
           let name = cname + "=";
@@ -64,8 +67,7 @@
           }
         }
     </script>
-
-  <body>
+    
     <div id="app">
     <div class="hero_area">
       <!-- header section strats -->
@@ -156,14 +158,14 @@
   <!-- footer section -->
 </div>
 
-  <script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
-  <script type="text/javascript" src="js/bootstrap.js"></script>
+  <script type="text/javascript" src="../js/jquery-3.4.1.min.js"></script>
+  <script type="text/javascript" src="../js/bootstrap.js"></script>
   </body>
   </section>
 </html>
 
 <script>
-    const get_groomer_info_URL = "http://localhost:5000/groomer/search/name/"+ getCookie('groomername');
+    const get_groomer_info_URL = "http://localhost:8000/backend/groomer/search/name/"+ getCookie('groomername');
 
     const app = Vue.createApp({
         data() {
@@ -199,12 +201,12 @@
                             this.contactNo = data.contactNo 
 
                         })
-                        .catch(error => {
-                            // Errors when calling the service; such as network error, 
-                            // service offline, etc
-                            console.log(this.message + error);
+                        // .catch(error => {
+                        //     // Errors when calling the service; such as network error, 
+                        //     // service offline, etc
+                        //     console.log(this.message + error);
 
-                        });
+                        // });
 
             },
 

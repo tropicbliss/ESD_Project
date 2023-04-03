@@ -199,7 +199,8 @@
                                     <div class="card-header py-3">
                                         <h6 class="m-0 font-weight-bold text-primary">Appointment with {{each.userName}} </h6>
                                         
-                                            <changestatusbutton v-bind:appid="each.id" style="float:right"></changestatusbutton>
+                                            <changestatusbutton v-bind:appid="each.id" style="float:right; margin-top: 10px"></changestatusbutton>
+                                            <cancelappbutton v-bind:appid="each.id" style="float:right; margin-right: 10px; margin-top: 10px;"></cancelappbutton>
                                        
                                        
                                     </div>
@@ -336,6 +337,24 @@
                     }) 
                 }
         }});
+    app.component('cancelappbutton', {
+        props: ['appid'],
+        template:
+            `<button v-on:click="this.cancelApp()" type="button" class="btn btn-danger">Cancel Appointment</button>`
+        ,
+        methods: {
+            cancelApp() {
+                cancelAppURL = 'http://localhost:8000/backend/refund/' + this.appid
+                const response =
+                        fetch(cancelAppURL)
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log(data);
+                            
+                    }) 
+                }
+        }
+    })
     const vm = app.mount('#app');
 
 
