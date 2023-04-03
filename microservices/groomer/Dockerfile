@@ -1,7 +1,6 @@
 FROM node:19
 WORKDIR /usr/src/app
 COPY package*.json ./
+RUN npm ci --only=production
 COPY . .
-RUN npm i
-RUN npm run build
-CMD [ "npm", "run", "start" ]
+CMD ["npm", "start"]
