@@ -28,7 +28,38 @@
 </head>
 
 <body id="page-top">
-
+    <script>
+        function getCookie(cname) {
+            let name = cname + "=";
+            let ca = document.cookie.split(';');
+            for(let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+          }
+    
+        function delete_cookie(name) {
+          document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        }
+    
+        function checkCookie() {
+            let user = getCookie("username");
+            if (user != "") {
+                alert("Welcome again " + user);
+            } else {
+                user = prompt("Please enter your name:", "");
+                if (user != "" && user != null) {
+                setCookie("username", user, 365);
+                }
+            }
+          }
+      </script>
     <!-- Page Wrapper -->
     <div id="wrapper">
 
@@ -204,15 +235,13 @@
                             <!-- Project Card Example -->
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Revenue per month</h6>
                                 </div>
-                                <div class="card-body" v-for="month in months">
+
+                                <div class="card-body" v-for="(month, index) in months">
                                     <h4 class="small font-weight-bold"> {{month}}  <span
                                             class="float-right"></span></h4>
-                                    <div class="progress mb-4">
-                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 20%"
-                                            aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
+                                    <permonth v-bind:idx="index" v-bind:lstofmonths="listOfAllApps"></permonth>
                                 </div>
                             </div>
                     </div>
@@ -252,7 +281,7 @@
 
 
     <script>
-        const future_rev_URL = "http://localhost:8000/backend/appointments/signin/Alice";
+        const future_rev_URL = "http://localhost:8000/backend/appointments/signin/" + getCookie('groomername');
     
         const app = Vue.createApp({
             data() {
@@ -268,9 +297,9 @@
                         fetch(future_rev_URL)
                             .then(response => response.json())
                             .then(data => {
-                                console.log(response)
+                                
                                 this.listOfFutureApp = data
-                                console.log(this.listOfFutureApp)
+                                
                                 
                             })
                             .catch(error => {
@@ -283,7 +312,6 @@
                 }, totalFutureRev(){
                     futureRev =0 
                     for(each of this.listOfFutureApp){
-                        console.log(each)
                         futureRev += each['totalPrice']
                     }
                 return futureRev
@@ -301,7 +329,7 @@
 
 
 
-        const current_rev_URL = "http://localhost:8000/backend/appointments/staying/Alice";
+        const current_rev_URL = "http://localhost:8000/backend/appointments/staying/" + getCookie('groomername');
     
         const app2 = Vue.createApp({
             data() {
@@ -317,9 +345,9 @@
                         fetch(current_rev_URL)
                             .then(response => response.json())
                             .then(data => {
-                                console.log(response)
+                                
                                 this.listOfCurrentApp = data
-                                console.log(this.listOfCurrentApp)
+                               
                                 
                             })
                             .catch(error => {
@@ -332,7 +360,7 @@
                 }, totalCurrentRev(){
                     currentRev =0 
                     for(each of this.listOfCurrentApp){
-                        console.log(each)
+                      
                         currentRev += each['totalPrice']
                     }
                     return currentRev
@@ -346,7 +374,7 @@
         });
         const vm2 = app2.mount('#app2');
 
-        const get_groomer_name_URL = "http://localhost:8000/backend/groomer/search/name/Alice";
+        const get_groomer_name_URL = "http://localhost:8000/backend/groomer/search/name/" + getCookie('groomername');
 
     const app3 = Vue.createApp({
         data() {
@@ -362,7 +390,7 @@
                     fetch(get_groomer_name_URL)
                         .then(response => response.json())
                         .then(data => {
-                            console.log(response)
+                           
                             this.gName = data.name
                             
                         })
@@ -374,6 +402,7 @@
                         });
 
             },
+
     
    
         }, created(){
@@ -382,17 +411,81 @@
     });
     const vm3 = app3.mount('#app3');
 
-    const get_appt_by_month_URL = "http://localhost:8000/backend/appointments/groomer/Alice";
+
+    
+    const get_all_apps_URL = "http://localhost:8000/backend/appointments/groomer/" + getCookie('groomername');
     const app4 = Vue.createApp({
         data() {
             return {
                 months:['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'],
-                // listofApp: [],
-
+                listOfAllApps: [],
             };
-        }
 
-    })
+        }, 
+        methods: {
+    
+    allAppts () {
+        const response =
+            fetch(get_all_apps_URL)
+                .then(response => response.json())
+                .then(data => {
+                    
+                    this.listOfAllApps = data
+                    
+                    
+                })
+                .catch(error => {
+                    // Errors when calling the service; such as network error, 
+                    // service offline, etc
+                    console.log(this.message + error);
+
+                });
+
+    },
+
+
+}, created(){
+    this.allAppts()
+}
+
+})
+
+app4.component('permonth', { 
+    props: ['idx', 'lstofmonths'],
+  
+
+    template:
+        `<div class="progress mb-4">
+            <div class="progress-bar bg-warning" role="progressbar" v-bind:style="{'width': this.getWidthBar}" v-bind:aria-valuenow="this.getNumber"  aria-valuemin="0" aria-valuemax="100"><p class='m-2'>{{this.getWidthBar}}</p></div>
+        </div>`
+    ,
+    methods: {
+        calcRevenuePerMonth() {
+            totalRev = 0
+            totalRevPerMonth = 0
+            for(each of this.lstofmonths){
+
+                totalRev += each.totalPrice
+                let dt  = new Date(each.startDate);
+                let mth = dt.getMonth();
+                if(mth == this.idx ){
+                    totalRevPerMonth += each.totalPrice
+                }
+            }
+            revPercentage = (totalRevPerMonth/totalRev) *100
+            return revPercentage
+            }
+    },
+    computed:{
+        getWidthBar(){
+            return this.calcRevenuePerMonth() + "%" 
+        },
+        getNumber(){
+            return this.calcRevenuePerMonth()
+        }
+    }
+
+});
     const vm4 = app4.mount('#app4');
 </script>
 </body>
