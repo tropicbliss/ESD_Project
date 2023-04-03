@@ -7,6 +7,7 @@ from typing import Optional
 from contextlib import asynccontextmanager
 import pika
 import time
+from starlette.responses import RedirectResponse
 
 time.sleep(9)
 
@@ -295,7 +296,7 @@ async def update_appointment_date(groomer_name: str, dates: input.AppointmentUpd
                                 detail=json["message"])
 
 
-@app.post("/checkout", status_code=200, response_model=output.Checkout, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}}, description="To send the time in Javascript, call `date.toISOString()` on a `Date` object.")
+@app.post("/checkout", responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}}, description="To send the time in Javascript, call `date.toISOString()` on a `Date` object.")
 async def checkout(checkout: input.Checkout):
     # check if groomer accepts the pets specified by the customer and return pricing info of the groomer
     async with HttpClient.get_client().post(f"http://groomer:5000/accepts/{checkout.groomerName}", json={"petTypes": list(map(lambda x: x.petType, checkout.pets))}) as resp:
@@ -329,7 +330,8 @@ async def checkout(checkout: input.Checkout):
             json = await resp.json()
             raise HTTPException(status_code=resp.status,
                                 detail=json["message"])
-    return {"checkoutUrl": checkout_url}
+    response = RedirectResponse(url=checkout_url)
+    return response
 
 
 @app.post("/refund", status_code=200, responses={404: {"model": output.Error}, 500: {"model": output.Error}, 400: {"model": output.Error}})
