@@ -89,13 +89,13 @@ app.get("/search/keyword/:keyword", async (req, res) => {
 app.get("/search/name/:name", async (req, res) => {
   const { name } = req.params;
   try {
-    const result = await Groomer.find(
+    const result = await Groomer.findOne(
       {
         name,
       },
       "-_id -__v"
     ).exec();
-    if (result.length > 0) {
+    if (result) {
       res.status(200);
       res.send(result);
     } else {
@@ -208,7 +208,6 @@ app.post("/read", async (req, res) => {
       res.send({ result });
     }
   } catch (err) {
-    console.error(err);
     res.status(400);
     res.send({ message: "an error has occurred" });
   }
