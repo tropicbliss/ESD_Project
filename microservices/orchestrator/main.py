@@ -7,7 +7,6 @@ from typing import Optional
 from contextlib import asynccontextmanager
 import pika
 import time
-from starlette.responses import RedirectResponse
 import asyncio
 from async_lru import alru_cache
 
