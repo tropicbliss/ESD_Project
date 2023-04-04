@@ -237,6 +237,24 @@
                         </div>
                       </div>
                       <hr>
+                      <div class="row">
+                        <div class="col-sm-3">
+                          <p class="mb-0">Starting Date</p>
+                        </div>
+                        <div class="col-sm-9">
+                          <p class="text-muted mb-0">{{appoint.startDate}}</p>
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-sm-3">
+                          <p class="mb-0">Pet Name</p>
+                        </div>
+                        <div class="col-sm-9">
+                          <p class="text-muted mb-0">{{appoint.petNames[0]}}</p>
+                        </div>
+                      </div>
+                      <hr>
                       <button v-on:click="makeRefund(appoint.id)" type="button" class="btn btn-primary mt-2">Make Refund</button>
                       <div class="text-danger" v-show="sucMsg!=''">{{sucMsg}}</div>
                     </div>
@@ -326,16 +344,18 @@
                         .then(response => response.json())
                         .then(data => {
                           console.log(data)
-                          if (data.hasOwnProperty('detail')) { 
-                            if(data.detail[0].hasOwnProperty('msg')){ //error 422
-                              alert(data.detail[0].msg)
-                            }else{
-                              alert(data.detail) //error except 422
-                            }
-                          } else {
-                              this.sucMsg = data.result;
+                          if(data == null) {
+                              this.sucMsg = "Refund Successfully!";
                               console.log(this.sucMsg)
                               location.reload();
+                          } else {
+                            if (data.hasOwnProperty('detail')) { 
+                              if(data.detail[0].hasOwnProperty('msg')){ //error 422
+                                alert(data.detail[0].msg)
+                              }else{
+                                alert(data.detail) //error except 422
+                              }
+                            }
                           }
                         })
                         .catch(error => {

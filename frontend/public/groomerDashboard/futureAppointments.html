@@ -172,6 +172,7 @@
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
                                 </a>
+                                <a class="dropdown-item" href="../index.html">Logout</a>
                                
                                 </a>
                             </div>
@@ -333,9 +334,9 @@
                             .then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                            
+                                location.reload()
                     }) 
-                location.reload()
+                
                 }
         }});
     app.component('cancelappbutton', {
@@ -351,9 +352,9 @@
                             .then(response => response.json())
                             .then(data => {
                                 console.log(data);
-                            
+                                location.reload()
                     }) 
-                    location.reload()
+                    
                 }
         }
     })
