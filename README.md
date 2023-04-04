@@ -11,7 +11,7 @@
 7. Establish a connection with Kong by filling out the connection URL with `http://kong:8001` and a name like "Default".
 8. Click on "snapshots" in the left panel.
 9. Click on "import from file", and import `snapshot.json` from the respository's root directory.
-10. Click on "details", and click "restore". Check the "routes" and "services" checkboxes.
+10. Click on "details", and click "restore". Check the "routes" first and restore then "services" checkbox and restore.
 11. Go to `http://localhost:8000/backend/docs` for documentation, and `http://localhost:8000` for the frontend homepage.
 
 ## Exposed ports
