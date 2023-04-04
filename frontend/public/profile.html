@@ -237,6 +237,24 @@
                         </div>
                       </div>
                       <hr>
+                      <div class="row">
+                        <div class="col-sm-3">
+                          <p class="mb-0">Starting Date</p>
+                        </div>
+                        <div class="col-sm-9">
+                          <p class="text-muted mb-0">{{appoint.startDate}}</p>
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="row">
+                        <div class="col-sm-3">
+                          <p class="mb-0">Pet Name</p>
+                        </div>
+                        <div class="col-sm-9">
+                          <p class="text-muted mb-0">{{appoint.petNames[0]}}</p>
+                        </div>
+                      </div>
+                      <hr>
                       <button v-on:click="makeRefund(appoint.id)" type="button" class="btn btn-primary mt-2">Make Refund</button>
                       <div class="text-danger" v-show="sucMsg!=''">{{sucMsg}}</div>
                     </div>
