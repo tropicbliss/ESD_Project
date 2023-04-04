@@ -12,3 +12,4 @@ stripe==3.0.0
 toml==0.10.2
 WTForms==3.0.1
 Werkzeug==2.0.1
+Django~=3.2.0
