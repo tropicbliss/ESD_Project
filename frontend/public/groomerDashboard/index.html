@@ -456,7 +456,7 @@ app4.component('permonth', {
 
     template:
         `<div class="progress mb-4">
-            <div class="progress-bar bg-warning" role="progressbar" v-bind:style="{'width': this.getWidthBar}" v-bind:aria-valuenow="this.getNumber"  aria-valuemin="0" aria-valuemax="100"><p class='m-2'>{{this.getWidthBar}}</p></div>
+            <div class="progress-bar bg-success" role="progressbar" v-bind:style="{'width': this.getWidthBar}" v-bind:aria-valuenow="this.getNumber"  aria-valuemin="0" aria-valuemax="100"><p class='m-2'>{{this.getWidthBar}}</p></div>
         </div>`
     ,
     methods: {
@@ -473,7 +473,7 @@ app4.component('permonth', {
                 }
             }
             revPercentage = (totalRevPerMonth/totalRev) *100
-            return revPercentage
+            return (revPercentage).toFixed(0)
             }
     },
     computed:{
