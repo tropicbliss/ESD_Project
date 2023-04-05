@@ -130,8 +130,8 @@ def create_checkout_session():
     id = checkout_session.id
     if request.is_json:
         return jsonify(checkout_url=checkout_session.url, id=id)
-    else:
-        return redirect(checkout_session.url, code=303)
+    # else:
+    #     return redirect(checkout_session.url, code=303)
 
 
 # @app.route('/stripe_webhooks', methods=['POST'])
