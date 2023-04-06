@@ -44,6 +44,7 @@ graphql_client = GraphQLClient(
 )
 
 
+# HTTP client singleton
 class HttpClient:
     aiohttp_client: Optional[ClientSession] = None
 
