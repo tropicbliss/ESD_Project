@@ -29,10 +29,6 @@ services:
       DATABASE: esdproject
       COLLECTION: comments
       ADDR: 0.0.0.0:5000
-    depends_on:
-      - groomer
-      - user
-      - censorer
   esd-rabbit:
     image: rabbitmq:3-management
     restart: always
@@ -52,9 +48,6 @@ services:
       DATABASE: esdproject
       APPOINTMENTS_COLLECTION: appointments
       ADDR: 0.0.0.0:5000
-    depends_on:
-      - groomer
-      - user
   groomer:
     build:
       context: groomer
@@ -81,6 +74,8 @@ services:
       - appointments
       - groomer
       - stripe
+      - censorer
+      - smssender
   smssender:
     build:
       context: smssender
